@@ -1,0 +1,1 @@
+User provided real images of the coaching center to be embedded in the website for authenticity.
