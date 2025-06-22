@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Online Class - Sunrise Education Centre</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+    <link rel="stylesheet" href="online-class.css" />
+  </head>
+  <body>
+    <nav class="container-fluid">
+      <ul>
+        <li><strong><a href="index.html">Sunrise Education Centre</a></strong></li>
+      </ul>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#" onclick="endClass()">End Class</a></li>
+      </ul>
+    </nav>
+
+    <main class="container-fluid">
+      <div class="class-layout">
+        <!-- Video Section -->
+        <section class="video-section">
+          <div class="video-container">
+            <div class="teacher-video">
+              <h4>Er. Mohit Nariyani</h4>
+              <div class="video-placeholder">
+                <p>📹 Teacher Video Feed</p>
+                <button onclick="toggleVideo()">Toggle Camera</button>
+              </div>
+            </div>
+            
+            <div class="student-videos">
+              <h5>Students</h5>
+              <div class="students-grid">
+                <div class="student-video">
+                  <p>👤 Student 1</p>
+                  <small>Muted</small>
+                </div>
+                <div class="student-video">
+                  <p>👤 Student 2</p>
+                  <small>Muted</small>
+                </div>
+                <div class="student-video">
+                  <p>👤 Student 3</p>
+                  <small>Muted</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="controls">
+            <button onclick="toggleMute()" id="muteBtn">🎤 Mute</button>
+            <button onclick="toggleVideo()" id="videoBtn">📹 Video</button>
+            <button onclick="shareScreen()">🖥️ Share Screen</button>
+            <button onclick="raiseHand()" id="handBtn">✋ Raise Hand</button>
+          </div>
+        </section>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <!-- Chat Section -->
+          <section class="chat-section">
+            <h4>Class Chat</h4>
+            <div class="chat-messages" id="chatMessages">
+              <div class="message teacher">
+                <strong>Er. Mohit Nariyani:</strong> Welcome to today's Mathematics class!
+              </div>
+              <div class="message student">
+                <strong>Student:</strong> Good morning sir!
+              </div>
+            </div>
+            <div class="chat-input">
+              <input type="text" id="messageInput" placeholder="Type your message..." />
+              <button onclick="sendMessage()">Send</button>
+            </div>
+          </section>
+
+          <!-- Participants -->
+          <section class="participants">
+            <h5>Participants (4)</h5>
+            <ul>
+              <li>👨‍🏫 Er. Mohit Nariyani (Host)</li>
+              <li>👤 Student 1</li>
+              <li>👤 Student 2</li>
+              <li>👤 Student 3</li>
+            </ul>
+          </section>
+
+          <!-- Study Materials -->
+          <section class="materials">
+            <h5>Today's Materials</h5>
+            <ul>
+              <li><a href="#" onclick="openMaterial('algebra')">📄 Algebra Formulas</a></li>
+              <li><a href="#" onclick="openMaterial('practice')">📝 Practice Problems</a></li>
+              <li><a href="#" onclick="openMaterial('solutions')">✅ Solutions</a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+
+      <!-- Whiteboard Modal -->
+      <div id="whiteboardModal" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="closeWhiteboard()">&times;</span>
+          <h3>Digital Whiteboard</h3>
+          <canvas id="whiteboard" width="800" height="600"></canvas>
+          <div class="whiteboard-tools">
+            <button onclick="clearBoard()">Clear</button>
+            <button onclick="changeColor('black')">⚫</button>
+            <button onclick="changeColor('red')">🔴</button>
+            <button onclick="changeColor('blue')">🔵</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="online-class.js"></script>
+  </body>
+</html>
