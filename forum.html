@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Student Forum - Sunrise Education Centre</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+    <link rel="stylesheet" href="forum.css" />
+  </head>
+  <body>
+    <nav class="container-fluid" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('attached_assets/image_1750584670920.png'); background-size: 100px auto; background-repeat: repeat-x; background-position: center;">
+      <ul>
+        <li style="display: flex; align-items: center; gap: 0.5rem;">
+          <img src="attached_assets/image_1750584670920.png" alt="Sunrise Education Centre Logo" style="height: 40px; width: auto;">
+          <strong style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Sunrise Education Centre</strong>
+        </li>
+      </ul>
+      <ul>
+        <li><a href="index.html" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Home</a></li>
+        <li><a href="study-resources.html" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Study Resources</a></li>
+        <li><a href="auth.html" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Login</a></li>
+      </ul>
+    </nav>
+
+    <main class="container">
+      <div class="forum-header">
+        <h1>Student Discussion Forum</h1>
+        <p>Connect with fellow students, ask questions, and share knowledge</p>
+      </div>
+
+      <div class="forum-actions">
+        <button onclick="showNewTopicForm()" class="primary">📝 Start New Discussion</button>
+        <div class="forum-stats">
+          <span>👥 <strong id="active-users">24</strong> Active Students</span>
+          <span>💬 <strong id="total-posts">156</strong> Total Posts</span>
+        </div>
+      </div>
+
+      <!-- New Topic Form -->
+      <div id="new-topic-form" class="new-topic" style="display: none;">
+        <article>
+          <header>
+            <h3>Start New Discussion</h3>
+            <button onclick="hideNewTopicForm()" style="float: right; background: none; border: none; font-size: 1.2rem; cursor: pointer;">✕</button>
+          </header>
+          <form onsubmit="createNewTopic(event)">
+            <div class="grid">
+              <label for="topic-category">
+                Category
+                <select id="topic-category" required>
+                  <option value="">Select Category</option>
+                  <option value="math-9">Class 9 Mathematics</option>
+                  <option value="math-10">Class 10 Mathematics</option>
+                  <option value="math-11">Class 11 Mathematics</option>
+                  <option value="math-12">Class 12 Mathematics</option>
+                  <option value="general">General Discussion</option>
+                  <option value="homework">Homework Help</option>
+                  <option value="exam-prep">Exam Preparation</option>
+                </select>
+              </label>
+            </div>
+            <div class="grid">
+              <label for="topic-title">
+                Title
+                <input type="text" id="topic-title" placeholder="Enter discussion title" required />
+              </label>
+            </div>
+            <div class="grid">
+              <label for="topic-content">
+                Content
+                <textarea id="topic-content" rows="5" placeholder="Describe your question or topic..." required></textarea>
+              </label>
+            </div>
+            <button type="submit">Post Discussion</button>
+          </form>
+        </article>
+      </div>
+
+      <!-- Forum Categories -->
+      <div class="forum-categories">
+        <div class="category-tabs">
+          <button class="category-btn active" onclick="showCategory('all')">All Posts</button>
+          <button class="category-btn" onclick="showCategory('math-9')">Class 9</button>
+          <button class="category-btn" onclick="showCategory('math-10')">Class 10</button>
+          <button class="category-btn" onclick="showCategory('math-11')">Class 11</button>
+          <button class="category-btn" onclick="showCategory('math-12')">Class 12</button>
+          <button class="category-btn" onclick="showCategory('general')">General</button>
+        </div>
+      </div>
+
+      <!-- Forum Posts -->
+      <div class="forum-posts" id="forum-posts">
+        <!-- Sample posts will be populated by JavaScript -->
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button onclick="previousPage()">← Previous</button>
+        <span id="page-info">Page 1 of 5</span>
+        <button onclick="nextPage()">Next →</button>
+      </div>
+    </main>
+
+    <footer class="container">
+      <small><a href="index.html">Home</a> • <a href="#">Forum Rules</a> • <a href="#">Report Issue</a></small>
+    </footer>
+
+    <script src="forum.js"></script>
+  </body>
+</html>
