@@ -48,7 +48,7 @@ function openVideoLibrary() {
 function submitDoubt() {
   const doubt = prompt('Please enter your doubt or question:');
   if (doubt && doubt.trim()) {
-    alert(`Your doubt has been submitted successfully!\n\nDoubt: "${doubt}"\n\nEr. Mohit Nariyani will respond within 24 hours.`);
+    alert(`Your doubt has been submitted successfully!\n\nDoubt: "${doubt}"\n\nSunrise Education Centre will respond within 24 hours.`);
     
     // In real implementation, you would send this to a server:
     // submitDoubtToServer(doubt);

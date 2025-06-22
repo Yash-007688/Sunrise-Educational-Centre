@@ -21,7 +21,7 @@ function sendMessage() {
     setTimeout(() => {
       const teacherMsg = document.createElement('div');
       teacherMsg.className = 'message teacher';
-      teacherMsg.innerHTML = `<strong>Er. Mohit Nariyani:</strong> Thank you for your question!`;
+      teacherMsg.innerHTML = `<strong>Sunrise Education Centre:</strong> Thank you for your question!`;
       messages.appendChild(teacherMsg);
       messages.scrollTop = messages.scrollHeight;
     }, 2000);
