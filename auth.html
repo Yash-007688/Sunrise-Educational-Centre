@@ -1,162 +1,129 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Login & Signup - Sunrise Education Centre</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
-    <link rel="stylesheet" href="auth.css" />
+    <title>Login - Sunrise Education Centre</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+    <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
-    <nav class="container-fluid" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('attached_assets/image_1750584670920.png'); background-size: 100px auto; background-repeat: repeat-x; background-position: center;">
-      <ul>
-        <li style="display: flex; align-items: center; gap: 0.5rem;">
-          <img src="attached_assets/image_1750584670920.png" alt="Sunrise Education Centre Logo" style="height: 40px; width: auto;">
-          <strong style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Sunrise Education Centre</strong>
-        </li>
-      </ul>
-      <ul>
-        <li><a href="index.html" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Home</a></li>
-        <li><a href="study-resources.html" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Study Resources</a></li>
-        <li><a href="forum.html" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Forum</a></li>
-      </ul>
-    </nav>
-
-    <main class="container">
-      <div class="auth-container">
-        <div class="logo-section">
-          <img src="attached_assets/image_1750584670920.png" alt="Sunrise Education Centre Logo" class="auth-logo">
-          <h1>Welcome to Sunrise Education Centre</h1>
-          <p>Your gateway to excellence in Mathematics education</p>
+  <body class="login-bg">
+    <nav class="navbar glassmorphic">
+      <div class="container nav-content">
+        <div class="nav-logo">
+          <img src="attached_assets/image_1750584670920.png" alt="Logo">
+          <span>Sunrise Education Centre</span>
         </div>
-
-        <div class="auth-forms">
-          <div class="form-tabs">
-            <button class="tab-btn active" onclick="showForm('login')">Login</button>
-            <button class="tab-btn" onclick="showForm('signup')">Sign Up</button>
-          </div>
-
-          <!-- Login Form -->
-          <div id="login-form" class="auth-form active">
-            <article>
-              <header>
-                <h3>Login to Your Account</h3>
-              </header>
-              <form onsubmit="handleLogin(event)">
-                <div class="grid">
-                  <label for="login-email">
-                    Email
-                    <input type="email" id="login-email" name="email" placeholder="Enter your email" required />
-                  </label>
-                </div>
-                <div class="grid">
-                  <label for="login-password">
-                    Password
-                    <input type="password" id="login-password" name="password" placeholder="Enter your password" required />
-                  </label>
-                </div>
-                <div class="grid">
-                  <label for="remember">
-                    <input type="checkbox" id="remember" name="remember" />
-                    Remember me
-                  </label>
-                </div>
-                <button type="submit">Login</button>
-                <p><a href="#" onclick="showForgotPassword()">Forgot Password?</a></p>
-              </form>
-            </article>
-          </div>
-
-          <!-- Signup Form -->
-          <div id="signup-form" class="auth-form">
-            <article>
-              <header>
-                <h3>Create New Account</h3>
-              </header>
-              <form onsubmit="handleSignup(event)">
-                <div class="grid">
-                  <label for="signup-name">
-                    Full Name
-                    <input type="text" id="signup-name" name="name" placeholder="Enter your full name" required />
-                  </label>
-                </div>
-                <div class="grid">
-                  <label for="signup-email">
-                    Email
-                    <input type="email" id="signup-email" name="email" placeholder="Enter your email" required />
-                  </label>
-                </div>
-                <div class="grid">
-                  <label for="signup-phone">
-                    Phone Number
-                    <input type="tel" id="signup-phone" name="phone" placeholder="Enter your phone number" required />
-                  </label>
-                </div>
-                <div class="grid">
-                  <label for="signup-class">
-                    Class
-                    <select id="signup-class" name="class" required>
-                      <option value="">Select your class</option>
-                      <option value="9">Class 9</option>
-                      <option value="10">Class 10</option>
-                      <option value="11">Class 11</option>
-                      <option value="12">Class 12</option>
-                    </select>
-                  </label>
-                </div>
-                <div class="grid">
-                  <label for="signup-password">
-                    Password
-                    <input type="password" id="signup-password" name="password" placeholder="Create a password" required />
-                  </label>
-                </div>
-                <div class="grid">
-                  <label for="signup-confirm">
-                    Confirm Password
-                    <input type="password" id="signup-confirm" name="confirm" placeholder="Confirm your password" required />
-                  </label>
-                </div>
-                <div class="grid">
-                  <label for="terms">
-                    <input type="checkbox" id="terms" name="terms" required />
-                    I agree to the Terms and Conditions
-                  </label>
-                </div>
-                <button type="submit">Sign Up</button>
-              </form>
-            </article>
-          </div>
-        </div>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+        </ul>
+        <button class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
       </div>
-
-      <!-- Quick Access Section -->
-      <section class="quick-access">
-        <h2>Quick Access</h2>
-        <div class="grid">
-          <article>
-            <header>📚 Study Materials</header>
-            <p>Access notes, worksheets, and practice problems</p>
-            <a href="study-resources.html" role="button">Browse Resources</a>
-          </article>
-          <article>
-            <header>💬 Student Forum</header>
-            <p>Connect with fellow students and ask questions</p>
-            <a href="forum.html" role="button">Join Discussion</a>
-          </article>
-          <article>
-            <header>🎥 Live Classes</header>
-            <p>Join interactive online mathematics sessions</p>
-            <a href="online-class.html" role="button">Enter Classroom</a>
-          </article>
+    </nav>
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-logo">
+          <img src="attached_assets/image_1750584670920.png" alt="Logo">
+          <h2 id="formTitle">Login</h2>
         </div>
-      </section>
-    </main>
-
-    <footer class="container">
-      <small><a href="index.html">Home</a> • <a href="#">Privacy Policy</a> • <a href="#">Contact Us</a></small>
-    </footer>
-
-    <script src="auth.js"></script>
+        <form id="loginForm" method="POST" action="/auth" class="login-form">
+          <input type="text" name="username" placeholder="Username" required autocomplete="username" />
+          <input type="password" name="password" placeholder="Password" required autocomplete="current-password" />
+          <select name="class_id" id="loginRole" required style="border-radius:20px; padding:0.7rem 1.1rem;">
+            {% for id, name in all_classes %}
+              <option value="{{ id }}">{{ name|title }}</option>
+            {% endfor %}
+          </select>
+          <input type="text" name="admin_code" id="loginAdminCodeInput" placeholder="Admin Code" style="display:none;" />
+          <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        <form id="signupForm" method="POST" action="/register" class="login-form" style="display:none;">
+          <input type="text" id="signup-username" name="username" placeholder="Username" required autocomplete="username" />
+          <input type="password" id="signup-password" name="password" placeholder="Password" required autocomplete="new-password" />
+          <select name="class_id" id="signupRole" required style="border-radius:20px; padding:0.7rem 1.1rem;">
+            {% for id, name in all_classes %}
+              <option value="{{ id }}">{{ name|title }}</option>
+            {% endfor %}
+                    </select>
+          <input type="text" name="admin_code" id="signupAdminCodeInput" placeholder="Admin Code" style="display:none;" />
+          <button type="submit" class="btn btn-primary">Sign Up</button>
+              </form>
+        <div class="login-links">
+          <a href="/">&larr; Back to Home</a> |
+          <a href="#" id="toggleForm">Don't have an account? Sign Up</a>
+        </div>
+        {% if error %}
+        <div class="login-error">{{ error }}</div>
+        {% endif %}
+      </div>
+    </div>
+    <div style="text-align:center; margin: 1.5rem 0 2rem 0;">
+      <button id="darkModeToggle" class="btn btn-primary" style="min-width:160px;">Toggle Dark Mode</button>
+    </div>
   </body>
+  <script>
+    // Toggle between Login and Sign Up forms
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const toggleForm = document.getElementById('toggleForm');
+    const formTitle = document.getElementById('formTitle');
+    let isLogin = true;
+    toggleForm.addEventListener('click', function(e) {
+      e.preventDefault();
+      isLogin = !isLogin;
+      loginForm.style.display = isLogin ? '' : 'none';
+      signupForm.style.display = isLogin ? 'none' : '';
+      formTitle.textContent = isLogin ? 'Login' : 'Sign Up';
+      toggleForm.textContent = isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login";
+    });
+    // Dark mode toggle
+    const toggleBtn = document.getElementById('darkModeToggle');
+    function setDarkMode(on) {
+      if (on) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'on');
+      } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('darkMode', 'off');
+      }
+    }
+    toggleBtn.addEventListener('click', () => {
+      setDarkMode(!document.body.classList.contains('dark-mode'));
+    });
+    if (localStorage.getItem('darkMode') === 'on') {
+      document.body.classList.add('dark-mode');
+    }
+    // Show/hide admin code input on role change
+    const signupRole = document.getElementById('signupRole');
+    const signupAdminCodeInput = document.getElementById('signupAdminCodeInput');
+    signupRole.addEventListener('change', function() {
+      if (signupRole.value === 'admin') {
+        signupAdminCodeInput.style.display = '';
+        signupAdminCodeInput.required = true;
+      } else {
+        signupAdminCodeInput.style.display = 'none';
+        signupAdminCodeInput.required = false;
+      }
+    });
+    // Show/hide admin code input on login role change
+    const loginRole = document.getElementById('loginRole');
+    const loginAdminCodeInput = document.getElementById('loginAdminCodeInput');
+    const all_classes_dict = {
+        {% for id, name in all_classes %}'{{ id }}': '{{ name }}',{% endfor %}
+    };
+    loginRole.addEventListener('change', function() {
+      const selectedRoleName = all_classes_dict[loginRole.value];
+      if (selectedRoleName === 'admin') {
+        loginAdminCodeInput.style.display = '';
+        loginAdminCodeInput.required = true;
+      } else {
+        loginAdminCodeInput.style.display = 'none';
+        loginAdminCodeInput.required = false;
+      }
+    });
+  </script>
 </html>

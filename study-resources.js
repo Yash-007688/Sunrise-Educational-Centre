@@ -1,25 +1,52 @@
-
 // Study Resources Page JavaScript
 
 // Tab switching functionality
-function showClass(className) {
-  // Hide all class content
-  const allContent = document.querySelectorAll('.class-content');
-  allContent.forEach(content => {
+function showClass(event, classId) {
+    // Hide all main class content
+    document.querySelectorAll('.class-content').forEach(content => {
     content.classList.remove('active');
   });
   
-  // Remove active class from all buttons
-  const allButtons = document.querySelectorAll('.tab-button');
-  allButtons.forEach(button => {
+    // Deactivate all main tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
     button.classList.remove('active');
   });
   
-  // Show selected class content
-  document.getElementById(className).classList.add('active');
+    // Show the selected class content and activate its tab
+    const activeClassContent = document.getElementById(classId);
+    if (activeClassContent) {
+        activeClassContent.classList.add('active');
+    }
+    event.target.classList.add('active');
   
-  // Add active class to clicked button
-  event.target.classList.add('active');
+    // Automatically click the first sub-tab within the newly active class
+    const firstSubTab = activeClassContent ? activeClassContent.querySelector('.sub-tab-button') : null;
+    if (firstSubTab) {
+        firstSubTab.click();
+    }
+}
+
+function showCategory(event, categoryId) {
+    const target = event.target;
+    // The parent container of the sub-tabs for the current class
+    const parentContainer = target.closest('.class-content');
+
+    // Hide all category content within this class
+    parentContainer.querySelectorAll('.category-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    // Deactivate all sub-tab buttons within this class
+    parentContainer.querySelectorAll('.sub-tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // Show selected category content and activate its sub-tab
+    const activeCategoryContent = document.getElementById(categoryId);
+    if (activeCategoryContent) {
+        activeCategoryContent.classList.add('active');
+    }
+    target.classList.add('active');
 }
 
 // Resource opening functionality
@@ -89,25 +116,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Auto-save user's last visited class tab in localStorage
-  const savedTab = localStorage.getItem('lastVisitedClass');
-  if (savedTab) {
-    const tabButton = document.querySelector(`[onclick="showClass('${savedTab}')"]`);
-    if (tabButton) {
-      tabButton.click();
-    }
-  }
-  
-  // Save current tab when switching
-  const tabButtons = document.querySelectorAll('.tab-button');
-  tabButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const classMatch = this.getAttribute('onclick').match(/showClass\('(\w+)'\)/);
-      if (classMatch) {
-        localStorage.setItem('lastVisitedClass', classMatch[1]);
+  // Click the first main class tab by default
+  const firstClassTab = document.querySelector('.tab-button');
+  if (firstClassTab) {
+    firstClassTab.click();
       }
-    });
-  });
 });
 
 // Utility function to format resource names for file paths

@@ -4,184 +4,237 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sunrise Education Centre</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
-    <style>
-      .neon-typing {
-        font-family: 'Courier New', monospace;
-        font-size: 1.8rem;
-        color: #ff69b4;
-        border-right: 3px solid #ff69b4;
-        white-space: nowrap;
-        overflow: hidden;
-        margin: 0;
-      }
-
-      @keyframes neon-glow {
-        from {
-          color: #ff69b4;
-        }
-        to {
-          color: #da70d6;
-        }
-      }
-
-      @keyframes typing {
-        from {
-          width: 0;
-        }
-        to {
-          width: 100%;
-        }
-      }
-
-      @keyframes blink-cursor {
-        from, to {
-          border-color: transparent;
-        }
-        50% {
-          border-color: #ff69b4;
-        }
-      }
-
-      .typing-active {
-        animation: 
-          typing 4s steps(40, end),
-          blink-cursor 0.75s step-end infinite;
-      }
-    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <nav class="container-fluid" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('attached_assets/image_1750584670920.png'); background-size: 100px auto; background-repeat: repeat-x; background-position: center;">
-      <ul>
-        <li style="display: flex; align-items: center; gap: 0.5rem;">
-          <img src="attached_assets/image_1750584670920.png" alt="Sunrise Education Centre Logo" style="height: 40px; width: auto;">
-          <strong style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Sunrise Education Centre</strong>
-        </li>
+    <nav class="navbar glassmorphic">
+      <div class="container nav-content">
+        <div class="nav-logo">
+          <img src="attached_assets/image_1750584670920.png" alt="Logo">
+          <span>Sunrise Education Centre</span>
+        </div>
+        <ul class="nav-links">
+          <li><a href="#programs">Programs</a></li>
+          <li><a href="#about-us">About</a></li>
+          <li><a href="/online-class">Live Class</a></li>
+          <li><a href="/study-resources">Study Resources</a></li>
+          <li><a href="/forum">Forum</a></li>
+          {% if user_notifications and user_notifications|length > 0 %}
+          <li style="position:relative;">
+            <button id="notifBell" style="background:none; border:none; cursor:pointer; position:relative;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.63-5.64-5-6.32V4a1 1 0 1 0-2 0v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29A1 1 0 0 0 6 19h12a1 1 0 0 0 .71-1.71L18 16z" fill="#6a82fb"/></svg>
+              <span style="position:absolute;top:0;right:0;width:10px;height:10px;background:#fc5c7d;border-radius:50%;"></span>
+            </button>
+            <div id="notifDropdown" style="display:none; position:absolute; right:0; top:36px; background:#fff; min-width:260px; box-shadow:0 4px 24px rgba(100,100,255,0.13); border-radius:12px; z-index:100; padding:1rem;">
+              <strong style="color:#6a82fb;">Notifications</strong>
+              <ul style="list-style:none; padding:0; margin:0;">
+                {% for id, message, created_at in user_notifications %}
+                <li style="padding:0.5rem 0; border-bottom:1px solid #eee; font-size:0.98rem; color:#232946;">
+                  {{ message }}<br><span style="font-size:0.85rem; color:#888;">{{ created_at[:19].replace('T', ' ') }}</span>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </li>
+          {% endif %}
+          {% if username %}
+            <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+          {% else %}
+            <li><a href="/auth" class="btn btn-primary">Login</a></li>
+          {% endif %}
       </ul>
-      <ul>
-        <li><a href="#" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Programs</a></li>
-        <li><a href="#" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">About</a></li>
-        <li><a href="#" role="button" onclick="joinLiveClass()" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Live Class</a></li>
-        <li><a href="study-resources.html" role="button" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Study Resources</a></li>
-        <li><a href="forum.html" role="button" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Forum</a></li>
-        <li><a href="auth.html" role="button" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Login</a></li>
-      </ul>
-    </nav>
-
-    <main class="container">
-      <div class="grid">
-        <section>
-          <hgroup>
-            <h2 id="typing-heading" class="neon-typing"></h2>
-            <h3>By Sunrise Education Centre</h3>
-          </hgroup>
-          <p>Welcome to Sunrise Education Centre — your trusted guide for Mathematics education from Class 9 to 12. We provide a focused and customized coaching experience tailored to help students succeed in their academic journey.</p>
-
-          <figure>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Sunrise_Education_Centre_logo.png/600px-Sunrise_Education_Centre_logo.png" alt="Sunrise Education Centre Logo" />
-            <figcaption><a href="#">Logo: Sunrise Education Centre</a></figcaption>
-          </figure>
-
-          <h3>Live Classroom Sessions</h3>
-          <p>Our students are engaged in real-time coaching sessions focused on individual improvement and concept clarity.</p>
-          <figure>
-            <img src="https://user-images.githubusercontent.com/placeholder/classroom-students.jpg" alt="Students Studying in Coaching Class" />
-          </figure>
-
-          <h3>Subjects We Offer</h3>
-          <ul>
-            <li>Core Mathematics</li>
-            <li>Applied Mathematics</li>
-            <li>Basic Mathematics</li>
-            <li>Standard Mathematics</li>
-          </ul>
-
-          <h3>Why Choose Us?</h3>
-          <p>Our classrooms are designed for focused learning with minimal distractions and a comfortable setup.</p>
-          <figure>
-            <img src="https://user-images.githubusercontent.com/placeholder/empty-classroom.jpg" alt="Classroom setup at Sunrise Education Centre" />
-          </figure>
-
-          <h3>Community & Celebrations</h3>
-          <p>We regularly celebrate achievements and build strong student connections through organized events and send-offs.</p>
-          <figure>
-            <img src="https://user-images.githubusercontent.com/placeholder/farewell.jpg" alt="Group celebration at coaching" />
-          </figure>
-        </section>
+      <button class="hamburger">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
       </div>
-    </main>
-
-    <section aria-label="Contact section">
-      <div class="container">
-        <article>
-          <hgroup>
-            <h2>Get in Touch</h2>
-            <h3>Follow Sunrise Education Centre for daily tips and updates</h3>
-          </hgroup>
-          <div style="text-align: center; margin: 2rem 0;">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
-              <div style="padding: 1.5rem; border: 1px solid var(--pico-border-color); border-radius: var(--pico-border-radius);">
-                <h4 style="color: #E4405F; margin-bottom: 1rem;">📱 Instagram</h4>
-                <p>Follow for daily math tips, formula tricks, and study motivation</p>
-                <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(45deg, #E4405F, #833AB4); color: white; text-decoration: none; border-radius: 25px;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                  </svg>
-                  Contact Us
-                </a>
+    </nav>
+    <header class="hero-section" style="background: url('attached_assets/image_1750584670920.png') center/contain no-repeat; position: relative;">
+      <div style="position: absolute; inset: 0; background: rgba(106,130,251,0.55); z-index: 1;"></div>
+      <div class="container hero-content" style="position: relative; z-index: 2;">
+        <h1><span id="typing-hero"></span></h1>
+        <p>Your trusted guide for Class 9-12. Personalized coaching, real results.</p>
+        <a href="#programs" class="btn btn-cta">Explore Programs</a>
+      </div>
+    </header>
+    <main class="container main-content">
+      <section id="programs" class="card-section">
+        <h2>Subjects We Offer</h2>
+        <div class="card-grid">
+          <div class="card animated-card"><h3>Core Mathematics</h3><p>Deep understanding of concepts and problem-solving.</p></div>
+          <div class="card animated-card"><h3>Applied Mathematics</h3><p>Practical applications and advanced topics.</p></div>
+          <div class="card animated-card"><h3>Basic Mathematics</h3><p>Foundational skills for all levels.</p></div>
+          <div class="card animated-card"><h3>Standard Mathematics</h3><p>Comprehensive coverage for board exams.</p></div>
+        </div>
+      </section>
+      <section id="class-timings" class="card-section">
+        <h2>Class Timings</h2>
+        <div class="card-grid">
+          <div class="card animated-card"><h3>Class 9</h3><p>4:00 PM – 5:00 PM</p></div>
+          <div class="card animated-card"><h3>Class 10</h3><p>Batch 1: 5:00 PM – 6:00 PM<br>Batch 2: 7:00 PM – 8:00 PM</p></div>
+          <div class="card animated-card"><h3>Class 11</h3><p>6:00 PM – 7:00 PM</p></div>
+          <div class="card animated-card"><h3>Class 12</h3><p>7:00 PM – 8:00 PM</p></div>
+        </div>
+      </section>
+      <section id="about-teacher" class="card-section" style="text-align:center;">
+        <h2>About the Teacher</h2>
+        <p>Learn more about your mentor and guide, <strong>Er. Mohit Nariyani</strong>.</p>
+        <button id="showTeacherPhoto" class="btn btn-primary" style="margin:1rem 0;">Show Photo of Er. Mohit Nariyani</button>
+        <div id="teacherPhotoContainer" style="display:none; margin-top:1.5rem;">
+          <img src="attached_assets/image_1750584670920.png" alt="Er. Mohit Nariyani" style="max-width:220px; border-radius:16px; box-shadow:0 4px 24px rgba(100,100,255,0.13);">
+        </div>
+      </section>
+      <section id="live" class="card-section">
+        <h2>Live Classroom Sessions</h2>
+        <div class="card-grid">
+          <div class="card animated-card">
+            <img src="https://user-images.githubusercontent.com/placeholder/classroom-students.jpg" alt="Students Studying">
+            <h3>Interactive Classes</h3>
+            <p>Real-time coaching with concept clarity and doubt resolution.</p>
               </div>
-              <div style="padding: 1.5rem; border: 1px solid var(--pico-border-color); border-radius: var(--pico-border-radius);">
-                <h4 style="color: #FF0000; margin-bottom: 1rem;">📺 YouTube</h4>
-                <p>Watch detailed video lectures and problem-solving sessions</p>
-                <a href="https://youtube.com/@sunriseeducationcentre" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #FF0000; color: white; text-decoration: none; border-radius: 25px;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                  </svg>
-                  Subscribe Now
-                </a>
+          <div class="card animated-card">
+            <img src="https://user-images.githubusercontent.com/placeholder/empty-classroom.jpg" alt="Classroom setup">
+            <h3>Modern Setup</h3>
+            <p>Comfortable, distraction-free environment for focused learning.</p>
               </div>
             </div>
+      </section>
+      <section id="community" class="card-section">
+        <h2>Community & Celebrations</h2>
+        <div class="card-grid">
+          <div class="card animated-card">
+            <img src="https://user-images.githubusercontent.com/placeholder/farewell.jpg" alt="Celebration">
+            <h3>Events & Achievements</h3>
+            <p>Celebrating milestones and building strong student connections.</p>
           </div>
-        </article>
       </div>
     </section>
-
-    <section aria-label="Subscribe example">
-      <div class="container">
-        <article>
-          <hgroup>
-            <h2>Stay Informed</h2>
-            <h3>Subscribe for updates on batch openings and exam tips</h3>
-          </hgroup>
-          <form class="grid">
-            <input type="text" id="firstname" name="firstname" placeholder="Your name" aria-label="First name" required />
-            <input type="email" id="email" name="email" placeholder="Your email" aria-label="Email address" required />
-            <button type="submit" onclick="event.preventDefault()">Subscribe</button>
-          </form>
-        </article>
-      </div>
-    </section>
-
-    <footer class="container">
-      <div style="text-align: center; margin-bottom: 1rem;">
-        <h4>Connect with Sunrise Education Centre</h4>
-        <div style="display: flex; justify-content: center; gap: 2rem; margin: 1rem 0;">
-          <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" fill="#E4405F"/>
-            </svg>
-            @mohit_nariyani
-          </a>
-          <a href="https://youtube.com/@sunriseeducationcentre" target="_blank" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#FF0000"/>
-            </svg>
-            Sunrise Education Centre
-          </a>
+      <section id="contact" class="contact-section">
+        <h2>Get in Touch</h2>
+        <div class="contact-grid">
+          <div class="contact-card">
+            <h4>Instagram</h4>
+            <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank" class="btn btn-instagram">Follow Us</a>
+          </div>
+          <div class="contact-card">
+            <h4>YouTube</h4>
+            <a href="https://www.youtube.com/@MohitNariyani" target="_blank" class="btn btn-youtube">Subscribe</a>
+          </div>
+          <div class="contact-card">
+            <h4>Phone</h4>
+            <a href="tel:+917224860881" class="btn btn-primary">+91 72248 60881</a>
+          </div>
         </div>
+      </section>
+      <section class="subscribe-section">
+        <h2>Stay Informed</h2>
+        <form class="subscribe-form">
+          <input type="text" placeholder="Your name" required />
+          <input type="email" placeholder="Your email" required />
+          <button type="submit" class="btn btn-primary">Subscribe</button>
+        </form>
+      </section>
+      <div style="text-align:center; margin: 1.5rem 0 2rem 0;">
+        <button id="darkModeToggle" class="btn btn-primary" style="min-width:160px;">Toggle Dark Mode</button>
       </div>
-      <small><a href="#">Privacy Policy</a> • <a href="#">Contact Us</a></small>
+      <section id="about-us" class="card-section" style="text-align:center; margin-top:2rem;">
+        <div class="card animated-card" style="max-width:600px; margin:0 auto; padding:2rem;">
+          <h2>About Us</h2>
+          <p>Sunrise Education Centre is dedicated to empowering students in mathematics and science for classes 9 to 12. Our mission is to provide personalized coaching, concept clarity, and real results through interactive sessions and a supportive community. Led by experienced educators, we focus on holistic development and academic excellence.</p>
+          <p>We believe in nurturing curiosity, building strong foundations, and celebrating every achievement. Join us to experience a new way of learning!</p>
+        </div>
+      </section>
+      <section class="card-section" style="text-align:center; margin:2rem 0 2.5rem 0;">
+        <div class="card animated-card" style="max-width:400px; margin:0 auto; padding:2rem;">
+          <h2 style="margin-bottom:1.2rem;">Who Made This?</h2>
+          <div style="font-size:1.15rem; font-weight:600; color:#6a82fb;">Mohit Nariyani</div>
+          <div style="font-size:1.05rem; font-weight:600; color:#6a82fb; margin-top:0.7rem;">Yash K Moolchandani</div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer">
+      <div class="container footer-content">
+        <div class="footer-social">
+          <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank">Instagram</a>
+          <a href="https://www.youtube.com/@MohitNariyani" target="_blank">YouTube</a>
+        </div>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Contact Us</a>
+        </div>
+        <div class="footer-copy">&copy; 2024 Sunrise Education Centre</div>
+      </div>
     </footer>
     <script src="script.js"></script>
+    <script>
+      const toggleBtn = document.getElementById('darkModeToggle');
+      function setDarkMode(on) {
+        if (on) {
+          document.body.classList.add('dark-mode');
+          localStorage.setItem('darkMode', 'on');
+        } else {
+          document.body.classList.remove('dark-mode');
+          localStorage.setItem('darkMode', 'off');
+        }
+      }
+      toggleBtn.addEventListener('click', () => {
+        setDarkMode(!document.body.classList.contains('dark-mode'));
+      });
+      // On page load, check preference
+      if (localStorage.getItem('darkMode') === 'on') {
+        document.body.classList.add('dark-mode');
+      }
+      // Teacher photo toggle
+      const showTeacherPhotoBtn = document.getElementById('showTeacherPhoto');
+      const teacherPhotoContainer = document.getElementById('teacherPhotoContainer');
+      let photoVisible = false;
+      showTeacherPhotoBtn.addEventListener('click', () => {
+        photoVisible = !photoVisible;
+        teacherPhotoContainer.style.display = photoVisible ? 'block' : 'none';
+        showTeacherPhotoBtn.textContent = photoVisible ? 'Hide Photo of Er. Mohit Nariyani' : 'Show Photo of Er. Mohit Nariyani';
+      });
+      // Typing animation for hero section
+      const typingText = "Empowering Students in Mathematics";
+      const typingHero = document.getElementById('typing-hero');
+      let typingIdx = 0;
+      let typingForward = true;
+      function typeHero() {
+        if (!typingHero) return;
+        if (typingForward) {
+          typingHero.textContent = typingText.slice(0, typingIdx);
+          typingIdx++;
+          if (typingIdx > typingText.length) {
+            typingForward = false;
+            setTimeout(typeHero, 1000); // Pause at end
+            return;
+          }
+        } else {
+          typingHero.textContent = typingText.slice(0, typingIdx);
+          typingIdx--;
+          if (typingIdx < 0) {
+            typingForward = true;
+            setTimeout(typeHero, 500); // Pause before restart
+            return;
+          }
+        }
+        setTimeout(typeHero, 60);
+      }
+      typeHero();
+      // Notification bell dropdown
+      const notifBell = document.getElementById('notifBell');
+      const notifDropdown = document.getElementById('notifDropdown');
+      if (notifBell && notifDropdown) {
+        notifBell.addEventListener('click', function(e) {
+          notifDropdown.style.display = notifDropdown.style.display === 'block' ? 'none' : 'block';
+          e.stopPropagation();
+        });
+        document.addEventListener('click', function() {
+          notifDropdown.style.display = 'none';
+        });
+        notifDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+      }
+    </script>
   </body>
 </html>

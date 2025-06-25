@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit User - Admin</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar glassmorphic">
+    <div class="container nav-content">
+      <div class="nav-logo">
+        <img src="attached_assets/image_1750584670920.png" alt="Logo">
+        <span>Sunrise Education Centre</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/admin">Admin Panel</a></li>
+        <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main class="container main-content">
+    <section class="user-info-section">
+      <h2>Edit User</h2>
+      {% if error %}
+      <div class="login-error" style="margin-bottom:1rem;">{{ error }}</div>
+      {% endif %}
+      <form method="POST" class="login-form">
+        <input type="text" name="username" value="{{ user[1] }}" required placeholder="Username" style="margin-bottom:1rem;" />
+        <select name="class_id" required style="border-radius:20px; padding:0.7rem 1.1rem;">
+          {% for id, name in all_classes %}
+            <option value="{{ id }}" {% if user[2] == id %}selected{% endif %}>{{ name|title }}</option>
+          {% endfor %}
+        </select>
+        <select name="paid" required style="border-radius:20px; padding:0.7rem 1.1rem; margin-top:1rem;">
+          <option value="not paid" {% if user[3]=='not paid' %}selected{% endif %}>Not Paid</option>
+          <option value="paid" {% if user[3]=='paid' %}selected{% endif %}>Paid</option>
+        </select>
+        <button type="submit" class="btn btn-primary" style="margin-top:1rem;">Update</button>
+      </form>
+      <div class="back-link">
+        <a href="/admin">&larr; Back to Admin Panel</a>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-social">
+        <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank">Instagram</a>
+        <a href="https://www.youtube.com/@MohitNariyani" target="_blank">YouTube</a>
+      </div>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Contact Us</a>
+      </div>
+      <div class="footer-copy">&copy; 2024 Sunrise Education Centre</div>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html> 

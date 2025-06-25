@@ -1,111 +1,106 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Student Forum - Sunrise Education Centre</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+    <title>Forum - Sunrise Education Centre</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+    <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="forum.css" />
   </head>
   <body>
-    <nav class="container-fluid" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('attached_assets/image_1750584670920.png'); background-size: 100px auto; background-repeat: repeat-x; background-position: center;">
-      <ul>
-        <li style="display: flex; align-items: center; gap: 0.5rem;">
-          <img src="attached_assets/image_1750584670920.png" alt="Sunrise Education Centre Logo" style="height: 40px; width: auto;">
-          <strong style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Sunrise Education Centre</strong>
-        </li>
-      </ul>
-      <ul>
-        <li><a href="index.html" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Home</a></li>
-        <li><a href="study-resources.html" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Study Resources</a></li>
-        <li><a href="auth.html" style="color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Login</a></li>
-      </ul>
+    <nav class="navbar glassmorphic">
+      <div class="container nav-content">
+        <div class="nav-logo">
+          <img src="attached_assets/image_1750584670920.png" alt="Logo">
+          <span>Sunrise Education Centre</span>
+        </div>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/online-class">Live Class</a></li>
+          <li><a href="/study-resources">Study Resources</a></li>
+          {% if username %}
+            <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+          {% else %}
+            <li><a href="/auth" class="btn btn-primary">Login</a></li>
+          {% endif %}
+        </ul>
+        <button class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+      </div>
     </nav>
-
-    <main class="container">
-      <div class="forum-header">
-        <h1>Student Discussion Forum</h1>
-        <p>Connect with fellow students, ask questions, and share knowledge</p>
+    <header class="hero-section">
+      <div class="container hero-content">
+        <h1>Student Forum</h1>
+        <p>Ask questions, share ideas, and connect with your peers!</p>
       </div>
-
-      <div class="forum-actions">
-        <button onclick="showNewTopicForm()" class="primary">📝 Start New Discussion</button>
-        <div class="forum-stats">
-          <span>👥 <strong id="active-users">24</strong> Active Students</span>
-          <span>💬 <strong id="total-posts">156</strong> Total Posts</span>
+    </header>
+    <main class="container main-content">
+      <section class="card-section" style="max-width:800px;margin:0 auto;">
+        <h2>Forum Feed</h2>
+        <form id="forumForm" class="subscribe-form" style="margin-bottom:1.5rem;">
+          <input type="text" id="forumInput" placeholder="Start a new discussion..." required />
+          <button type="submit" class="btn btn-primary">Post</button>
+        </form>
+        <div id="forumMessages" class="card" style="min-height:120px; text-align:left; padding:1.5rem;">
+          <div id="emptyForumMsg" style="color:#888; text-align:center;">No messages yet. Start the conversation!</div>
         </div>
-      </div>
-
-      <!-- New Topic Form -->
-      <div id="new-topic-form" class="new-topic" style="display: none;">
-        <article>
-          <header>
-            <h3>Start New Discussion</h3>
-            <button onclick="hideNewTopicForm()" style="float: right; background: none; border: none; font-size: 1.2rem; cursor: pointer;">✕</button>
-          </header>
-          <form onsubmit="createNewTopic(event)">
-            <div class="grid">
-              <label for="topic-category">
-                Category
-                <select id="topic-category" required>
-                  <option value="">Select Category</option>
-                  <option value="math-9">Class 9 Mathematics</option>
-                  <option value="math-10">Class 10 Mathematics</option>
-                  <option value="math-11">Class 11 Mathematics</option>
-                  <option value="math-12">Class 12 Mathematics</option>
-                  <option value="general">General Discussion</option>
-                  <option value="homework">Homework Help</option>
-                  <option value="exam-prep">Exam Preparation</option>
-                </select>
-              </label>
-            </div>
-            <div class="grid">
-              <label for="topic-title">
-                Title
-                <input type="text" id="topic-title" placeholder="Enter discussion title" required />
-              </label>
-            </div>
-            <div class="grid">
-              <label for="topic-content">
-                Content
-                <textarea id="topic-content" rows="5" placeholder="Describe your question or topic..." required></textarea>
-              </label>
-            </div>
-            <button type="submit">Post Discussion</button>
-          </form>
-        </article>
-      </div>
-
-      <!-- Forum Categories -->
-      <div class="forum-categories">
-        <div class="category-tabs">
-          <button class="category-btn active" onclick="showCategory('all')">All Posts</button>
-          <button class="category-btn" onclick="showCategory('math-9')">Class 9</button>
-          <button class="category-btn" onclick="showCategory('math-10')">Class 10</button>
-          <button class="category-btn" onclick="showCategory('math-11')">Class 11</button>
-          <button class="category-btn" onclick="showCategory('math-12')">Class 12</button>
-          <button class="category-btn" onclick="showCategory('general')">General</button>
-        </div>
-      </div>
-
-      <!-- Forum Posts -->
-      <div class="forum-posts" id="forum-posts">
-        <!-- Sample posts will be populated by JavaScript -->
-      </div>
-
-      <!-- Pagination -->
-      <div class="pagination">
-        <button onclick="previousPage()">← Previous</button>
-        <span id="page-info">Page 1 of 5</span>
-        <button onclick="nextPage()">Next →</button>
+      </section>
+      <div style="text-align:center; margin: 1.5rem 0 2rem 0;">
+        <button id="darkModeToggle" class="btn btn-primary" style="min-width:160px;">Toggle Dark Mode</button>
       </div>
     </main>
-
-    <footer class="container">
-      <small><a href="index.html">Home</a> • <a href="#">Forum Rules</a> • <a href="#">Report Issue</a></small>
+    <footer class="footer">
+      <div class="container footer-content">
+        <div class="footer-social">
+          <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank">Instagram</a>
+          <a href="https://www.youtube.com/@MohitNariyani" target="_blank">YouTube</a>
+        </div>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Contact Us</a>
+        </div>
+        <div class="footer-copy">&copy; 2024 Sunrise Education Centre</div>
+      </div>
     </footer>
-
+    <script src="script.js"></script>
     <script src="forum.js"></script>
+    <script>
+      // Forum message logic (client-side only, not persistent)
+      const forumForm = document.getElementById('forumForm');
+      const forumInput = document.getElementById('forumInput');
+      const forumMessages = document.getElementById('forumMessages');
+      const emptyForumMsg = document.getElementById('emptyForumMsg');
+      forumForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const msg = forumInput.value.trim();
+        if (!msg) return;
+        if (emptyForumMsg) emptyForumMsg.style.display = 'none';
+        const div = document.createElement('div');
+        div.textContent = msg;
+        div.style.margin = '0.5rem 0';
+        forumMessages.appendChild(div);
+        forumInput.value = '';
+      });
+      const toggleBtn = document.getElementById('darkModeToggle');
+      function setDarkMode(on) {
+        if (on) {
+          document.body.classList.add('dark-mode');
+          localStorage.setItem('darkMode', 'on');
+        } else {
+          document.body.classList.remove('dark-mode');
+          localStorage.setItem('darkMode', 'off');
+        }
+      }
+      toggleBtn.addEventListener('click', () => {
+        setDarkMode(!document.body.classList.contains('dark-mode'));
+      });
+      if (localStorage.getItem('darkMode') === 'on') {
+        document.body.classList.add('dark-mode');
+      }
+    </script>
   </body>
 </html>

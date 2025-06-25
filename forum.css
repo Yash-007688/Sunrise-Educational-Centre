@@ -1,4 +1,3 @@
-
 /* Forum Page Styles */
 
 .forum-header {
@@ -218,4 +217,119 @@
 
 .post-card.new {
   animation: slideIn 0.3s ease-out;
+}
+
+.forum-post {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #fff;
+}
+
+.dark-mode .forum-post {
+    border-color: #444;
+    background-color: #333;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.dark-mode .post-header {
+    color: #bbb;
+}
+
+.post-header .post-date {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.dark-mode .post-header .post-date {
+    color: #aaa;
+}
+
+.post-message {
+    margin-bottom: 1rem;
+}
+
+.post-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.vote-btn, .reply-btn {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.dark-mode .vote-btn, .dark-mode .reply-btn {
+    border-color: #555;
+    color: #eee;
+}
+
+.vote-btn:hover, .reply-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.dark-mode .vote-btn:hover, .dark-mode .reply-btn:hover {
+    background-color: #444;
+}
+
+.upvote:hover {
+    color: #28a745;
+}
+
+.downvote:hover {
+    color: #dc3545;
+}
+
+.replies-container {
+    margin-top: 1rem;
+    padding-left: 1.5rem;
+    border-left: 2px solid #eee;
+}
+
+.dark-mode .replies-container {
+    border-left-color: #444;
+}
+
+.reply-form {
+    margin-top: 1rem;
+    padding-left: 1.5rem;
+}
+
+.reply-form input {
+    width: 70%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.dark-mode .reply-form input {
+    background-color: #444;
+    border-color: #666;
+    color: #eee;
+}
+
+.reply-form button {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.reply-form button:hover {
+    background-color: #0056b3;
 }

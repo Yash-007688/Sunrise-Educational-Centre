@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel - Sunrise Education Centre</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar glassmorphic">
+    <div class="container nav-content">
+      <div class="nav-logo">
+        <img src="attached_assets/image_1750584670920.png" alt="Logo">
+        <span>Sunrise Education Centre</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/study-resources">Study Resources</a></li>
+        <li><a href="/online-class">Live Class</a></li>
+        {% if resources and resources|length > 0 %}
+        <li><a href="/upload-resource" class="btn btn-primary">Upload Resources</a></li>
+        {% endif %}
+        <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+      </ul>
+      <button class="hamburger">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
+  </nav>
+  <header class="hero-section">
+    <div class="container hero-content">
+      <h1>Admin Panel</h1>
+      <p>Welcome, Admin! Manage your website and resources here.</p>
+    </div>
+  </header>
+  <main class="container main-content">
+    <section class="card-section">
+      <div class="card-grid">
+        <a href="#" class="card animated-card" style="cursor:pointer; text-decoration:none;">
+          <h3>Manage Users</h3>
+          <p>View, add, or remove users (feature coming soon).</p>
+        </a>
+        {% if not resources or resources|length == 0 %}
+        <a href="/upload-resource" class="card animated-card" style="cursor:pointer; text-decoration:none;">
+          <h3>Upload Resources</h3>
+          <p>Add new notes, worksheets, or solutions (feature coming soon).</p>
+        </a>
+        {% endif %}
+        <a href="#" class="card animated-card" style="cursor:pointer; text-decoration:none;">
+          <h3>Start Live Class</h3>
+          <p>Begin a new live class session for students.</p>
+        </a>
+      </div>
+      <section class="card-section" style="margin-top:2rem;">
+        <h2>Live Class Management</h2>
+        <div style="margin-bottom:1.5rem;">
+            <a href="/create-live-class" class="btn btn-start-class">Create a New Live Class</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}" style="margin-bottom:1rem; padding: 0.8rem 1.2rem; border-radius:12px; background: #6a82fb; color: #fff;">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% if active_classes %}
+        <h3>Active Classes</h3>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f3f6fa;">
+                <th style="padding:0.7rem 1rem; text-align:left;">Topic</th>
+                <th style="padding:0.7rem 1rem; text-align:left;">Code</th>
+                <th style="padding:0.7rem 1rem; text-align:left;">PIN</th>
+                <th style="padding:0.7rem 1rem; text-align:left;">Started At</th>
+                <th style="padding:0.7rem 1rem; text-align:left;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for id, class_code, pin, topic, description, created_at in active_classes %}
+              <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.7rem 1rem;">{{ topic or 'N/A' }}</td>
+                <td style="padding:0.7rem 1rem;">{{ class_code }}</td>
+                <td style="padding:0.7rem 1rem;">{{ pin }}</td>
+                <td style="padding:0.7rem 1rem;">{{ created_at[:19].replace('T', ' ') }}</td>
+                <td style="padding:0.7rem 1rem;">
+                  <form method="POST" action="/end-live-class/{{ id }}" style="display:inline;">
+                    <button type="submit" class="btn btn-primary" style="background:#fc5c7d;">End Class</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %}
+      </section>
+      {% if resources and resources|length > 0 %}
+      <section class="card-section" style="margin-top:2rem;">
+        <h2>Uploaded Resources</h2>
+        <div style="margin-bottom:1rem; text-align:right;">
+          <label for="resourceSorter" style="font-weight:500; margin-right:0.5rem;">Sort by Class:</label>
+          <select id="resourceSorter" style="padding:0.4rem 1rem; border-radius:8px;">
+            <option value="all">All</option>
+            {% for id, name in all_classes %}
+              <option value="{{ name }}">{{ name|title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="card-grid" id="resourceCards">
+          {% for filename, class_id, filepath, title, description, category in resources %}
+          {% set class_name = all_classes|selectattr('0', 'equalto', class_id)|map(attribute='1')|first|default('N/A') %}
+          {% set user_paid = users|selectattr('2', 'equalto', class_name)|map(attribute='3')|first|default('N/A') %}
+          <div class="card animated-card" style="text-align:left;" data-class="{{ class_name }}">
+            <strong style="font-size:1.1rem;">{{ title }}</strong><br>
+            {% if description %}<span style="color:#555; font-size:0.98rem;">{{ description }}</span><br>{% endif %}
+            <span style="color:#888; font-size:0.95rem;">File: {{ filename }}</span><br>
+            <span style="color:#6a82fb;">Class: {{ class_name }}</span><br>
+            <span style="color:#28a745;">Category: {{ category|title }}</span><br>
+            <span style="color:{% if user_paid == 'paid' %}#28a745{% else %}#fc5c7d{% endif %}; font-weight:bold;">{{ user_paid|title }}</span><br>
+            <a href="/uploads/{{ filename }}" target="_blank" style="color:#fc5c7d;">Download/View</a>
+            <form method="POST" action="/delete-resource/{{ filename }}" style="display:inline; margin-left:1rem;">
+              <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Delete</button>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      <script>
+        // Resource sorter
+        const sorter = document.getElementById('resourceSorter');
+        const cards = document.querySelectorAll('#resourceCards .card');
+        sorter.addEventListener('change', function() {
+          const val = sorter.value;
+          cards.forEach(card => {
+            if (val === 'all' || card.getAttribute('data-class') === val) {
+              card.style.display = '';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      </script>
+      {% endif %}
+      {% if users and users|length > 0 %}
+      <section class="card-section" style="margin-top:2rem;">
+        <h2>Registered Users</h2>
+        <form method="GET" action="/admin" style="margin-bottom:1rem; text-align:right;">
+          <input type="text" name="q" placeholder="Search by username" value="{{ search_query or '' }}" style="padding:0.5rem 1rem; border-radius:8px; border:1px solid #ccc; min-width:200px;" />
+          <button type="submit" class="btn btn-primary" style="margin-left:0.5rem;">Search</button>
+        </form>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f3f6fa;">
+                <th style="padding:0.7rem 1rem; text-align:left;">ID</th>
+                <th style="padding:0.7rem 1rem; text-align:left;">Username</th>
+                <th style="padding:0.7rem 1rem; text-align:left;">Role</th>
+                <th style="padding:0.7rem 1rem; text-align:left;">Paid</th>
+                <th style="padding:0.7rem 1rem; text-align:left;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for id, username, role, paid in users %}
+              <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.7rem 1rem;">{{ id }}</td>
+                <td style="padding:0.7rem 1rem;">{{ username }}</td>
+                <td style="padding:0.7rem 1rem;">{{ role }}</td>
+                <td style="padding:0.7rem 1rem;">{{ paid }}</td>
+                <td style="padding:0.7rem 1rem;">
+                  <form method="POST" action="/delete-user/{{ id }}" style="display:inline;">
+                    <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Delete</button>
+                  </form>
+                  <a href="/user-info/{{ id }}" class="btn btn-primary" style="background:#6a82fb; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px; margin-left:0.5rem;">Edit</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {% endif %}
+      <section class="card-section" style="margin-top:2rem;">
+        <h2>Send Notification</h2>
+        <form method="POST" action="/add-notification" class="login-form" style="max-width:500px; margin:0 auto 2rem auto;">
+          <textarea name="message" placeholder="Notification message" required rows="2" style="margin-bottom:1rem; border-radius:14px; padding:0.7rem 1.1rem;"></textarea>
+          <select name="class_id" required style="border-radius:20px; padding:0.7rem 1.1rem;">
+            {% for id, name in all_classes %}
+              <option value="{{ id }}">{{ name|title }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-primary" style="margin-top:1rem;">Send Notification</button>
+        </form>
+        <h3 style="margin-top:2rem;">All Notifications</h3>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f3f6fa;">
+                <th style="padding:0.7rem 1rem; text-align:left;">Message</th>
+                <th style="padding:0.7rem 1rem; text-align:left;">Class</th>
+                <th style="padding:0.7rem 1rem; text-align:left;">Date</th>
+                <th style="padding:0.7rem 1rem; text-align:left;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for id, message, class_role, created_at in all_notifications %}
+              <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:0.7rem 1rem;">{{ message }}</td>
+                <td style="padding:0.7rem 1rem;">{{ class_role }}</td>
+                <td style="padding:0.7rem 1rem;">{{ created_at[:19].replace('T', ' ') }}</td>
+                <td style="padding:0.7rem 1rem;">
+                  <form method="POST" action="/delete-notification/{{ id }}" style="display:inline;">
+                    <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-social">
+        <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank">Instagram</a>
+        <a href="https://www.youtube.com/@MohitNariyani" target="_blank">YouTube</a>
+      </div>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Contact Us</a>
+      </div>
+      <div class="footer-copy">&copy; 2024 Sunrise Education Centre</div>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+  <script>
+    // Upload Resources card file picker
+    const uploadCard = document.getElementById('uploadCard');
+    const fileInput = document.getElementById('fileInput');
+    const fileName = document.getElementById('fileName');
+    uploadCard.addEventListener('click', function(e) {
+      // Only trigger if not clicking the file input itself
+      if (e.target !== fileInput) fileInput.click();
+    });
+    fileInput.addEventListener('change', function() {
+      if (fileInput.files.length > 0) {
+        fileName.textContent = 'Selected: ' + fileInput.files[0].name;
+      } else {
+        fileName.textContent = '';
+      }
+    });
+  </script>
+</body>
+</html> 

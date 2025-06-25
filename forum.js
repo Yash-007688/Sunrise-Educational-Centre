@@ -1,4 +1,3 @@
-
 // Forum functionality
 
 let currentPage = 1;
@@ -277,3 +276,160 @@ function updateStats() {
 setInterval(() => {
   updateStats();
 }, 30000); // Update every 30 seconds
+
+document.addEventListener('DOMContentLoaded', () => {
+    const forumForm = document.getElementById('forumForm');
+    const forumInput = document.getElementById('forumInput');
+    const forumMessages = document.getElementById('forumMessages');
+    const emptyForumMsg = document.getElementById('emptyForumMsg');
+
+    const API_URL = '/api/forum/messages';
+
+    async function fetchMessages() {
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error('Failed to fetch messages');
+            const messages = await response.json();
+            renderMessages(messages);
+        } catch (error) {
+            console.error('Error fetching messages:', error);
+            forumMessages.innerHTML = '<div style="color:red; text-align:center;">Could not load messages.</div>';
+        }
+    }
+
+    function renderMessages(messages) {
+        if (messages.length === 0) {
+            emptyForumMsg.style.display = 'block';
+            forumMessages.innerHTML = '';
+        } else {
+            emptyForumMsg.style.display = 'none';
+            forumMessages.innerHTML = '';
+            messages.forEach(msg => {
+                const messageEl = createMessageElement(msg);
+                forumMessages.appendChild(messageEl);
+            });
+        }
+    }
+
+    function createMessageElement(msg) {
+        const div = document.createElement('div');
+        div.className = 'forum-post';
+        div.setAttribute('data-id', msg.id);
+        
+        const postDate = new Date(msg.timestamp).toLocaleString();
+
+        div.innerHTML = `
+            <div class="post-header">
+                <strong>${msg.username}</strong>
+                <span class="post-date">${postDate}</span>
+            </div>
+            <p class="post-message">${msg.message}</p>
+            <div class="post-actions">
+                <button class="vote-btn upvote" data-id="${msg.id}">&#x25B2; Upvote (${msg.upvotes})</button>
+                <button class="vote-btn downvote" data-id="${msg.id}">&#x25BC; Downvote (${msg.downvotes})</button>
+                <button class="reply-btn" data-id="${msg.id}">Reply</button>
+            </div>
+            <div class="replies-container" id="replies-${msg.id}"></div>
+            <form class="reply-form" id="reply-form-${msg.id}" style="display:none;">
+                <input type="text" placeholder="Write a reply..." required>
+                <button type="submit">Post Reply</button>
+            </form>
+        `;
+
+        return div;
+    }
+
+    forumForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = forumInput.value.trim();
+        if (!message) return;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+            if (response.ok) {
+                forumInput.value = '';
+                fetchMessages();
+            } else {
+                alert('Failed to post message.');
+            }
+        } catch (error) {
+            console.error('Error posting message:', error);
+            alert('An error occurred. Please try again.');
+        }
+    });
+
+    forumMessages.addEventListener('click', async (e) => {
+        const target = e.target;
+        const messageId = target.dataset.id;
+
+        if (target.classList.contains('vote-btn')) {
+            const voteType = target.classList.contains('upvote') ? 'upvote' : 'downvote';
+            try {
+                const response = await fetch(`${API_URL}/${messageId}/vote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ vote_type: voteType })
+                });
+                if (response.ok) fetchMessages();
+            } catch (error) {
+                console.error('Error voting:', error);
+            }
+        }
+
+        if (target.classList.contains('reply-btn')) {
+            const replyForm = document.getElementById(`reply-form-${messageId}`);
+            replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+        }
+    });
+
+    forumMessages.addEventListener('submit', async (e) => {
+        if (e.target.classList.contains('reply-form')) {
+            e.preventDefault();
+            const form = e.target;
+            const messageId = form.id.split('-')[2];
+            const input = form.querySelector('input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, parent_id: messageId })
+                });
+                if (response.ok) {
+                    input.value = '';
+                    fetchMessages(); 
+                } else {
+                    alert('Failed to post reply.');
+                }
+            } catch (error) {
+                console.error('Error posting reply:', error);
+            }
+        }
+    });
+    
+    fetchMessages();
+    setInterval(fetchMessages, 30000);
+
+    const toggleBtn = document.getElementById('darkModeToggle');
+      function setDarkMode(on) {
+        if (on) {
+          document.body.classList.add('dark-mode');
+          localStorage.setItem('darkMode', 'on');
+        } else {
+          document.body.classList.remove('dark-mode');
+          localStorage.setItem('darkMode', 'off');
+        }
+      }
+      toggleBtn.addEventListener('click', () => {
+        setDarkMode(!document.body.classList.contains('dark-mode'));
+      });
+      if (localStorage.getItem('darkMode') === 'on') {
+        document.body.classList.add('dark-mode');
+      }
+});

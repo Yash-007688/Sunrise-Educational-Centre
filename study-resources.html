@@ -1,233 +1,190 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Study Resources - Sunrise Education Centre</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
-    <link rel="stylesheet" href="study-resources.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Styles for nested tabs */
+      .sub-tabs {
+        display: flex;
+        justify-content: center;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1rem;
+      }
+      .sub-tab-button {
+        background: #f1f3f5;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #555;
+        margin: 0 0.4rem;
+        transition: all 0.3s ease;
+      }
+      .sub-tab-button.active {
+        background: #6a82fb;
+        color: #fff;
+      }
+      .category-content {
+        display: none;
+      }
+      .category-content.active {
+        display: block;
+      }
+      body.dark-mode .sub-tabs {
+        border-bottom-color: #333;
+      }
+      body.dark-mode .sub-tab-button {
+        background: #333;
+        color: #ccc;
+      }
+      body.dark-mode .sub-tab-button.active {
+        background: #6a82fb;
+      }
+    </style>
   </head>
   <body>
-    <nav class="container-fluid">
-      <ul>
-        <li><strong><a href="index.html">Sunrise Education Centre</a></strong></li>
-      </ul>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="#">Programs</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="online-class.html" role="button">Live Class</a></li>
-        <li><a href="#" role="button">Contact</a></li>
-      </ul>
+    <nav class="navbar glassmorphic">
+      <div class="container nav-content">
+        <div class="nav-logo">
+          <img src="attached_assets/image_1750584670920.png" alt="Logo">
+          <span>Sunrise Education Centre</span>
+        </div>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/online-class">Live Class</a></li>
+          <li><a href="/forum">Forum</a></li>
+          {% if username %}
+            <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+          {% else %}
+            <li><a href="/auth" class="btn btn-primary">Login</a></li>
+          {% endif %}
+        </ul>
+        <button class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+      </div>
     </nav>
-
-    <main class="container">
-      <hgroup>
+    <header class="hero-section">
+      <div class="container hero-content">
         <h1>Study Resources</h1>
-        <h2>Mathematics Learning Materials for Class 9-12</h2>
-      </hgroup>
-
-      <!-- Class-wise Resources -->
-      <section class="resources-section">
-        <h3>Resources by Class</h3>
-        <div class="class-tabs">
-          <button class="tab-button active" onclick="showClass('class9')">Class 9</button>
-          <button class="tab-button" onclick="showClass('class10')">Class 10</button>
-          <button class="tab-button" onclick="showClass('class11')">Class 11</button>
-          <button class="tab-button" onclick="showClass('class12')">Class 12</button>
+        <p>Access notes, worksheets, practice problems, and solutions to boost your learning!</p>
+        <a href="#resources" class="btn btn-cta">Browse Resources</a>
+      </div>
+    </header>
+    <main class="container main-content">
+      <section id="resources" class="card-section">
+        <h2>Available Resources</h2>
+        
+        <!-- Class Tabs -->
+        <div class="tabs">
+          {% for class_id, class_name in all_classes %}
+            {% if class_name not in ['admin', 'teacher'] %}
+              <button class="tab-button" onclick="showClass(event, 'class-{{ class_id }}')">{{ class_name|title }}</button>
+            {% endif %}
+          {% endfor %}
         </div>
 
-        <!-- Class 9 Resources -->
-        <div id="class9" class="class-content active">
-          <div class="grid">
-            <article class="resource-card">
-              <header>📚 Study Notes</header>
-              <ul>
-                <li><a href="#" onclick="openResource('Number Systems Notes')">Number Systems</a></li>
-                <li><a href="#" onclick="openResource('Polynomials Notes')">Polynomials</a></li>
-                <li><a href="#" onclick="openResource('Coordinate Geometry Notes')">Coordinate Geometry</a></li>
-                <li><a href="#" onclick="openResource('Linear Equations Notes')">Linear Equations</a></li>
-              </ul>
-            </article>
-            
-            <article class="resource-card">
-              <header>📝 Practice Papers</header>
-              <ul>
-                <li><a href="#" onclick="openResource('Class 9 Sample Paper 1')">Sample Paper 1</a></li>
-                <li><a href="#" onclick="openResource('Class 9 Sample Paper 2')">Sample Paper 2</a></li>
-                <li><a href="#" onclick="openResource('Class 9 Previous Year Paper')">Previous Year Papers</a></li>
-                <li><a href="#" onclick="openResource('Class 9 Mock Test')">Mock Tests</a></li>
-              </ul>
-            </article>
-            
-            <article class="resource-card">
-              <header>🧮 Formula Sheets</header>
-              <ul>
-                <li><a href="#" onclick="openResource('Algebra Formulas')">Algebra Formulas</a></li>
-                <li><a href="#" onclick="openResource('Geometry Formulas')">Geometry Formulas</a></li>
-                <li><a href="#" onclick="openResource('Statistics Formulas')">Statistics Formulas</a></li>
-              </ul>
-            </article>
-          </div>
-        </div>
+        <!-- Content for each class -->
+        <div class="tab-content-wrapper">
+          {% set categories = [
+              ('worksheet', 'Worksheets'),
+              ('pyq', 'PYQs'),
+              ('case-base', 'Case-Base'),
+              ('assertion-reasoning', 'Assertion/Reasoning'),
+              ('formula', 'Formula')
+          ] %}
+          {% for class_id, class_name in all_classes %}
+            {% if class_name not in ['admin', 'teacher'] %}
+              <div id="class-{{ class_id }}" class="class-content">
+                <!-- Category Sub-Tabs -->
+                <div class="sub-tabs">
+                  {% for cat_key, cat_name in categories %}
+                    {% if (cat_key in ['worksheet', 'formula'] and paid_status == 'paid') or (cat_key not in ['worksheet', 'formula']) %}
+                      <button class="sub-tab-button" onclick="showCategory(event, 'class-{{ class_id }}-cat-{{ cat_key }}')">{{ cat_name }}</button>
+                    {% endif %}
+                  {% endfor %}
+                </div>
 
-        <!-- Class 10 Resources -->
-        <div id="class10" class="class-content">
-          <div class="grid">
-            <article class="resource-card">
-              <header>📚 Study Notes</header>
-              <ul>
-                <li><a href="#" onclick="openResource('Real Numbers Notes')">Real Numbers</a></li>
-                <li><a href="#" onclick="openResource('Quadratic Equations Notes')">Quadratic Equations</a></li>
-                <li><a href="#" onclick="openResource('Arithmetic Progressions Notes')">Arithmetic Progressions</a></li>
-                <li><a href="#" onclick="openResource('Triangles Notes')">Triangles</a></li>
-              </ul>
-            </article>
-            
-            <article class="resource-card">
-              <header>📝 CBSE Papers</header>
-              <ul>
-                <li><a href="#" onclick="openResource('CBSE Board Paper 2024')">Board Paper 2024</a></li>
-                <li><a href="#" onclick="openResource('CBSE Board Paper 2023')">Board Paper 2023</a></li>
-                <li><a href="#" onclick="openResource('CBSE Sample Paper')">Sample Papers</a></li>
-                <li><a href="#" onclick="openResource('Compartment Papers')">Compartment Papers</a></li>
-              </ul>
-            </article>
-            
-            <article class="resource-card">
-              <header>🎯 Important Questions</header>
-              <ul>
-                <li><a href="#" onclick="openResource('Board Exam Important Questions')">Board Exam Questions</a></li>
-                <li><a href="#" onclick="openResource('Chapter-wise Important Questions')">Chapter-wise Questions</a></li>
-                <li><a href="#" onclick="openResource('MCQ Practice')">MCQ Practice</a></li>
-              </ul>
-            </article>
-          </div>
-        </div>
-
-        <!-- Class 11 Resources -->
-        <div id="class11" class="class-content">
-          <div class="grid">
-            <article class="resource-card">
-              <header>📚 Study Notes</header>
-              <ul>
-                <li><a href="#" onclick="openResource('Sets Notes')">Sets</a></li>
-                <li><a href="#" onclick="openResource('Functions Notes')">Relations and Functions</a></li>
-                <li><a href="#" onclick="openResource('Trigonometry Notes')">Trigonometric Functions</a></li>
-                <li><a href="#" onclick="openResource('Complex Numbers Notes')">Complex Numbers</a></li>
-              </ul>
-            </article>
-            
-            <article class="resource-card">
-              <header>📈 Advanced Topics</header>
-              <ul>
-                <li><a href="#" onclick="openResource('Limits Notes')">Limits and Derivatives</a></li>
-                <li><a href="#" onclick="openResource('Mathematical Reasoning Notes')">Mathematical Reasoning</a></li>
-                <li><a href="#" onclick="openResource('Statistics Notes')">Statistics</a></li>
-                <li><a href="#" onclick="openResource('Probability Notes')">Probability</a></li>
-              </ul>
-            </article>
-            
-            <article class="resource-card">
-              <header>🔢 JEE Preparation</header>
-              <ul>
-                <li><a href="#" onclick="openResource('JEE Chapter-wise Questions')">Chapter-wise Questions</a></li>
-                <li><a href="#" onclick="openResource('JEE Mock Tests')">Mock Tests</a></li>
-                <li><a href="#" onclick="openResource('Previous Year JEE Papers')">Previous Year Papers</a></li>
-              </ul>
-            </article>
-          </div>
-        </div>
-
-        <!-- Class 12 Resources -->
-        <div id="class12" class="class-content">
-          <div class="grid">
-            <article class="resource-card">
-              <header>📚 Study Notes</header>
-              <ul>
-                <li><a href="#" onclick="openResource('Relations Functions Notes')">Relations and Functions</a></li>
-                <li><a href="#" onclick="openResource('Inverse Trigonometry Notes')">Inverse Trigonometry</a></li>
-                <li><a href="#" onclick="openResource('Matrices Notes')">Matrices</a></li>
-                <li><a href="#" onclick="openResource('Determinants Notes')">Determinants</a></li>
-              </ul>
-            </article>
-            
-            <article class="resource-card">
-              <header>🎓 Calculus</header>
-              <ul>
-                <li><a href="#" onclick="openResource('Continuity Differentiability Notes')">Continuity & Differentiability</a></li>
-                <li><a href="#" onclick="openResource('Application Derivatives Notes')">Application of Derivatives</a></li>
-                <li><a href="#" onclick="openResource('Integrals Notes')">Integrals</a></li>
-                <li><a href="#" onclick="openResource('Application Integrals Notes')">Application of Integrals</a></li>
-              </ul>
-            </article>
-            
-            <article class="resource-card">
-              <header>🏆 Board & JEE</header>
-              <ul>
-                <li><a href="#" onclick="openResource('CBSE Board Papers 12')">CBSE Board Papers</a></li>
-                <li><a href="#" onclick="openResource('JEE Advanced Papers')">JEE Advanced Papers</a></li>
-                <li><a href="#" onclick="openResource('JEE Main Papers')">JEE Main Papers</a></li>
-                <li><a href="#" onclick="openResource('All India Test Series')">Test Series</a></li>
-              </ul>
-            </article>
-          </div>
+                <!-- Resources for each category -->
+                {% for cat_key, cat_name in categories %}
+                  <div id="class-{{ class_id }}-cat-{{ cat_key }}" class="category-content">
+                    <div class="card-grid">
+                      {% set has_resources = false %}
+                      {% for filename, res_class_id, filepath, title, description, category in resources %}
+                        {% if res_class_id == class_id and category == cat_key %}
+                          {% set has_resources = true %}
+                          <div class="card animated-card" style="text-align:left;">
+                            <strong style="font-size:1.1rem;">{{ title }}</strong><br>
+                            {% if description %}<span style="color:#555; font-size:0.98rem;">{{ description }}</span><br>{% endif %}
+                            <span style="color:#888; font-size:0.95rem;">File: {{ filename }}</span><br>
+                            <a href="/uploads/{{ filename }}" target="_blank" class="btn btn-primary" style="margin-top:0.7rem;">Download/View</a>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                      {% if not has_resources %}
+                        <div style="color:#888; text-align:center; grid-column: 1 / -1;">No resources available in this category yet.</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endfor %}
         </div>
       </section>
-
-      <!-- Quick Access Section -->
-      <section class="quick-access">
-        <h3>Quick Access</h3>
-        <div class="grid">
-          <article class="quick-card">
-            <header>📱 Mobile App</header>
-            <p>Download our mobile app for offline access to all study materials</p>
-            <button onclick="downloadApp()">Download App</button>
-          </article>
-          
-          <article class="quick-card">
-            <header>📺 Video Lectures</header>
-            <p>Access recorded video lectures for all topics</p>
-            <button onclick="openVideoLibrary()">Watch Videos</button>
-          </article>
-          
-          <article class="quick-card">
-            <header>❓ Doubt Resolution</header>
-            <p>Submit your doubts and get them resolved by Er. Mohit Nariyani</p>
-            <button onclick="submitDoubt()">Ask Doubt</button>
-          </article>
-        </div>
-      </section>
-
-      <!-- Study Tips Section -->
-      <section class="study-tips">
-        <h3>Study Tips from Er. Mohit Nariyani</h3>
-        <div class="tips-grid">
-          <div class="tip-card">
-            <h4>💡 Daily Practice</h4>
-            <p>Solve at least 5 problems daily to maintain your problem-solving skills</p>
-          </div>
-          <div class="tip-card">
-            <h4>📝 Formula Revision</h4>
-            <p>Revise formulas weekly and create your own formula sheets</p>
-          </div>
-          <div class="tip-card">
-            <h4>⏰ Time Management</h4>
-            <p>Practice solving papers within time limits to improve speed</p>
-          </div>
-          <div class="tip-card">
-            <h4>🤔 Conceptual Understanding</h4>
-            <p>Focus on understanding concepts rather than just memorizing methods</p>
-          </div>
-        </div>
-      </section>
+      <div style="text-align:center; margin: 1.5rem 0 2rem 0;">
+        <button id="darkModeToggle" class="btn btn-primary" style="min-width:160px;">Toggle Dark Mode</button>
+      </div>
     </main>
-
-    <footer class="container">
-      <small><a href="#">Privacy Policy</a> • <a href="#">Contact Us</a> • <a href="index.html">Back to Home</a></small>
+    <footer class="footer">
+      <div class="container footer-content">
+        <div class="footer-social">
+          <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank">Instagram</a>
+          <a href="https://www.youtube.com/@MohitNariyani" target="_blank">YouTube</a>
+        </div>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Contact Us</a>
+        </div>
+        <div class="footer-copy">&copy; 2024 Sunrise Education Centre</div>
+      </div>
     </footer>
-
+    <script src="script.js"></script>
     <script src="study-resources.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Show the first tab by default
+        const firstTab = document.querySelector('.tab-button');
+        if (firstTab) {
+          firstTab.click();
+        }
+
+        const toggleBtn = document.getElementById('darkModeToggle');
+        function setDarkMode(on) {
+          if (on) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('darkMode', 'on');
+          } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('darkMode', 'off');
+          }
+        }
+        toggleBtn.addEventListener('click', () => {
+          setDarkMode(!document.body.classList.contains('dark-mode'));
+        });
+        if (localStorage.getItem('darkMode') === 'on') {
+          document.body.classList.add('dark-mode');
+        }
+      });
+    </script>
   </body>
 </html>
