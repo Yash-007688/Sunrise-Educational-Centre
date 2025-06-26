@@ -283,28 +283,20 @@
                   <th style="padding:0.7rem 1rem; text-align:left;">Code</th>
                   <th style="padding:0.7rem 1rem; text-align:left;">PIN</th>
                   <th style="padding:0.7rem 1rem; text-align:left;">Join Link</th>
-                  <th style="padding:0.7rem 1rem; text-align:left;">Created At</th>
                   <th style="padding:0.7rem 1rem; text-align:left;">Status</th>
                   <th style="padding:0.7rem 1rem; text-align:left;">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {% for id, class_code, pin, meeting_url, topic, description, created_at, is_active in active_classes %}
+                {% for id, class_code, pin, meeting_url, topic, description in active_classes %}
                 <tr style="border-bottom:1px solid #eee;">
                   <td style="padding:0.7rem 1rem;">{{ topic or 'N/A' }}</td>
                   <td style="padding:0.7rem 1rem;">{{ class_code }}</td>
                   <td style="padding:0.7rem 1rem;">{{ pin }}</td>
                   <td style="padding:0.7rem 1rem;"><a href="{{ meeting_url }}" target="_blank">Join</a></td>
-                  <td style="padding:0.7rem 1rem;">{{ created_at[:19].replace('T', ' ') }}</td>
-                  <td style="padding:0.7rem 1rem;">{% if is_active %}<span style="color:#28a745;">Active</span>{% else %}<span style="color:#fc5c7d;">Ended</span>{% endif %}</td>
+                  <td style="padding:0.7rem 1rem;"><span style="color:#888;">Unknown</span></td>
                   <td style="padding:0.7rem 1rem;">
                     <a href="{{ meeting_url }}" target="_blank" class="btn btn-primary" style="margin-bottom:0.3rem;">Join as Host</a>
-                    {% if is_active %}
-                    <form method="POST" action="/end-live-class" style="display:inline; margin-left:0.5rem;">
-                      <input type="hidden" name="class_id" value="{{ id }}" />
-                      <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">End Class</button>
-                    </form>
-                    {% endif %}
                   </td>
                 </tr>
                 {% endfor %}
