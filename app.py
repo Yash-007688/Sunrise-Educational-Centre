@@ -11,6 +11,8 @@ from auth_handler import (
     mark_notification_as_seen, delete_notification,
     save_forum_message, get_forum_messages, vote_on_message, delete_forum_message
 )
+import csv
+from io import StringIO
 
 app = Flask(__name__, static_folder='.', template_folder='.')
 app.secret_key = 'your_secret_key_here'  # Change this to a secure random value in production
@@ -137,17 +139,54 @@ def api_delete_forum_message(message_id):
     return jsonify({'success': True})
 
 # Route for online class
-@app.route('/online-class', methods=['GET', 'POST'])
+@app.route('/online-class', methods=['GET'])
 def online_class():
-    if request.method == 'POST':
-        code = request.form.get('class_code')
-        pin = request.form.get('pin')
-        meeting_url = get_live_class(code, pin)
-        if meeting_url:
-            return render_template('online-class.html', meeting_url=meeting_url)
-        else:
-            flash('Invalid class code or PIN. Please try again.', 'error')
-    return render_template('online-class.html', meeting_url=None)
+    user_id = session.get('user_id')
+    role = session.get('role')
+    username = session.get('username')
+    if not user_id or not role:
+        flash('You must be logged in to access the online class.', 'error')
+        return redirect(url_for('auth'))
+
+    # Teacher/admin: show start/end controls and active class info
+    if role in ['admin', 'teacher']:
+        active_classes = get_active_classes()
+        all_classes = get_all_classes()
+        return render_template('online-class.html', role=role, active_classes=active_classes, all_classes=all_classes, username=username)
+
+    # Student: check if a live class is active for their class
+    all_classes_dict_rev = {c[1]: c[0] for c in get_all_classes()}
+    class_id = all_classes_dict_rev.get(role)
+    active_classes = get_active_classes()
+    meeting_url = None
+    for c in active_classes:
+        if c[5] == class_id:  # c[5] is target_class_id
+            meeting_url = c[2]  # c[2] is meeting_url
+            break
+    return render_template('online-class.html', role=role, meeting_url=meeting_url, username=username)
+
+@app.route('/start-live-class', methods=['POST'])
+def start_live_class():
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    class_id = request.form.get('class_id')
+    topic = request.form.get('topic', 'Live Class')
+    description = request.form.get('description', '')
+    room_name = f"SunriseEducation-{secrets.token_hex(8)}"
+    meeting_url = f"https://meet.jit.si/{room_name}"
+    # Only one live class per class_id
+    create_live_class(class_id, meeting_url, topic, description)
+    flash('Live class started!', 'success')
+    return redirect(url_for('online_class'))
+
+@app.route('/end-live-class', methods=['POST'])
+def end_live_class():
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    class_id = request.form.get('class_id')
+    deactivate_class(class_id)
+    flash('Live class ended.', 'info')
+    return redirect(url_for('online_class'))
 
 # Route for authentication (login)
 @app.route('/auth', methods=['GET', 'POST'])
@@ -208,9 +247,39 @@ def admin_panel():
         users = search_users(q) if q else get_all_users()
         all_notifications = get_all_notifications()
         active_classes = get_active_classes()
-        return render_template('admin.html', resources=resources, users=users, search_query=q, all_notifications=all_notifications, active_classes=active_classes)
+        # Forum moderation
+        forum_q = request.args.get('forum_q', '').strip()
+        if forum_q:
+            forum_messages = [m for m in get_forum_messages() if forum_q.lower() in (m[2] or '').lower() or forum_q.lower() in (m[3] or '').lower()]
+        else:
+            forum_messages = get_forum_messages()
+        all_classes = get_all_classes()
+        # Analytics
+        total_users = len(get_all_users())
+        total_forum_posts = len(get_forum_messages())
+        total_resources = len(get_all_resources())
+        total_classes = len(all_classes)
+        # Most active users (by forum posts)
+        from collections import Counter
+        user_post_counts = Counter([m[2] for m in get_forum_messages() if m[2]])
+        most_active_users = user_post_counts.most_common(5)
+        # Most uploaded resources by class
+        class_resource_counts = Counter([r[1] for r in get_all_resources()])
+        most_resource_classes = [(cid, count) for cid, count in class_resource_counts.most_common(5)]
+        return render_template('admin.html', resources=resources, users=users, search_query=q, all_notifications=all_notifications, active_classes=active_classes, forum_messages=forum_messages, forum_search_query=forum_q, all_classes=all_classes, total_users=total_users, total_forum_posts=total_forum_posts, total_resources=total_resources, total_classes=total_classes, most_active_users=most_active_users, most_resource_classes=most_resource_classes)
     else:
         return redirect(url_for('auth'))
+
+@app.route('/admin/delete-forum-message/<int:message_id>', methods=['POST'])
+def admin_delete_forum_message(message_id):
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    delete_forum_message(message_id)
+    # Preserve forum search if present
+    forum_q = request.args.get('forum_q', '')
+    if forum_q:
+        return redirect(url_for('admin_panel', forum_q=forum_q, _anchor='forum'))
+    return redirect(url_for('admin_panel', _anchor='forum'))
 
 @app.route('/create-live-class', methods=['GET', 'POST'])
 def create_live_class_page():
@@ -233,14 +302,6 @@ def create_live_class_page():
         return render_template('create_class.html', class_details=class_details)
         
     return render_template('create_class.html', class_details=None)
-
-@app.route('/end-live-class/<int:class_id>', methods=['POST'])
-def end_live_class(class_id):
-    if session.get('role') not in ['admin', 'teacher']:
-        return redirect(url_for('auth'))
-    deactivate_class(class_id)
-    flash("Live class has been ended.", 'info')
-    return redirect(url_for('admin_panel'))
 
 # Upload resource route
 @app.route('/upload-resource', methods=['GET', 'POST'])
@@ -358,6 +419,167 @@ def delete_notification_route(notification_id):
     delete_notification(notification_id)
     flash('Notification deleted!', 'success')
     return redirect(url_for('admin_panel'))
+
+@app.route('/admin/classes/add', methods=['POST'])
+def admin_add_class():
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    name = request.form.get('name', '').strip()
+    if name:
+        from auth_handler import get_all_classes
+        import sqlite3
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        try:
+            c.execute('INSERT INTO classes (name) VALUES (?)', (name,))
+            conn.commit()
+        except sqlite3.IntegrityError:
+            pass  # Class already exists
+        conn.close()
+    return redirect(url_for('admin_panel', _anchor='classes'))
+
+@app.route('/admin/classes/edit/<int:class_id>', methods=['POST'])
+def admin_edit_class(class_id):
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    name = request.form.get('name', '').strip()
+    if name:
+        import sqlite3
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        c.execute('UPDATE classes SET name=? WHERE id=?', (name, class_id))
+        conn.commit()
+        conn.close()
+    return redirect(url_for('admin_panel', _anchor='classes'))
+
+@app.route('/admin/classes/delete/<int:class_id>', methods=['POST'])
+def admin_delete_class(class_id):
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    import sqlite3
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM classes WHERE id=?', (class_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('admin_panel', _anchor='classes'))
+
+@app.route('/admin/delete-resource/<filename>', methods=['POST'])
+def admin_delete_resource(filename):
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    # Remove file from uploads folder
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+    if os.path.exists(filepath):
+        os.remove(filepath)
+    # Remove from database
+    delete_resource(filename)
+    return redirect(url_for('admin_panel', _anchor='resources'))
+
+@app.route('/admin/delete-notification/<int:notification_id>', methods=['POST'])
+def admin_delete_notification(notification_id):
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    delete_notification(notification_id)
+    return redirect(url_for('admin_panel', _anchor='notifications'))
+
+@app.route('/admin/download/users')
+def admin_download_users():
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    users = get_all_users()
+    si = StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['ID', 'Username', 'Role', 'Paid'])
+    for u in users:
+        cw.writerow(u)
+    output = si.getvalue()
+    return app.response_class(output, mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename=users.csv'})
+
+@app.route('/admin/download/forum')
+def admin_download_forum():
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    messages = get_forum_messages()
+    si = StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['ID', 'User ID', 'Username', 'Message', 'Parent ID', 'Upvotes', 'Downvotes', 'Timestamp'])
+    for m in messages:
+        cw.writerow(m)
+    output = si.getvalue()
+    return app.response_class(output, mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename=forum.csv'})
+
+@app.route('/admin/download/resources')
+def admin_download_resources():
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    resources = get_all_resources()
+    si = StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['Filename', 'Class ID', 'Filepath', 'Title', 'Description', 'Category'])
+    for r in resources:
+        cw.writerow(r)
+    output = si.getvalue()
+    return app.response_class(output, mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename=resources.csv'})
+
+@app.route('/admin/promote/<int:user_id>', methods=['POST'])
+def admin_promote_user(user_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('auth'))
+    import sqlite3
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    # Get admin class id
+    c.execute("SELECT id FROM classes WHERE name='admin'")
+    admin_class_id = c.fetchone()[0]
+    c.execute('UPDATE users SET class_id=? WHERE id=?', (admin_class_id, user_id))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('admin_panel', _anchor='settings'))
+
+@app.route('/admin/demote/<int:user_id>', methods=['POST'])
+def admin_demote_user(user_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('auth'))
+    # Demote to student: set to first non-admin/teacher class
+    import sqlite3
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute("SELECT id FROM classes WHERE name NOT IN ('admin','teacher') ORDER BY id LIMIT 1")
+    student_class_id = c.fetchone()[0]
+    c.execute('UPDATE users SET class_id=? WHERE id=?', (student_class_id, user_id))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('admin_panel', _anchor='settings'))
+
+@app.route('/admin/delete-admin/<int:user_id>', methods=['POST'])
+def admin_delete_admin(user_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('auth'))
+    if user_id == session.get('user_id'):
+        flash('You cannot delete your own admin account.', 'error')
+        return redirect(url_for('admin_panel', _anchor='settings'))
+    delete_user(user_id)
+    return redirect(url_for('admin_panel', _anchor='settings'))
+
+@app.route('/send-notification', methods=['GET', 'POST'])
+def send_notification_page():
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    all_classes = get_all_classes()
+    if request.method == 'POST':
+        message = request.form.get('message')
+        description = request.form.get('description')  # Accept description from form
+        class_id = request.form.get('class_id')
+        if message and class_id:
+            # Try to store description if add_notification supports it, else ignore
+            try:
+                add_notification(message, class_id, description)
+            except TypeError:
+                add_notification(message, class_id)
+            flash('Notification sent!', 'success')
+            return redirect(url_for('admin_panel', _anchor='notifications'))
+    return render_template('send_notification.html', all_classes=all_classes)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))

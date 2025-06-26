@@ -87,6 +87,19 @@ def init_db():
             FOREIGN KEY(parent_id) REFERENCES forum_messages(id)
         )
     ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS live_class_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            live_class_id INTEGER NOT NULL,
+            user_id INTEGER,
+            username TEXT,
+            message TEXT,
+            media_url TEXT,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(live_class_id) REFERENCES live_classes(id),
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
     conn.commit()
 
     # --- Data Migration ---
@@ -460,5 +473,35 @@ def delete_forum_message(message_id):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     c.execute("DELETE FROM forum_messages WHERE id = ? OR parent_id = ?", (message_id, message_id))
+    conn.commit()
+    conn.close()
+
+def save_live_class_message(live_class_id, user_id, username, message, media_url=None):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO live_class_messages (live_class_id, user_id, username, message, media_url)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (live_class_id, user_id, username, message, media_url))
+    conn.commit()
+    conn.close()
+
+def get_live_class_messages(live_class_id):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('''
+        SELECT id, user_id, username, message, media_url, timestamp
+        FROM live_class_messages
+        WHERE live_class_id = ?
+        ORDER BY timestamp ASC
+    ''', (live_class_id,))
+    messages = c.fetchall()
+    conn.close()
+    return messages
+
+def delete_live_class_message(message_id):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM live_class_messages WHERE id = ?', (message_id,))
     conn.commit()
     conn.close()

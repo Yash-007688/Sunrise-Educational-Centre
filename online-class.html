@@ -33,61 +33,51 @@
       </div>
     </header>
     <main class="container main-content" style="max-width: 100vw;">
-      {% if meeting_url %}
-      <section id="live-classroom" class="live-classroom-section">
-        <div class="live-classroom-wrapper">
-          <div class="video-area">
-            <iframe
-              src="{{ meeting_url }}"
-              allow="camera; microphone; fullscreen; display-capture"
-              style="width:100%; height:60vh; min-height:320px; border-radius:16px; border:0; background:#232946;"
-              title="Live Class Video"
-            ></iframe>
-            <div class="meeting-controls">
-              <button class="control-btn" title="Toggle Mic">🎤</button>
-              <button class="control-btn" title="Toggle Camera">🎥</button>
-              <button class="control-btn" title="Share Screen">🖥️</button>
-              <button class="control-btn leave" title="Leave" onclick="window.location.href='/online-class'">🚪 Leave</button>
-            </div>
-          </div>
-          <aside class="sidebar participants">
-            <h4>Participants</h4>
-            <ul>
-              <li>👩‍🏫 Teacher (Host)</li>
-              <li>🧑 Student 1</li>
-              <li>🧑 Student 2</li>
-              <li>...</li>
-            </ul>
-          </aside>
-          <aside class="sidebar chat">
-            <h4>Chat</h4>
-            <div class="chat-messages">
-              <div class="msg"><b>Teacher:</b> Welcome to class!</div>
-              <div class="msg"><b>Student 1:</b> Hello!</div>
-            </div>
-            <form class="chat-input" onsubmit="event.preventDefault();">
-              <input type="text" placeholder="Type a message..." />
-              <button type="submit">Send</button>
-            </form>
-          </aside>
-        </div>
-      </section>
-      {% else %}
-      <section id="join" class="card-section" style="max-width: 500px; margin: 2rem auto;">
-        <h2>Enter Live Classroom</h2>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="login-error" style="margin-bottom:1rem; background: #fc5c7d; color: #fff;">{{ message }}</div>
+      {% if role in ['admin', 'teacher'] %}
+      <section id="start-live" class="card-section" style="max-width: 500px; margin: 2rem auto;">
+        <h2>Start Live Class</h2>
+        <form method="POST" action="/start-live-class" class="login-form">
+          <label for="class_id">Select Class:</label>
+          <select name="class_id" id="class_id" required>
+            {% for c in all_classes %}
+              {% if c[1] not in ['admin', 'teacher'] %}
+                <option value="{{ c[0] }}">{{ c[1] }}</option>
+              {% endif %}
             {% endfor %}
+          </select>
+          <input type="text" name="topic" placeholder="Topic (optional)" />
+          <input type="text" name="description" placeholder="Description (optional)" />
+          <button type="submit" class="btn btn-primary">Start Live Class</button>
+            </form>
+      </section>
+      <section id="active-classes" class="card-section" style="max-width: 600px; margin: 2rem auto;">
+        <h2>Active Live Classes</h2>
+        {% if active_classes and active_classes|length > 0 %}
+          <ul style="list-style:none; padding:0;">
+            {% for c in active_classes %}
+              <li style="margin-bottom:1rem; padding:1rem; background:#f4f4f4; border-radius:12px;">
+                <strong>Class:</strong> {{ c[5] }} | <strong>Topic:</strong> {{ c[3] }}<br>
+                <a href="{{ c[2] }}" target="_blank" class="btn btn-primary" style="margin-top:0.5rem;">Join as Host</a>
+                <form method="POST" action="/end-live-class" style="display:inline; margin-left:1rem;">
+                  <input type="hidden" name="class_id" value="{{ c[5] }}" />
+                  <button type="submit" class="btn btn-primary" style="background:#fc5c7d;">End Class</button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No live classes are currently active.</p>
           {% endif %}
-        {% endwith %}
-        <form method="POST" action="/online-class" class="login-form">
-          <input type="text" name="class_code" placeholder="Class Code (6 digits)" required />
-          <input type="text" name="pin" placeholder="PIN (4 digits)" required />
-          <button type="submit" class="btn btn-primary">Join Class</button>
-        </form>
-        <p style="text-align:center; margin-top:1rem; color:#555;">Ask your teacher for the class code and PIN to join the session.</p>
+      </section>
+      {% elif role and meeting_url %}
+      <section id="join-now" class="card-section" style="max-width: 500px; margin: 2rem auto; text-align:center;">
+        <h2>Live Class is Active!</h2>
+        <a href="{{ meeting_url }}" target="_blank" class="btn btn-primary" style="font-size:1.2rem;">Join Now</a>
+      </section>
+      {% elif role %}
+      <section id="no-class" class="card-section" style="max-width: 500px; margin: 2rem auto; text-align:center;">
+        <h2>No Live Class</h2>
+        <p>Your teacher has not started a live class yet. Please check back later.</p>
       </section>
       {% endif %}
     </main>

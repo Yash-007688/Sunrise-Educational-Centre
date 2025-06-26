@@ -41,13 +41,23 @@
     <main class="container main-content">
       <section class="card-section" style="max-width:800px;margin:0 auto;">
         <h2>Forum Feed</h2>
-        <form id="forumForm" class="subscribe-form" style="margin-bottom:1.5rem;">
-          <input type="text" id="forumInput" placeholder="Start a new discussion..." required />
-          <button type="submit" class="btn btn-primary">Post</button>
-        </form>
-        <div id="forumMessages" class="card" style="min-height:120px; text-align:left; padding:1.5rem;">
+        <div id="forumMessages" style="min-height:120px; text-align:left; margin-bottom:2.5rem;">
           <div id="emptyForumMsg" style="color:#888; text-align:center;">No messages yet. Start the conversation!</div>
         </div>
+        <div class="chat-input-bar" style="display:flex;align-items:flex-end;gap:0.5rem;position:relative;">
+          <button id="forumEmojiBtn" type="button" class="btn btn-secondary" aria-label="Insert emoji" style="padding:0; width:44px; height:44px; border-radius:50%; display:flex;align-items:center;justify-content:center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fc5c7d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          </button>
+          <textarea id="forumInput" placeholder="Type your message..." rows="1" style="flex:1;resize:none;padding:0.7rem 1rem;border-radius:16px;min-height:44px;"></textarea>
+          <button id="forumUploadBtn" type="button" class="btn btn-secondary" aria-label="Attach media" style="padding:0; width:44px; height:44px; border-radius:50%; display:flex;align-items:center;justify-content:center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6a82fb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a5.5 5.5 0 0 1-7.78-7.78l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95l-9.2 9.19a1.5 1.5 0 0 1-2.12-2.12l8.49-8.49"/></svg>
+          </button>
+          <input type="file" id="forumMediaInput" accept="image/*,video/*" style="display:none;" />
+          <button id="forumSendBtn" class="btn btn-primary" style="padding:0.5rem 1.2rem;display:flex;align-items:center;gap:0.3rem;">
+            <span style="font-size:1.3rem;">&#10148;</span>
+          </button>
+        </div>
+        <div id="forumMediaPreview" style="margin-top:0.5rem;"></div>
       </section>
       <div style="text-align:center; margin: 1.5rem 0 2rem 0;">
         <button id="darkModeToggle" class="btn btn-primary" style="min-width:160px;">Toggle Dark Mode</button>
@@ -68,39 +78,5 @@
     </footer>
     <script src="script.js"></script>
     <script src="forum.js"></script>
-    <script>
-      // Forum message logic (client-side only, not persistent)
-      const forumForm = document.getElementById('forumForm');
-      const forumInput = document.getElementById('forumInput');
-      const forumMessages = document.getElementById('forumMessages');
-      const emptyForumMsg = document.getElementById('emptyForumMsg');
-      forumForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const msg = forumInput.value.trim();
-        if (!msg) return;
-        if (emptyForumMsg) emptyForumMsg.style.display = 'none';
-        const div = document.createElement('div');
-        div.textContent = msg;
-        div.style.margin = '0.5rem 0';
-        forumMessages.appendChild(div);
-        forumInput.value = '';
-      });
-      const toggleBtn = document.getElementById('darkModeToggle');
-      function setDarkMode(on) {
-        if (on) {
-          document.body.classList.add('dark-mode');
-          localStorage.setItem('darkMode', 'on');
-        } else {
-          document.body.classList.remove('dark-mode');
-          localStorage.setItem('darkMode', 'off');
-        }
-      }
-      toggleBtn.addEventListener('click', () => {
-        setDarkMode(!document.body.classList.contains('dark-mode'));
-      });
-      if (localStorage.getItem('darkMode') === 'on') {
-        document.body.classList.add('dark-mode');
-      }
-    </script>
   </body>
 </html>

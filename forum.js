@@ -278,12 +278,97 @@ setInterval(() => {
 }, 30000); // Update every 30 seconds
 
 document.addEventListener('DOMContentLoaded', () => {
-    const forumForm = document.getElementById('forumForm');
     const forumInput = document.getElementById('forumInput');
+    const forumSendBtn = document.getElementById('forumSendBtn');
+    const forumUploadBtn = document.getElementById('forumUploadBtn');
+    const forumMediaInput = document.getElementById('forumMediaInput');
+    const forumMediaPreview = document.getElementById('forumMediaPreview');
     const forumMessages = document.getElementById('forumMessages');
     const emptyForumMsg = document.getElementById('emptyForumMsg');
-
+    let selectedMediaFile = null;
     const API_URL = '/api/forum/messages';
+
+    // Media upload logic
+    forumUploadBtn.addEventListener('click', () => {
+        forumMediaInput.click();
+    });
+    forumMediaInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        selectedMediaFile = file || null;
+        forumMediaPreview.innerHTML = '';
+        if (file) {
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.maxWidth = '180px';
+                img.style.maxHeight = '120px';
+                img.style.borderRadius = '10px';
+                img.onload = () => URL.revokeObjectURL(img.src);
+                forumMediaPreview.appendChild(img);
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.controls = true;
+                video.style.maxWidth = '180px';
+                video.style.maxHeight = '120px';
+                video.style.borderRadius = '10px';
+                video.onloadeddata = () => URL.revokeObjectURL(video.src);
+                forumMediaPreview.appendChild(video);
+            } else {
+                forumMediaPreview.textContent = 'Unsupported file type.';
+            }
+        }
+    });
+
+    // Send message logic
+    async function sendMessage() {
+        const message = forumInput.value.trim();
+        if (!message && !selectedMediaFile) return;
+        forumSendBtn.disabled = true;
+        try {
+            let response;
+            if (selectedMediaFile) {
+                const formData = new FormData();
+                formData.append('message', message);
+                formData.append('media', selectedMediaFile);
+                response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+            } else {
+                response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+            }
+            if (response.ok) {
+                forumInput.value = '';
+                selectedMediaFile = null;
+                forumMediaInput.value = '';
+                forumMediaPreview.innerHTML = '';
+                fetchMessages();
+            } else {
+                alert('Failed to post message.');
+            }
+        } catch (error) {
+            console.error('Error posting message:', error);
+            alert('An error occurred. Please try again.');
+        } finally {
+            forumSendBtn.disabled = false;
+        }
+    }
+
+    forumSendBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        sendMessage();
+    });
+    forumInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
 
     async function fetchMessages() {
         try {
@@ -297,6 +382,96 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Helper: get initials from username
+    function getInitials(name) {
+        if (!name) return '?';
+        const parts = name.trim().split(' ');
+        if (parts.length === 1) return parts[0][0].toUpperCase();
+        return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+    }
+    // Helper: is this my message?
+    function isOwnMessage(msg) {
+        // You may want to compare with the logged-in username
+        const myName = window.currentUsername || (window.username || '');
+        return msg.username && myName && msg.username === myName;
+    }
+    // Helper: friendly time
+    function friendlyTime(ts) {
+        const date = new Date(ts);
+        const now = new Date();
+        const diff = Math.floor((now - date) / 1000);
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) return `${Math.floor(diff/60)} min ago`;
+        if (diff < 86400) return `${Math.floor(diff/3600)} hr ago`;
+        return date.toLocaleString();
+    }
+    // Spinner
+    function showSpinner() {
+        forumMessages.innerHTML = '<div class="forum-spinner" aria-label="Loading messages"></div>';
+    }
+    // Auto-scroll
+    function scrollToBottom() {
+        forumMessages.scrollTop = forumMessages.scrollHeight;
+    }
+    // Emoji picker
+    let emojiPicker = null;
+    function showEmojiPicker() {
+        if (emojiPicker) { emojiPicker.remove(); emojiPicker = null; return; }
+        emojiPicker = document.createElement('div');
+        emojiPicker.className = 'emoji-picker';
+        emojiPicker.setAttribute('role', 'dialog');
+        const emojis = ['😀','😂','😍','😎','👍','🙏','🎉','😢','😮','😡','❤️','🔥','🤔','😇','🥳','😅','😜','😏','😬','😱'];
+        emojis.forEach(e => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = e;
+            btn.onclick = () => {
+                forumInput.value += e;
+                forumInput.focus();
+                emojiPicker.remove();
+                emojiPicker = null;
+            };
+            emojiPicker.appendChild(btn);
+        });
+        document.querySelector('.chat-input-bar').appendChild(emojiPicker);
+    }
+    // Add emoji button
+    let emojiBtn = document.getElementById('forumEmojiBtn');
+    if (!emojiBtn) {
+        emojiBtn = document.createElement('button');
+        emojiBtn.id = 'forumEmojiBtn';
+        emojiBtn.type = 'button';
+        emojiBtn.className = 'btn btn-secondary';
+        emojiBtn.style.padding = '0.5rem 0.8rem';
+        emojiBtn.innerHTML = '<span style="font-size:1.3rem;">😊</span>';
+        document.querySelector('.chat-input-bar').insertBefore(emojiBtn, forumInput);
+    }
+    emojiBtn.onclick = showEmojiPicker;
+    // Drag & drop
+    const chatInputBar = document.querySelector('.chat-input-bar');
+    chatInputBar.addEventListener('dragover', e => { e.preventDefault(); chatInputBar.classList.add('dragover'); });
+    chatInputBar.addEventListener('dragleave', e => { chatInputBar.classList.remove('dragover'); });
+    chatInputBar.addEventListener('drop', e => {
+        e.preventDefault();
+        chatInputBar.classList.remove('dragover');
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            forumMediaInput.files = e.dataTransfer.files;
+            const event = new Event('change');
+            forumMediaInput.dispatchEvent(event);
+        }
+    });
+    // Simulate upload progress
+    function showUploadProgress() {
+        forumMediaPreview.innerHTML += '<div class="forum-upload-progress"><div class="forum-upload-progress-bar" style="width:0%"></div></div>';
+        const bar = forumMediaPreview.querySelector('.forum-upload-progress-bar');
+        let percent = 0;
+        return setInterval(() => {
+            percent += 10;
+            bar.style.width = percent + '%';
+            if (percent >= 100) clearInterval(progressIntv);
+        }, 80);
+    }
+    // Render messages as chat bubbles
     function renderMessages(messages) {
         if (messages.length === 0) {
             emptyForumMsg.style.display = 'block';
@@ -305,114 +480,111 @@ document.addEventListener('DOMContentLoaded', () => {
             emptyForumMsg.style.display = 'none';
             forumMessages.innerHTML = '';
             messages.forEach(msg => {
-                const messageEl = createMessageElement(msg);
-                forumMessages.appendChild(messageEl);
-            });
-        }
-    }
-
-    function createMessageElement(msg) {
-        const div = document.createElement('div');
-        div.className = 'forum-post';
-        div.setAttribute('data-id', msg.id);
-        
-        const postDate = new Date(msg.timestamp).toLocaleString();
-
-        div.innerHTML = `
-            <div class="post-header">
-                <strong>${msg.username}</strong>
-                <span class="post-date">${postDate}</span>
-            </div>
-            <p class="post-message">${msg.message}</p>
-            <div class="post-actions">
-                <button class="vote-btn upvote" data-id="${msg.id}">&#x25B2; Upvote (${msg.upvotes})</button>
-                <button class="vote-btn downvote" data-id="${msg.id}">&#x25BC; Downvote (${msg.downvotes})</button>
-                <button class="reply-btn" data-id="${msg.id}">Reply</button>
-            </div>
-            <div class="replies-container" id="replies-${msg.id}"></div>
-            <form class="reply-form" id="reply-form-${msg.id}" style="display:none;">
-                <input type="text" placeholder="Write a reply..." required>
-                <button type="submit">Post Reply</button>
-            </form>
-        `;
-
-        return div;
-    }
-
-    forumForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const message = forumInput.value.trim();
-        if (!message) return;
-
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message })
-            });
-            if (response.ok) {
-                forumInput.value = '';
-                fetchMessages();
-            } else {
-                alert('Failed to post message.');
-            }
-        } catch (error) {
-            console.error('Error posting message:', error);
-            alert('An error occurred. Please try again.');
-        }
-    });
-
-    forumMessages.addEventListener('click', async (e) => {
-        const target = e.target;
-        const messageId = target.dataset.id;
-
-        if (target.classList.contains('vote-btn')) {
-            const voteType = target.classList.contains('upvote') ? 'upvote' : 'downvote';
-            try {
-                const response = await fetch(`${API_URL}/${messageId}/vote`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ vote_type: voteType })
-                });
-                if (response.ok) fetchMessages();
-            } catch (error) {
-                console.error('Error voting:', error);
-            }
-        }
-
-        if (target.classList.contains('reply-btn')) {
-            const replyForm = document.getElementById(`reply-form-${messageId}`);
-            replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
-        }
-    });
-
-    forumMessages.addEventListener('submit', async (e) => {
-        if (e.target.classList.contains('reply-form')) {
-            e.preventDefault();
-            const form = e.target;
-            const messageId = form.id.split('-')[2];
-            const input = form.querySelector('input');
-            const message = input.value.trim();
-            if (!message) return;
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message, parent_id: messageId })
-                });
-                if (response.ok) {
-                    input.value = '';
-                    fetchMessages(); 
-                } else {
-                    alert('Failed to post reply.');
+                const isOwn = isOwnMessage(msg);
+                const postDiv = document.createElement('div');
+                postDiv.className = 'forum-post';
+                postDiv.setAttribute('role', 'listitem');
+                // Avatar
+                const avatar = document.createElement('div');
+                avatar.className = 'forum-avatar';
+                avatar.textContent = getInitials(msg.username);
+                // Bubble
+                const bubble = document.createElement('div');
+                bubble.className = 'forum-bubble' + (isOwn ? ' own' : '');
+                bubble.tabIndex = 0;
+                // Username
+                const uname = document.createElement('div');
+                uname.style.fontWeight = '600';
+                uname.style.fontSize = '1.01rem';
+                uname.textContent = msg.username;
+                bubble.appendChild(uname);
+                // Message text
+                const mtext = document.createElement('div');
+                mtext.innerHTML = msg.message.replace(/\n/g, '<br>');
+                bubble.appendChild(mtext);
+                // Media (image/video)
+                if (msg.media_url) {
+                    if (msg.media_url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                        const img = document.createElement('img');
+                        img.src = msg.media_url;
+                        img.alt = 'attachment';
+                        img.style.maxWidth = '180px';
+                        img.style.maxHeight = '120px';
+                        img.style.borderRadius = '10px';
+                        img.style.marginTop = '0.5rem';
+                        bubble.appendChild(img);
+                    } else if (msg.media_url.match(/\.(mp4|webm|ogg)$/i)) {
+                        const video = document.createElement('video');
+                        video.src = msg.media_url;
+                        video.controls = true;
+                        video.style.maxWidth = '180px';
+                        video.style.maxHeight = '120px';
+                        video.style.borderRadius = '10px';
+                        video.style.marginTop = '0.5rem';
+                        bubble.appendChild(video);
+                    }
                 }
-            } catch (error) {
-                console.error('Error posting reply:', error);
-            }
+                // Timestamp
+                const ts = document.createElement('span');
+                ts.className = 'forum-timestamp';
+                ts.textContent = friendlyTime(msg.timestamp);
+                bubble.appendChild(ts);
+                // Reply/quote UI
+                if (msg.reply_to) {
+                    const reply = document.createElement('div');
+                    reply.className = 'forum-reply';
+                    reply.textContent = msg.reply_to;
+                    bubble.insertBefore(reply, mtext);
+                }
+                // Link preview (UI only)
+                const urlMatch = msg.message.match(/https?:\/\/[\w\.-]+(\.[\w\.-]+)+[\w\-\._~:/?#[\]@!$&'()*+,;=.]+/);
+                if (urlMatch) {
+                    const preview = document.createElement('div');
+                    preview.className = 'forum-link-preview';
+                    preview.style.marginTop = '0.4rem';
+                    preview.style.fontSize = '0.97rem';
+                    preview.innerHTML = `<a href="${urlMatch[0]}" target="_blank" rel="noopener">${urlMatch[0]}</a>`;
+                    bubble.appendChild(preview);
+                }
+                // Actions (edit/delete for own)
+                if (isOwn) {
+                    const actions = document.createElement('div');
+                    actions.className = 'forum-actions-bar';
+                    const editBtn = document.createElement('button');
+                    editBtn.className = 'forum-action-btn';
+                    editBtn.textContent = 'Edit';
+                    editBtn.title = 'Edit message';
+                    editBtn.onclick = () => alert('Edit not implemented yet');
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'forum-action-btn';
+                    delBtn.textContent = 'Delete';
+                    delBtn.title = 'Delete message';
+                    delBtn.onclick = () => alert('Delete not implemented yet');
+                    actions.appendChild(editBtn);
+                    actions.appendChild(delBtn);
+                    bubble.appendChild(actions);
+                }
+                // Reply button
+                const replyBtn = document.createElement('button');
+                replyBtn.className = 'forum-action-btn reply-btn';
+                replyBtn.textContent = 'Reply';
+                replyBtn.title = 'Reply to this message';
+                replyBtn.onclick = () => alert('Reply not implemented yet');
+                bubble.appendChild(replyBtn);
+                // Layout: own messages right, others left
+                if (isOwn) {
+                    postDiv.appendChild(bubble);
+                    postDiv.appendChild(avatar);
+                } else {
+                    postDiv.appendChild(avatar);
+                    postDiv.appendChild(bubble);
+                }
+                forumMessages.appendChild(postDiv);
+            });
+            scrollToBottom();
         }
-    });
-    
+    }
+
     fetchMessages();
     setInterval(fetchMessages, 30000);
 
