@@ -236,7 +236,7 @@ def get_user_by_id(user_id):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     c.execute('''
-        SELECT u.id, u.username, u.class_id, u.paid, c.name FROM users u
+        SELECT u.id, u.username, u.class_id, u.paid, c.name, u.banned FROM users u
         LEFT JOIN classes c ON u.class_id = c.id
         WHERE u.id=?
     ''', (user_id,))

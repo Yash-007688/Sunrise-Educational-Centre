@@ -206,6 +206,11 @@ def auth():
         user_data = authenticate_user(username, password)
         if user_data:
             user_id, user_role = user_data
+            # Check if user is banned
+            user = get_user_by_id(user_id)
+            if user and len(user) > 4 and user[4] == 1:
+                error = 'Your account has been banned. Please contact Mohit Sir or admin to be unbanned.'
+                return render_template('auth.html', error=error)
             if user_role == selected_role:
                 session['user_id'] = user_id
                 session['username'] = username
@@ -580,6 +585,60 @@ def send_notification_page():
             flash('Notification sent!', 'success')
             return redirect(url_for('admin_panel', _anchor='notifications'))
     return render_template('send_notification.html', all_classes=all_classes)
+
+@app.route('/admin/create-forum-discussion', methods=['GET'])
+def admin_create_forum_discussion_page():
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    return render_template('admin_create_discussion.html')
+
+@app.route('/admin/create-forum-discussion', methods=['POST'])
+def admin_create_forum_discussion():
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    user_id = session.get('user_id')
+    username = session.get('username')
+    title = request.form.get('title')
+    message = request.form.get('message')
+    if not title or not message:
+        flash('Title and message are required.', 'error')
+        return redirect(url_for('admin_panel', _anchor='forum'))
+    # Combine title and message for storage (or adjust schema if needed)
+    full_message = f"<b>{title}</b>\n{message}"
+    save_forum_message(user_id, username, full_message)
+    flash('Forum discussion created successfully!', 'success')
+    return redirect(url_for('admin_panel', _anchor='forum'))
+
+@app.route('/admin/create-user', methods=['GET'])
+def admin_create_user_page():
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    all_classes = get_all_classes()
+    return render_template('admin_create_user.html', all_classes=all_classes)
+
+@app.route('/admin/create-user', methods=['POST'])
+def admin_create_user_submit():
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    username = request.form.get('username')
+    password = request.form.get('password')
+    class_id = request.form.get('class_id')
+    paid = request.form.get('paid')
+    if not all([username, password, class_id, paid]):
+        flash('All fields are required.', 'error')
+        return redirect(url_for('admin_create_user_page'))
+    # Use register_user from auth_handler
+    if register_user(username, password, class_id):
+        # Update paid status if needed
+        from auth_handler import update_user, get_user_by_id
+        user = get_user_by_id(username)
+        if user:
+            update_user(user[0], username, class_id, paid)
+        flash('User created successfully!', 'success')
+        return redirect(url_for('admin_panel', _anchor='users'))
+    else:
+        flash('Username already exists. Please choose another.', 'error')
+        return redirect(url_for('admin_create_user_page'))
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))

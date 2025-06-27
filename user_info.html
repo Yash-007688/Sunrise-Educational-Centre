@@ -6,6 +6,85 @@
   <title>Edit User - Admin</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: #f4f6fb;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .user-info-section {
+      max-width: 500px;
+      margin: 2.5rem auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(100,100,255,0.07);
+      padding: 2.5rem 2rem;
+    }
+    .user-info-section h2 {
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #232946;
+    }
+    .user-info-section label {
+      font-weight: 600;
+      color: #232946;
+    }
+    .user-info-section input[type="text"],
+    .user-info-section select {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 1.2rem;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      background: #f9faff;
+      color: #232946;
+      box-sizing: border-box;
+    }
+    .user-info-section select {
+      border-radius: 20px;
+    }
+    .btn.btn-primary {
+      background: #6a82fb;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.3rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 1rem;
+    }
+    .btn.btn-primary:hover {
+      background: #232946;
+    }
+    .back-link {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    .back-link a {
+      color: #6a82fb;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+    .back-link a:hover {
+      color: #232946;
+    }
+    .login-error {
+      color: #fc5c7d;
+      background: #fff0f3;
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar glassmorphic">
@@ -24,20 +103,20 @@
     <section class="user-info-section">
       <h2>Edit User</h2>
       {% if error %}
-      <div class="login-error" style="margin-bottom:1rem;">{{ error }}</div>
+      <div class="login-error">{{ error }}</div>
       {% endif %}
       <form method="POST" class="login-form">
-        <input type="text" name="username" value="{{ user[1] }}" required placeholder="Username" style="margin-bottom:1rem;" />
-        <select name="class_id" required style="border-radius:20px; padding:0.7rem 1.1rem;">
+        <input type="text" name="username" value="{{ user[1] }}" required placeholder="Username" />
+        <select name="class_id" required>
           {% for id, name in all_classes %}
             <option value="{{ id }}" {% if user[2] == id %}selected{% endif %}>{{ name|title }}</option>
           {% endfor %}
         </select>
-        <select name="paid" required style="border-radius:20px; padding:0.7rem 1.1rem; margin-top:1rem;">
+        <select name="paid" required>
           <option value="not paid" {% if user[3]=='not paid' %}selected{% endif %}>Not Paid</option>
           <option value="paid" {% if user[3]=='paid' %}selected{% endif %}>Paid</option>
         </select>
-        <button type="submit" class="btn btn-primary" style="margin-top:1rem;">Update</button>
+        <button type="submit" class="btn btn-primary">Update</button>
       </form>
       <div class="back-link">
         <a href="/admin">&larr; Back to Admin Panel</a>

@@ -183,6 +183,7 @@
       </section>
       <section id="users" class="admin-section" aria-label="User management">
         <h2>User Management</h2>
+        <a href="/admin/create-user" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">+ Create User</a>
         <form method="GET" action="/admin" style="margin-bottom:1rem; text-align:right;">
           <input type="text" name="q" placeholder="Search by username" value="{{ search_query or '' }}" style="padding:0.5rem 1rem; border-radius:8px; border:1px solid #ccc; min-width:200px;" />
           <button type="submit" class="btn btn-primary" style="margin-left:0.5rem;">Search</button>
@@ -209,6 +210,9 @@
                   <form method="POST" action="/delete-user/{{ id }}" style="display:inline;">
                     <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Delete</button>
                   </form>
+                  <form method="POST" action="/admin/ban-user/{{ id }}" style="display:inline; margin-left:0.5rem;" onsubmit="return confirm('Are you sure you want to ban this user?');">
+                    <button type="submit" class="btn btn-primary" style="background:#232946; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Ban</button>
+                  </form>
                   <a href="/user-info/{{ id }}" class="btn btn-primary" style="background:#6a82fb; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px; margin-left:0.5rem;">Edit</a>
                 </td>
               </tr>
@@ -219,6 +223,7 @@
       </section>
       <section id="forum" class="admin-section" aria-label="Forum moderation">
         <h2>Forum Moderation</h2>
+        <a href="/admin/create-forum-discussion" class="btn btn-primary" style="margin-bottom:1.5rem;">+ Create New Discussion</a>
         <form method="GET" action="/admin" style="margin-bottom:1rem; text-align:right;">
           <input type="text" name="forum_q" placeholder="Search by username or message" value="{{ forum_search_query or '' }}" style="padding:0.5rem 1rem; border-radius:8px; border:1px solid #ccc; min-width:200px;" />
           <button type="submit" class="btn btn-primary" style="margin-left:0.5rem;">Search</button>
@@ -375,16 +380,6 @@
       <section id="notifications" class="admin-section" aria-label="Notifications">
         <h2>Notifications & Announcements</h2>
         <a href="/send-notification" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">+ Send Notification</a>
-        <form method="POST" action="/add-notification" class="login-form" style="max-width:500px; margin:0 auto 2rem auto; display:flex; flex-wrap:wrap; gap:0.7rem; align-items:center;">
-          <textarea name="message" placeholder="Notification message" required rows="2" style="flex:2; min-width:180px; border-radius:14px; padding:0.7rem 1.1rem;"></textarea>
-          <select name="class_id" required style="border-radius:20px; padding:0.7rem 1.1rem; flex:1; min-width:120px;">
-            <option value="">All Classes</option>
-            {% for id, name in all_classes %}
-              <option value="{{ id }}">{{ name|title }}</option>
-            {% endfor %}
-          </select>
-          <button type="submit" class="btn btn-primary" style="flex:1; min-width:120px;">Send Notification</button>
-        </form>
         <div style="overflow-x:auto;">
           <table style="width:100%; border-collapse:collapse;">
             <thead>
