@@ -41,7 +41,8 @@ def init_db():
             message TEXT NOT NULL,
             class_role TEXT, -- Deprecated, for migration
             created_at TEXT NOT NULL,
-            class_id INTEGER REFERENCES classes(id)
+            class_id INTEGER REFERENCES classes(id),
+            target_paid_status TEXT
         )
     ''')
     
@@ -354,33 +355,33 @@ def get_resources_for_class_id(class_id):
 # Notification Management Functions (Refactored)
 # ==============================================================================
 
-def add_notification(message, class_id):
+def add_notification(message, class_id, target_paid_status='all'):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
-    c.execute('INSERT INTO notifications (message, class_id, created_at) VALUES (?, ?, ?)', 
-              (message, class_id, datetime.now().isoformat()))
+    c.execute(
+        'INSERT INTO notifications (message, class_id, created_at, target_paid_status) VALUES (?, ?, ?, ?)',
+        (message, class_id, datetime.now().isoformat(), target_paid_status)
+    )
     conn.commit()
     conn.close()
 
 def get_unread_notifications_for_user(user_id):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
-    # First, get the class_id for the user
-    c.execute('SELECT class_id FROM users WHERE id = ?', (user_id,))
+    c.execute('SELECT class_id, paid FROM users WHERE id = ?', (user_id,))
     result = c.fetchone()
     if not result:
         conn.close()
         return []
-    class_id = result[0]
-
-    # Now, get all notifications for that class that the user hasn't seen
+    class_id, user_paid_status = result
     c.execute('''
         SELECT n.id, n.message, n.created_at
         FROM notifications n
         LEFT JOIN user_notification_status uns ON n.id = uns.notification_id AND uns.user_id = ?
         WHERE n.class_id = ? AND uns.notification_id IS NULL
+        AND (n.target_paid_status = 'all' OR n.target_paid_status = ?)
         ORDER BY n.created_at DESC
-    ''', (user_id, class_id))
+    ''', (user_id, class_id, user_paid_status))
     notifications = c.fetchall()
     conn.close()
     return notifications
@@ -411,7 +412,8 @@ def get_all_notifications():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     c.execute('''
-        SELECT n.id, n.message, c.name, n.created_at FROM notifications n
+        SELECT n.id, n.message, c.name, n.created_at, n.target_paid_status
+        FROM notifications n
         LEFT JOIN classes c ON n.class_id = c.id
         ORDER BY created_at DESC
     ''')

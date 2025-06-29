@@ -685,14 +685,11 @@ def send_notification_page():
     all_classes = get_all_classes()
     if request.method == 'POST':
         message = request.form.get('message')
-        description = request.form.get('description')  # Accept description from form
+        description = request.form.get('description')
         class_id = request.form.get('class_id')
+        target_paid_status = request.form.get('target_paid_status', 'all')
         if message and class_id:
-            # Try to store description if add_notification supports it, else ignore
-            try:
-                add_notification(message, class_id, description)
-            except TypeError:
-                add_notification(message, class_id)
+            add_notification(message, class_id, target_paid_status)
             flash('Notification sent!', 'success')
             return redirect(url_for('admin_panel', _anchor='notifications'))
     return render_template('send_notification.html', all_classes=all_classes)
