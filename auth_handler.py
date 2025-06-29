@@ -462,7 +462,7 @@ def get_live_class(class_code, pin):
 def get_active_classes():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
-    c.execute('SELECT id, class_code, pin, topic, description, created_at FROM live_classes WHERE is_active=1 ORDER BY created_at DESC')
+    c.execute('SELECT id, class_code, pin, meeting_url, topic, description FROM live_classes WHERE is_active=1 ORDER BY created_at DESC')
     classes = c.fetchall()
     conn.close()
     return classes

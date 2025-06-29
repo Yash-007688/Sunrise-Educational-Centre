@@ -795,6 +795,18 @@ def delete_topic_route(topic_id):
 def uploaded_forum_media(filename):
     return send_from_directory(os.path.join(UPLOAD_FOLDER, 'forum_media'), filename)
 
+@app.route('/admin/delete-live-class/<int:class_id>', methods=['POST'])
+def delete_live_class(class_id):
+    import sqlite3
+    from flask import flash, redirect, url_for
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM live_classes WHERE id = ?', (class_id,))
+    conn.commit()
+    conn.close()
+    flash('Live class deleted!', 'success')
+    return redirect(url_for('admin_panel', _anchor='classes'))
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port) 
