@@ -44,6 +44,7 @@ def init_db():
             class_id INTEGER REFERENCES classes(id)
         )
     ''')
+    
     c.execute('''
         CREATE TABLE IF NOT EXISTS user_notification_status (
             user_id INTEGER NOT NULL,
@@ -100,6 +101,16 @@ def init_db():
             FOREIGN KEY(user_id) REFERENCES users(id)
         )
     ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS forum_topics (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            description TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            class_id INTEGER REFERENCES classes(id),
+            paid TEXT DEFAULT 'unpaid'
+        )
+    ''')
     conn.commit()
 
     # --- Data Migration ---
@@ -133,6 +144,27 @@ def init_db():
         try:
             c.execute("ALTER TABLE resources ADD COLUMN category TEXT NOT NULL DEFAULT 'uncategorized'")
             c.execute('PRAGMA user_version = 2')
+            conn.commit()
+        except sqlite3.OperationalError as e:
+            if "duplicate column" not in str(e):
+                raise e
+    
+    if db_version < 3:
+        # Migration V3: Add paid column to forum_topics
+        try:
+            c.execute("ALTER TABLE forum_topics ADD COLUMN paid TEXT DEFAULT 'unpaid'")
+            c.execute('PRAGMA user_version = 3')
+            conn.commit()
+        except sqlite3.OperationalError as e:
+            if "duplicate column" not in str(e):
+                raise e
+    
+    if db_version < 4:
+        # Migration V4: Add mobile number and email address to users
+        try:
+            c.execute("ALTER TABLE users ADD COLUMN mobile_no TEXT")
+            c.execute("ALTER TABLE users ADD COLUMN email_address TEXT")
+            c.execute('PRAGMA user_version = 4')
             conn.commit()
         except sqlite3.OperationalError as e:
             if "duplicate column" not in str(e):
@@ -194,12 +226,13 @@ def get_all_classes():
 # User Management Functions (Refactored)
 # ==============================================================================
 
-def register_user(username, password, class_id):
+def register_user(username, password, class_id, mobile_no=None, email_address=None):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     try:
         # New registrations now use class_id directly
-        c.execute('INSERT INTO users (username, password, class_id) VALUES (?, ?, ?)', (username, password, class_id))
+        c.execute('INSERT INTO users (username, password, class_id, mobile_no, email_address) VALUES (?, ?, ?, ?, ?)', 
+                  (username, password, class_id, mobile_no, email_address))
         conn.commit()
         return True
     except sqlite3.IntegrityError:
@@ -225,7 +258,7 @@ def get_all_users():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     c.execute('''
-        SELECT u.id, u.username, c.name, u.paid FROM users u
+        SELECT u.id, u.username, c.name, u.paid, u.mobile_no, u.email_address FROM users u
         LEFT JOIN classes c ON u.class_id = c.id
     ''')
     users = c.fetchall()
@@ -236,7 +269,7 @@ def get_user_by_id(user_id):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     c.execute('''
-        SELECT u.id, u.username, u.class_id, u.paid, c.name, u.banned FROM users u
+        SELECT u.id, u.username, u.class_id, u.paid, c.name, u.banned, u.mobile_no, u.email_address FROM users u
         LEFT JOIN classes c ON u.class_id = c.id
         WHERE u.id=?
     ''', (user_id,))
@@ -244,10 +277,27 @@ def get_user_by_id(user_id):
     conn.close()
     return user
 
-def update_user(user_id, username, class_id, paid):
+def update_user(user_id, username, class_id, paid, banned=None, mobile_no=None, email_address=None):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
-    c.execute('UPDATE users SET username=?, class_id=?, paid=? WHERE id=?', (username, class_id, paid, user_id))
+    if banned is not None:
+        c.execute('UPDATE users SET username=?, class_id=?, paid=?, banned=?, mobile_no=?, email_address=? WHERE id=?', 
+                  (username, class_id, paid, banned, mobile_no, email_address, user_id))
+    else:
+        c.execute('UPDATE users SET username=?, class_id=?, paid=?, mobile_no=?, email_address=? WHERE id=?', 
+                  (username, class_id, paid, mobile_no, email_address, user_id))
+    conn.commit()
+    conn.close()
+
+def update_user_with_password(user_id, username, password, class_id, paid, banned=None, mobile_no=None, email_address=None):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    if banned is not None:
+        c.execute('UPDATE users SET username=?, password=?, class_id=?, paid=?, banned=?, mobile_no=?, email_address=? WHERE id=?', 
+                  (username, password, class_id, paid, banned, mobile_no, email_address, user_id))
+    else:
+        c.execute('UPDATE users SET username=?, password=?, class_id=?, paid=?, mobile_no=?, email_address=? WHERE id=?', 
+                  (username, password, class_id, paid, mobile_no, email_address, user_id))
     conn.commit()
     conn.close()
 
@@ -255,7 +305,7 @@ def search_users(query):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     c.execute('''
-        SELECT u.id, u.username, c.name, u.paid FROM users u
+        SELECT u.id, u.username, c.name, u.paid, u.mobile_no, u.email_address FROM users u
         LEFT JOIN classes c ON u.class_id = c.id
         WHERE u.username LIKE ?
     ''', (f'%{query}%',))
@@ -438,21 +488,152 @@ def delete_notification(notification_id):
     conn.commit()
     conn.close()
 
-def save_forum_message(user_id, username, message, parent_id=None):
+def create_topic(name, description, class_id=None, paid='unpaid'):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
-    c.execute(
-        "INSERT INTO forum_messages (user_id, username, message, parent_id) VALUES (?, ?, ?, ?)",
-        (user_id, username, message, parent_id)
-    )
+    c.execute('INSERT INTO forum_topics (name, description, class_id, paid) VALUES (?, ?, ?, ?)', (name, description, class_id, paid))
+    conn.commit()
+    topic_id = c.lastrowid
+    conn.close()
+    return topic_id
+
+def get_topics_by_class(class_id):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('SELECT id, name, description, created_at FROM forum_topics WHERE class_id = ? ORDER BY created_at DESC', (class_id,))
+    topics = c.fetchall()
+    conn.close()
+    return topics
+
+def get_topics_for_user(user_role, user_paid_status=None):
+    """Get topics based on user's role/class and paid status"""
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    
+    if user_role in ['admin', 'teacher']:
+        # Admin/teacher can see all topics
+        c.execute('SELECT id, name, description, created_at, paid FROM forum_topics ORDER BY created_at DESC')
+    else:
+        # Students see topics for their class and general topics (class_id is NULL)
+        # Filter by paid status: unpaid users only see unpaid topics, paid users see both
+        if user_paid_status == 'paid':
+            # Paid users can see both paid and unpaid topics for their class
+            c.execute('''
+                SELECT t.id, t.name, t.description, t.created_at, t.paid 
+                FROM forum_topics t 
+                LEFT JOIN classes c ON t.class_id = c.id 
+                WHERE (t.class_id IS NULL OR c.name = ?) 
+                ORDER BY t.created_at DESC
+            ''', (user_role,))
+        else:
+            # Unpaid users can only see unpaid topics for their class
+            c.execute('''
+                SELECT t.id, t.name, t.description, t.created_at, t.paid 
+                FROM forum_topics t 
+                LEFT JOIN classes c ON t.class_id = c.id 
+                WHERE (t.class_id IS NULL OR c.name = ?) 
+                AND (t.paid = 'unpaid' OR t.paid IS NULL)
+                ORDER BY t.created_at DESC
+            ''', (user_role,))
+    
+    topics = c.fetchall()
+    conn.close()
+    return topics
+
+def get_all_topics():
+    """Get all forum topics for admin use"""
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('SELECT id, name, description, class_id, created_at FROM forum_topics ORDER BY created_at DESC')
+    topics = c.fetchall()
+    conn.close()
+    return topics
+
+def delete_topic(topic_id):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM forum_topics WHERE id = ?', (topic_id,))
     conn.commit()
     conn.close()
 
-def get_forum_messages(parent_id=None):
+def can_user_access_topic(user_role, user_paid_status, topic_id):
+    """Check if user can access a specific topic based on their role, paid status, and class"""
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    
+    # Get topic details
+    c.execute('SELECT class_id, paid FROM forum_topics WHERE id = ?', (topic_id,))
+    topic = c.fetchone()
+    conn.close()
+    
+    if not topic:
+        return False
+    
+    class_id, topic_paid_status = topic
+    
+    # Admin/teacher can access all topics
+    if user_role in ['admin', 'teacher']:
+        return True
+    
+    # Check if user can access based on paid status
+    if topic_paid_status == 'paid' and user_paid_status != 'paid':
+        return False
+    
+    # If topic is paid and user is paid, allow access regardless of class
+    if topic_paid_status == 'paid' and user_paid_status == 'paid':
+        return True
+    
+    # Check if topic is for user's class or is general (class_id is NULL)
+    if class_id is None:
+        return True  # General topic, accessible to all
+    
+    # Get user's class
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('SELECT id FROM classes WHERE name = ?', (user_role,))
+    user_class = c.fetchone()
+    conn.close()
+    
+    if user_class and user_class[0] == class_id:
+        return True
+    
+    return False
+
+def save_forum_message(user_id, username, message, parent_id=None, topic_id=None, media_url=None):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    
+    # Get user details for access control
+    user = get_user_by_id(user_id)
+    
+    if not user or len(user) < 5:
+        conn.close()
+        return False
+    
+    user_class_name = user[4]  # class_name from get_user_by_id
+    user_paid_status = user[3]  # paid status from get_user_by_id
+    
+    # Check access control if topic_id is provided
+    if topic_id and not can_user_access_topic(user_class_name, user_paid_status, topic_id):
+        conn.close()
+        return False
+    
+    c.execute(
+        "INSERT INTO forum_messages (user_id, username, message, parent_id, topic_id, media_url) VALUES (?, ?, ?, ?, ?, ?)",
+        (user_id, username, message, parent_id, topic_id, media_url)
+    )
+    conn.commit()
+    conn.close()
+    return True
+
+def get_forum_messages(parent_id=None, topic_id=None):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     if parent_id is None:
-        c.execute("SELECT * FROM forum_messages WHERE parent_id IS NULL ORDER BY timestamp DESC")
+        if topic_id is not None:
+            c.execute("SELECT * FROM forum_messages WHERE parent_id IS NULL AND topic_id = ? ORDER BY timestamp DESC", (topic_id,))
+        else:
+            c.execute("SELECT * FROM forum_messages WHERE parent_id IS NULL ORDER BY timestamp DESC")
     else:
         c.execute("SELECT * FROM forum_messages WHERE parent_id = ? ORDER BY timestamp ASC", (parent_id,))
     messages = c.fetchall()

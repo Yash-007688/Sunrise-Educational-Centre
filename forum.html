@@ -7,8 +7,31 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="forum.css" />
+    <style>
+      .topic-badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+      }
+      .topic-badge.paid {
+        background: #10b981;
+        color: white;
+      }
+      .topic-badge.unpaid {
+        background: #6b7280;
+        color: white;
+      }
+      .topic-name {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    </style>
   </head>
-  <body>
+  <body data-user-role="{{ role }}" data-user-paid="{{ user_paid_status or 'unpaid' }}">
     <nav class="navbar glassmorphic">
       <div class="container nav-content">
         <div class="nav-logo">
@@ -36,11 +59,29 @@
       <div class="container hero-content">
         <h1>Student Forum</h1>
         <p>Ask questions, share ideas, and connect with your peers!</p>
+        {% if user_paid_status %}
+        <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
+          Status: <span style="color: {{ '#10b981' if user_paid_status == 'paid' else '#6b7280' }}; font-weight: 600;">{{ user_paid_status|title }}</span>
+        </p>
+        {% endif %}
       </div>
     </header>
     <main class="container main-content">
       <section class="card-section" style="max-width:800px;margin:0 auto;">
-        <h2>Forum Feed</h2>
+        <h2>Forum Discussions</h2>
+        
+        <!-- Topic Selection Tabs (like study-resources) -->
+        <div class="tabs">
+          {% for topic in all_topics %}
+            <button class="tab-button" data-topic="{{ topic[0] }}" data-topic-name="{{ topic[1] }}">
+                {{ topic[1] }}
+              {% if topic[4] == 'paid' and user_paid_status != 'paid' %}
+                <span class="access-lock" title="Paid topic - upgrade required">🔒</span>
+              {% endif %}
+            </button>
+          {% endfor %}
+        </div>
+        
         <div id="forumMessages" style="min-height:120px; text-align:left; margin-bottom:2.5rem;">
           <div id="emptyForumMsg" style="color:#888; text-align:center;">No messages yet. Start the conversation!</div>
         </div>
@@ -53,6 +94,9 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6a82fb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a5.5 5.5 0 0 1-7.78-7.78l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95l-9.2 9.19a1.5 1.5 0 0 1-2.12-2.12l8.49-8.49"/></svg>
           </button>
           <input type="file" id="forumMediaInput" accept="image/*,video/*" style="display:none;" />
+          <button id="forumDeleteBtn" class="btn btn-secondary" style="padding:0.5rem 1.2rem;display:flex;align-items:center;gap:0.3rem; margin-right:0.3rem;" disabled title="Select your message to delete">
+            <span style="font-size:1.3rem;">🗑️</span>
+          </button>
           <button id="forumSendBtn" class="btn btn-primary" style="padding:0.5rem 1.2rem;display:flex;align-items:center;gap:0.3rem;">
             <span style="font-size:1.3rem;">&#10148;</span>
           </button>

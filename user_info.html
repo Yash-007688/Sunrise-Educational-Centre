@@ -107,6 +107,7 @@
       {% endif %}
       <form method="POST" class="login-form">
         <input type="text" name="username" value="{{ user[1] }}" required placeholder="Username" />
+        <input type="password" name="password" placeholder="New Password (leave blank to keep current)" />
         <select name="class_id" required>
           {% for id, name in all_classes %}
             <option value="{{ id }}" {% if user[2] == id %}selected{% endif %}>{{ name|title }}</option>
@@ -116,6 +117,8 @@
           <option value="not paid" {% if user[3]=='not paid' %}selected{% endif %}>Not Paid</option>
           <option value="paid" {% if user[3]=='paid' %}selected{% endif %}>Paid</option>
         </select>
+        <input type="tel" name="mobile_no" value="{{ user[6] or '' }}" placeholder="Mobile Number" />
+        <input type="email" name="email_address" value="{{ user[7] or '' }}" placeholder="Email Address" />
         <button type="submit" class="btn btn-primary">Update</button>
       </form>
       <div class="back-link">

@@ -9,10 +9,22 @@ from auth_handler import (
     create_live_class, get_live_class, get_active_classes, deactivate_class,
     get_class_details_by_id, get_all_classes, get_resources_for_class_id,
     mark_notification_as_seen, delete_notification,
-    save_forum_message, get_forum_messages, vote_on_message, delete_forum_message
+    save_forum_message, get_forum_messages, vote_on_message, delete_forum_message,
+    create_topic, delete_topic, get_all_topics, get_topics_for_user, can_user_access_topic,
+    update_user_with_password
 )
 import csv
 from io import StringIO
+from collections import Counter
+from functools import wraps
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('role') != 'admin':
+            return redirect(url_for('auth'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 app = Flask(__name__, static_folder='.', template_folder='.')
 app.secret_key = 'your_secret_key_here'  # Change this to a secure random value in production
@@ -78,21 +90,69 @@ def study_resources():
     return render_template('study-resources.html', resources=resources, class_name=role, paid_status=paid_status)
 
 # Route for forum
-@app.route('/forum')
+@app.route("/forum")
 def forum():
-    username = session.get('username')
+    username = session.get("username")
+    role = session.get("role")
+    user_id = session.get("user_id")
+    
     if not username:
-        flash('You must be logged in to view the forum.', 'error')
-        return redirect(url_for('auth'))
-    return render_template('forum.html', username=username)
+        flash("You must be logged in to view the forum.", "error")
+        return redirect(url_for("auth"))
+    
+    # Get user's paid status
+    user_paid_status = None
+    if user_id:
+        user = get_user_by_id(user_id)
+        if user and len(user) > 3:
+            user_paid_status = user[3]  # user[3] is the paid status
+    
+    # Get topics for this user/class with paid status filtering
+    all_topics = get_topics_for_user(role, user_paid_status)
+    return render_template('forum.html', username=username, all_topics=all_topics, role=role, user_paid_status=user_paid_status)
 
 @app.route('/api/forum/messages', methods=['GET'])
 def api_get_forum_messages():
-    messages = get_forum_messages()
+    user_id = session.get('user_id')
+    user_role = session.get('role')
+    
+    if not user_id:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    # Get user's paid status
+    user = get_user_by_id(user_id)
+    user_paid_status = user[3] if user and len(user) > 3 else None
+    
+    topic_id = request.args.get('topic_id')
+    
+    # Check access control if specific topic is requested
+    if topic_id and topic_id != 'all':
+        if not can_user_access_topic(user_role, user_paid_status, int(topic_id)):
+            return jsonify({'error': 'Access denied to this topic'}), 403
+        messages = get_forum_messages(topic_id=int(topic_id))
+    else:
+        # For 'all' topics, filter based on user's access
+        if user_role in ['admin', 'teacher']:
+                messages = get_forum_messages()
+        else:
+            # Students only see messages from topics they can access
+            user_topics = get_topics_for_user(user_role, user_paid_status)
+            topic_ids = [topic[0] for topic in user_topics]
+            if topic_ids:
+                # Get messages from accessible topics
+                messages = []
+                for tid in topic_ids:
+                    topic_messages = get_forum_messages(topic_id=tid)
+                    messages.extend(topic_messages)
+                # Sort by timestamp
+                messages.sort(key=lambda x: x[7], reverse=True)
+            else:
+                messages = []
+    
     return jsonify([
         {
             'id': m[0], 'user_id': m[1], 'username': m[2], 'message': m[3],
-            'parent_id': m[4], 'upvotes': m[5], 'downvotes': m[6], 'timestamp': m[7]
+            'parent_id': m[4], 'upvotes': m[5], 'downvotes': m[6], 'timestamp': m[7], 'topic_id': m[8] if len(m) > 8 else None
         } for m in messages
     ])
 
@@ -102,13 +162,45 @@ def api_post_forum_message():
     username = session.get('username')
     if not user_id:
         return jsonify({'error': 'Unauthorized'}), 401
-    data = request.json
-    message = data.get('message')
-    parent_id = data.get('parent_id')
-    if not message:
-        return jsonify({'error': 'Message cannot be empty'}), 400
-    save_forum_message(user_id, username, message, parent_id)
-    return jsonify({'success': True}), 201
+
+    # Handle both JSON and multipart/form-data
+    if request.content_type and request.content_type.startswith('multipart/form-data'):
+        message = request.form.get('message')
+        parent_id = request.form.get('parent_id')
+        topic_id = request.form.get('topic_id')
+        file = request.files.get('media')
+        media_url = None
+        if file and file.filename:
+            filename = secure_filename(file.filename)
+            media_folder = os.path.join(UPLOAD_FOLDER, 'forum_media')
+            os.makedirs(media_folder, exist_ok=True)
+            filepath = os.path.join(media_folder, filename)
+            file.save(filepath)
+            media_url = f'uploads/forum_media/{filename}'
+    else:
+        data = request.json
+        message = data.get('message') if data else None
+        parent_id = data.get('parent_id') if data else None
+        topic_id = data.get('topic_id') if data else None
+        media_url = None
+
+    if not message and not media_url:
+        return jsonify({'error': 'Message or media required'}), 400
+
+    # Check access control for the topic
+    if topic_id:
+        user = get_user_by_id(user_id)
+        if user and len(user) > 4:
+            user_class_name = user[4]  # class_name from get_user_by_id
+            user_paid_status = user[3]  # paid status from get_user_by_id
+            if not can_user_access_topic(user_class_name, user_paid_status, topic_id):
+                return jsonify({'error': 'Access denied to this topic'}), 403
+
+    success = save_forum_message(user_id, username, message, parent_id, topic_id, media_url)
+    if success:
+        return jsonify({'success': True}), 201
+    else:
+        return jsonify({'error': 'Access denied or invalid topic'}), 403
 
 @app.route('/api/forum/messages/<int:message_id>/replies', methods=['GET'])
 def api_get_message_replies(message_id):
@@ -133,7 +225,15 @@ def api_vote_on_message(message_id):
 
 @app.route('/api/forum/messages/<int:message_id>', methods=['DELETE'])
 def api_delete_forum_message(message_id):
-    if session.get('role') != 'admin':
+    user_id = session.get('user_id')
+    user_role = session.get('role')
+    # Only allow delete if admin or the message belongs to the user
+    from auth_handler import get_forum_messages
+    messages = get_forum_messages()
+    msg = next((m for m in messages if m[0] == message_id), None)
+    if not msg:
+        return jsonify({'error': 'Message not found'}), 404
+    if user_role != 'admin' and msg[1] != user_id:
         return jsonify({'error': 'Unauthorized'}), 401
     delete_forum_message(message_id)
     return jsonify({'success': True})
@@ -265,13 +365,16 @@ def admin_panel():
         total_resources = len(get_all_resources())
         total_classes = len(all_classes)
         # Most active users (by forum posts)
-        from collections import Counter
         user_post_counts = Counter([m[2] for m in get_forum_messages() if m[2]])
         most_active_users = user_post_counts.most_common(5)
         # Most uploaded resources by class
         class_resource_counts = Counter([r[1] for r in get_all_resources()])
         most_resource_classes = [(cid, count) for cid, count in class_resource_counts.most_common(5)]
-        return render_template('admin.html', resources=resources, users=users, search_query=q, all_notifications=all_notifications, active_classes=active_classes, forum_messages=forum_messages, forum_search_query=forum_q, all_classes=all_classes, total_users=total_users, total_forum_posts=total_forum_posts, total_resources=total_resources, total_classes=total_classes, most_active_users=most_active_users, most_resource_classes=most_resource_classes)
+        
+        # Get all topics for topic management
+        all_topics = get_all_topics()
+        
+        return render_template('admin.html', resources=resources, users=users, search_query=q, all_notifications=all_notifications, active_classes=active_classes, forum_messages=forum_messages, forum_search_query=forum_q, all_classes=all_classes, total_users=total_users, total_forum_posts=total_forum_posts, total_resources=total_resources, total_classes=total_classes, most_active_users=most_active_users, most_resource_classes=most_resource_classes, all_topics=all_topics)
     else:
         return redirect(url_for('auth'))
 
@@ -375,15 +478,23 @@ def user_info(user_id):
     error = None
     if request.method == 'POST':
         new_username = request.form.get('username')
+        new_password = request.form.get('password')
         new_class_id = request.form.get('class_id')
         new_paid = request.form.get('paid')
+        new_mobile_no = request.form.get('mobile_no')
+        new_email_address = request.form.get('email_address')
         if not all([new_username, new_class_id, new_paid]):
             error = 'Username, role, and paid status are required.'
         else:
-            update_user(user_id, new_username, new_class_id, new_paid)
+            # Update user with password if provided
+            if new_password:
+                update_user_with_password(user_id, new_username, new_password, new_class_id, new_paid, banned=None, mobile_no=new_mobile_no, email_address=new_email_address)
+            else:
+                update_user(user_id, new_username, new_class_id, new_paid, mobile_no=new_mobile_no, email_address=new_email_address)
             flash('User updated successfully!', 'success')
             return redirect(url_for('admin_panel'))
-    return render_template('user_info.html', user=user, error=error)
+    all_classes = get_all_classes()
+    return render_template('user_info.html', user=user, error=error, all_classes=all_classes)
 
 @app.route('/add-notification', methods=['POST'])
 def add_notification_route():
@@ -495,7 +606,7 @@ def admin_download_users():
     users = get_all_users()
     si = StringIO()
     cw = csv.writer(si)
-    cw.writerow(['ID', 'Username', 'Role', 'Paid'])
+    cw.writerow(['ID', 'Username', 'Role', 'Paid', 'Mobile Number', 'Email Address'])
     for u in users:
         cw.writerow(u)
     output = si.getvalue()
@@ -586,29 +697,6 @@ def send_notification_page():
             return redirect(url_for('admin_panel', _anchor='notifications'))
     return render_template('send_notification.html', all_classes=all_classes)
 
-@app.route('/admin/create-forum-discussion', methods=['GET'])
-def admin_create_forum_discussion_page():
-    if session.get('role') not in ['admin', 'teacher']:
-        return redirect(url_for('auth'))
-    return render_template('admin_create_discussion.html')
-
-@app.route('/admin/create-forum-discussion', methods=['POST'])
-def admin_create_forum_discussion():
-    if session.get('role') not in ['admin', 'teacher']:
-        return redirect(url_for('auth'))
-    user_id = session.get('user_id')
-    username = session.get('username')
-    title = request.form.get('title')
-    message = request.form.get('message')
-    if not title or not message:
-        flash('Title and message are required.', 'error')
-        return redirect(url_for('admin_panel', _anchor='forum'))
-    # Combine title and message for storage (or adjust schema if needed)
-    full_message = f"<b>{title}</b>\n{message}"
-    save_forum_message(user_id, username, full_message)
-    flash('Forum discussion created successfully!', 'success')
-    return redirect(url_for('admin_panel', _anchor='forum'))
-
 @app.route('/admin/create-user', methods=['GET'])
 def admin_create_user_page():
     if session.get('role') not in ['admin', 'teacher']:
@@ -639,6 +727,76 @@ def admin_create_user_submit():
     else:
         flash('Username already exists. Please choose another.', 'error')
         return redirect(url_for('admin_create_user_page'))
+
+@app.route('/admin/ban-user/<int:user_id>', methods=['POST'])
+def admin_ban_user(user_id):
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    
+    # Get user info and ban them
+    from auth_handler import get_user_by_id, add_notification
+    user = get_user_by_id(user_id)
+    if not user:
+        flash('User not found.', 'error')
+        return redirect(url_for('admin_panel', _anchor='users'))
+    
+    # Set user as banned using direct SQL
+    import sqlite3
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('UPDATE users SET banned=1 WHERE id=?', (user_id,))
+    conn.commit()
+    conn.close()
+    
+    # Send notification to the banned user
+    ban_message = "You are banned. Call Mohit Sir or admin to be unbanned."
+    add_notification(ban_message, user[2])  # user[2] is class_id
+    
+    flash(f'User {user[1]} has been banned and notified.', 'success')
+    return redirect(url_for('admin_panel', _anchor='users'))
+
+@app.route('/admin/create-topic', methods=['GET'])
+@admin_required
+def admin_create_topic_page():
+    all_classes = get_all_classes()
+    return render_template('admin_create_topic.html', all_classes=all_classes)
+
+@app.route('/admin/create-topic', methods=['POST'])
+@admin_required
+def admin_create_topic_submit():
+    name = request.form.get('name')
+    description = request.form.get('description')
+    class_id = request.form.get('class_id')
+    paid = request.form.get('paid')
+    
+    if not name or not class_id or not paid:
+        flash('Topic name, class, and paid status are required', 'error')
+        return redirect(url_for('admin_create_topic_page'))
+    
+    try:
+        # Create topic with class_id and paid status
+        create_topic(name, description, class_id, paid)
+        flash('Topic created successfully!', 'success')
+    except Exception as e:
+        flash(f'Error creating topic: {str(e)}', 'error')
+    
+    return redirect(url_for('admin_panel', _anchor='forum'))
+
+@app.route('/admin/delete-topic/<int:topic_id>', methods=['POST'])
+@admin_required
+def delete_topic_route(topic_id):
+    try:
+        delete_topic(topic_id)
+        flash('Topic deleted successfully!', 'success')
+    except Exception as e:
+        flash(f'Error deleting topic: {str(e)}', 'error')
+    
+    return redirect(url_for('admin_panel', _anchor='forum'))
+
+# Serve uploaded forum media
+@app.route('/uploads/forum_media/<filename>')
+def uploaded_forum_media(filename):
+    return send_from_directory(os.path.join(UPLOAD_FOLDER, 'forum_media'), filename)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
