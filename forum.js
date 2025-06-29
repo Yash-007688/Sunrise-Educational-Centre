@@ -7,6 +7,8 @@ let posts = [];
 let selectedMediaFile = null;
 let selectedMessageId = null;
 
+window.isAdmin = (window.isAdmin === true || window.isAdmin === 'true');
+
 // Sample forum posts data
 const samplePosts = [
   {
@@ -788,6 +790,15 @@ function renderMessages(messages) {
       replyBtn.onclick = () => alert('Reply not implemented yet');
       bubble.appendChild(replyBtn);
       
+      if (window.isAdmin) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'forum-action-btn delete-btn';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.title = 'Delete this message';
+        deleteBtn.onclick = () => deleteForumMessage(msg.id);
+        bubble.appendChild(deleteBtn);
+      }
+      
       if (isOwn) {
         postDiv.appendChild(bubble);
         postDiv.appendChild(avatar);
@@ -845,5 +856,19 @@ function setupDarkMode() {
   
   if (localStorage.getItem('darkMode') === 'on') {
     document.body.classList.add('dark-mode');
+  }
+}
+
+// Forum message deletion for admins
+async function deleteForumMessage(messageId) {
+  if (!confirm('Are you sure you want to delete this message?')) return;
+  const response = await fetch(`/api/forum/messages/${messageId}`, {
+    method: 'DELETE'
+  });
+  if (response.ok) {
+    // Refresh messages after deletion
+    fetchMessages(currentTopic);
+  } else {
+    alert('Failed to delete message.');
   }
 } 

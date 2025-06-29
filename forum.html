@@ -122,5 +122,8 @@
     </footer>
     <script src="script.js"></script>
     <script src="forum.js"></script>
+    <script>
+      window.isAdmin = {{ 'true' if role in ['admin', 'teacher'] else 'false' }};
+    </script>
   </body>
 </html>
