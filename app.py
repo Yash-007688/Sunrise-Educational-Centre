@@ -18,12 +18,7 @@ from io import StringIO
 from collections import Counter
 from functools import wraps
 import sqlite3
-from datetime import datetime
-import flask
-import gunicorn
-import werkzeug
-import pandas
-import openpyxl
+from datetime import datetime, timedelta, timezone
 
 # Import bulk upload routes
 from bulk_upload.routes import bulk_upload_bp
@@ -141,7 +136,9 @@ def forum():
     
     # Get topics for this user/class with paid status filtering
     all_topics = get_topics_for_user(role, user_paid_status)
-    return render_template('forum.html', username=username, all_topics=all_topics, role=role, user_paid_status=user_paid_status)
+    paid_topics = [t for t in all_topics if t[4] == 'paid']
+    unpaid_topics = [t for t in all_topics if t[4] != 'paid']
+    return render_template('forum.html', username=username, paid_topics=paid_topics, unpaid_topics=unpaid_topics, role=role, user_paid_status=user_paid_status)
 
 @app.route('/api/forum/messages', methods=['GET'])
 def api_get_forum_messages():
@@ -406,11 +403,26 @@ def admin_panel():
         # Most uploaded resources by class
         class_resource_counts = Counter([r[1] for r in get_all_resources()])
         most_resource_classes = [(cid, count) for cid, count in class_resource_counts.most_common(5)]
-        
         # Get all topics for topic management
         all_topics = get_all_topics()
-        
-        return render_template('admin.html', resources=resources, users=users, search_query=q, all_notifications=all_notifications, active_classes=active_classes, forum_messages=forum_messages, forum_search_query=forum_q, all_classes=all_classes, total_users=total_users, total_forum_posts=total_forum_posts, total_resources=total_resources, total_classes=total_classes, most_active_users=most_active_users, most_resource_classes=most_resource_classes, all_topics=all_topics)
+        # Build notification_usernames for personal ban notifications
+        notification_usernames = {}
+        import sqlite3
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        for n in all_notifications:
+            notif_id, message, class_name, created_at, target_paid_status = n
+            if target_paid_status == 'personal' and 'ban' in message.lower():
+                c.execute('SELECT user_id FROM user_notification_status WHERE notification_id=?', (notif_id,))
+                row = c.fetchone()
+                if row:
+                    user_id = row[0]
+                    c.execute('SELECT username FROM users WHERE id=?', (user_id,))
+                    user_row = c.fetchone()
+                    if user_row:
+                        notification_usernames[notif_id] = user_row[0]
+        conn.close()
+        return render_template('admin.html', resources=resources, users=users, search_query=q, all_notifications=all_notifications, notification_usernames=notification_usernames, active_classes=active_classes, forum_messages=forum_messages, forum_search_query=forum_q, all_classes=all_classes, total_users=total_users, total_forum_posts=total_forum_posts, total_resources=total_resources, total_classes=total_classes, most_active_users=most_active_users, most_resource_classes=most_resource_classes, all_topics=all_topics)
     else:
         return redirect(url_for('auth'))
 
@@ -467,7 +479,11 @@ def upload_resource():
             filepath = os.path.join(UPLOAD_FOLDER, filename)
             file.save(filepath)
             save_resource(filename, class_id, filepath, title, description, category)
-            # Send notification to all users of the class
+            # Send notification to paid users for worksheet/formula, else all
+            paid_categories = ['worksheet', 'formula', 'formula sheet']
+            if category and category.lower() in paid_categories:
+                add_notification('A new resource has been uploaded!', class_id, 'paid')
+            else:
             add_notification('A new resource has been uploaded!', class_id, 'all')
             flash('Resource uploaded successfully!', 'success')
             return redirect(url_for('admin_panel'))
@@ -775,19 +791,40 @@ def admin_ban_user(user_id):
         flash('User not found.', 'error')
         return redirect(url_for('admin_panel', _anchor='users'))
     
+    # Prevent banning admin or teacher
+    if user[4] in ['admin', 'teacher']:
+        flash('You cannot ban an admin or teacher.', 'error')
+        return redirect(url_for('admin_panel', _anchor='users'))
+    
+    # Prevent banning again on the same day
+    import sqlite3
+    from datetime import datetime, timedelta, timezone
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('SELECT ban_effective_at FROM users WHERE id=?', (user_id,))
+    row = c.fetchone()
+    if row and row[0]:
+        try:
+            ban_time = datetime.fromisoformat(row[0])
+            now = datetime.now(timezone.utc)
+            if ban_time.date() == now.date():
+                flash('User is already scheduled to be banned today.', 'error')
+                conn.close()
+                return redirect(url_for('admin_panel', _anchor='users'))
+        except Exception:
+            pass
+    
     # Send 24-hour ban warning notification to the user only
     ban_warning = "You will be banned within 24 hours. Call Mohit Sir or admin."
     add_personal_notification(ban_warning, user_id)
     
-    # Set user as banned using direct SQL
-    import sqlite3
-    conn = sqlite3.connect('users.db')
-    c = conn.cursor()
-    c.execute('UPDATE users SET banned=1 WHERE id=?', (user_id,))
+    # Schedule ban to take effect in 24 hours
+    ban_time = (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
+    c.execute('UPDATE users SET ban_effective_at=? WHERE id=?', (ban_time, user_id))
     conn.commit()
     conn.close()
     
-    flash(f'User {user[1]} has been banned and personally notified.', 'success')
+    flash(f'User {user[1]} will be banned in 24 hours and has been personally notified.', 'success')
     return redirect(url_for('admin_panel', _anchor='users'))
 
 @app.route('/admin/create-topic', methods=['GET'])
@@ -862,6 +899,12 @@ def submit_query():
                   (name, email, message, submitted_at))
         conn.commit()
     return redirect(url_for('home'))
+
+@app.before_request
+def require_login():
+    allowed_routes = ['home', 'auth', 'register', 'static_files']
+    if request.endpoint not in allowed_routes and not session.get('user_id'):
+        return redirect(url_for('auth'))
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))

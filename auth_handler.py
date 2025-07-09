@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 
 # ==============================================================================
 # Database Initialization and Migration
@@ -360,7 +360,7 @@ def add_notification(message, class_id, target_paid_status='all'):
     c = conn.cursor()
     c.execute(
         'INSERT INTO notifications (message, class_id, created_at, target_paid_status) VALUES (?, ?, ?, ?)',
-        (message, class_id, datetime.now().isoformat(), target_paid_status)
+        (message, class_id, datetime.now(timezone.utc).isoformat(), target_paid_status)
     )
     conn.commit()
     conn.close()
@@ -374,6 +374,7 @@ def get_unread_notifications_for_user(user_id):
         conn.close()
         return []
     class_id, user_paid_status = result
+    # Fetch class/paid notifications
     c.execute('''
         SELECT n.id, n.message, n.created_at
         FROM notifications n
@@ -383,15 +384,24 @@ def get_unread_notifications_for_user(user_id):
         ORDER BY n.created_at DESC
     ''', (user_id, class_id, user_paid_status))
     notifications = c.fetchall()
+    # Fetch personal notifications
+    c.execute('''
+        SELECT n.id, n.message, n.created_at
+        FROM notifications n
+        JOIN user_notification_status uns ON n.id = uns.notification_id AND uns.user_id = ?
+        WHERE n.class_id IS NULL AND n.target_paid_status = 'personal' AND uns.seen_at = '1970-01-01T00:00:00'
+        ORDER BY n.created_at DESC
+    ''', (user_id,))
+    personal_notifications = c.fetchall()
     conn.close()
-    return notifications
+    return notifications + personal_notifications
 
 def mark_notification_as_seen(user_id, notification_id):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     try:
         c.execute('INSERT INTO user_notification_status (user_id, notification_id, seen_at) VALUES (?, ?, ?)',
-                  (user_id, notification_id, datetime.now().isoformat()))
+                  (user_id, notification_id, datetime.now(timezone.utc).isoformat()))
         conn.commit()
     except sqlite3.IntegrityError:
         # This will fail if the primary key (user_id, notification_id) already exists, which is fine.
@@ -412,10 +422,18 @@ def get_all_notifications():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     c.execute('''
-        SELECT n.id, n.message, c.name, n.created_at, n.target_paid_status
+        SELECT n.id, n.message,
+            CASE 
+                WHEN n.class_id IS NOT NULL THEN c.name
+                ELSE uclass.name
+            END as class_name,
+            n.created_at, n.target_paid_status
         FROM notifications n
         LEFT JOIN classes c ON n.class_id = c.id
-        ORDER BY created_at DESC
+        LEFT JOIN user_notification_status uns ON n.id = uns.notification_id
+        LEFT JOIN users u ON uns.user_id = u.id
+        LEFT JOIN classes uclass ON u.class_id = uclass.id
+        ORDER BY n.created_at DESC
     ''')
     notifications = c.fetchall()
     conn.close()
@@ -427,7 +445,7 @@ def add_personal_notification(message, user_id):
     # Insert notification with class_id as NULL and target_paid_status as 'personal'
     c.execute(
         'INSERT INTO notifications (message, class_id, created_at, target_paid_status) VALUES (?, NULL, ?, ?)',
-        (message, datetime.now().isoformat(), 'personal')
+        (message, datetime.now(timezone.utc).isoformat(), 'personal')
     )
     notification_id = c.lastrowid
     # Mark as unread for this user only
@@ -460,7 +478,7 @@ def create_live_class(class_code, pin, meeting_url, topic, description):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
     c.execute('INSERT INTO live_classes (class_code, pin, meeting_url, topic, description, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-              (class_code, pin, meeting_url, topic, description, datetime.now().isoformat()))
+              (class_code, pin, meeting_url, topic, description, datetime.now(timezone.utc).isoformat()))
     conn.commit()
     new_class_id = c.lastrowid
     conn.close()

@@ -54,24 +54,26 @@
           <li><a href="/online-class">Live Class</a></li>
           <li><a href="/study-resources">Study Resources</a></li>
           <li><a href="/forum">Forum</a></li>
-          <li style="position:relative;">
-            <button id="notifBell" style="background:none; border:none; cursor:pointer; position:relative;">
+          <!-- Notification Bell (rebuilt, now before login/logout) -->
+          <li id="notifBellContainer" style="position:relative; z-index:9999;">
+            <button id="notifBell" style="background:none; border:none; cursor:pointer; position:relative; z-index:10000; padding:0;">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.63-5.64-5-6.32V4a1 1 0 1 0-2 0v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29A1 1 0 0 0 6 19h12a1 1 0 0 0 .71-1.71L18 16z" fill="#6a82fb"/></svg>
               {% if user_notifications and user_notifications|length > 0 %}
               <span style="position:absolute;top:0;right:0;width:10px;height:10px;background:#fc5c7d;border-radius:50%;"></span>
               {% endif %}
             </button>
-            <div id="notifDropdown" style="display:none; position:absolute; right:0; top:36px; background:#fff; min-width:260px; box-shadow:0 4px 24px rgba(100,100,255,0.13); border-radius:12px; z-index:100; padding:1rem;">
-              <strong style="color:#6a82fb;">Notifications</strong>
-              <ul style="list-style:none; padding:0; margin:0;">
+            <div id="notifDropdown" style="display:none; position:absolute; right:0; top:36px; background:#fff; min-width:320px; box-shadow:0 4px 24px rgba(100,100,255,0.13); border-radius:12px; z-index:10001; padding:1rem;">
+              <strong style="color:#6a82fb; font-size:1.15rem;">Notifications</strong>
+              <ul style="list-style:none; padding:0; margin:0; max-height:320px; overflow-y:auto;">
                 {% if user_notifications and user_notifications|length > 0 %}
                   {% for id, message, created_at in user_notifications %}
-                  <li style="padding:0.5rem 0; border-bottom:1px solid #eee; font-size:0.98rem; color:#232946;">
-                    {{ message }}<br><span style="font-size:0.85rem; color:#888;">{{ created_at[:19].replace('T', ' ') }}</span>
+                  <li style="padding:0.9rem 1.2rem; border-bottom:1px solid #eee; font-size:1.05rem; color:#232946; background:#f8fafc; border-radius:10px; margin-bottom:0.7rem;">
+                    <strong>{{ message }}</strong><br>
+                    <span style="font-size:0.92rem; color:#888;">{{ created_at[:19].replace('T', ' ') }}</span>
                   </li>
                   {% endfor %}
                 {% else %}
-                  <li style="padding:0.7rem 0; color:#888; text-align:center;">No new notifications.</li>
+                  <li style="padding:1.1rem 1.2rem; color:#888; text-align:center; background:#f8fafc; border-radius:10px;">No new notifications.</li>
                 {% endif %}
               </ul>
             </div>
@@ -199,19 +201,6 @@
             <div style="font-size:1.05rem; color:#14213d; margin-top:0.2rem;">7+ years of experience</div>
           </div>
         </div>
-      </section>
-      <section id="live" class="card-section">
-        <h2>Live Classroom Sessions</h2>
-        <div class="card-grid">
-          <div class="card animated-card">
-            <h3>Interactive Classes</h3>
-            <p>Real-time coaching with concept clarity and doubt resolution.</p>
-              </div>
-          <div class="card animated-card">
-            <h3>Modern Setup</h3>
-            <p>Comfortable, distraction-free environment for focused learning.</p>
-              </div>
-            </div>
       </section>
       <section id="community" class="card-section">
         <h2>Wall of Fame</h2>
@@ -463,63 +452,12 @@
       </div>
     </footer>
     <script src="script.js"></script>
+    <!-- Rebuilt Notification Bell Script -->
     <script>
-      const toggleBtn = document.getElementById('darkModeToggle');
-      function setDarkMode(on) {
-        if (on) {
-          document.body.classList.add('dark-mode');
-          localStorage.setItem('darkMode', 'on');
-        } else {
-          document.body.classList.remove('dark-mode');
-          localStorage.setItem('darkMode', 'off');
-        }
-      }
-      toggleBtn.addEventListener('click', () => {
-        setDarkMode(!document.body.classList.contains('dark-mode'));
-      });
-      // On page load, check preference
-      if (localStorage.getItem('darkMode') === 'on') {
-        document.body.classList.add('dark-mode');
-      }
-      // Teacher photo toggle
-      const showTeacherPhotoBtn = document.getElementById('showTeacherPhoto');
-      const teacherPhotoContainer = document.getElementById('teacherPhotoContainer');
-      let photoVisible = false;
-      showTeacherPhotoBtn.addEventListener('click', () => {
-        photoVisible = !photoVisible;
-        teacherPhotoContainer.style.display = photoVisible ? 'block' : 'none';
-        showTeacherPhotoBtn.textContent = photoVisible ? 'Hide Photo of Er. Mohit Nariyani' : 'Show Photo of Er. Mohit Nariyani';
-      });
-      // Typing animation for hero section
-      const typingText = "Empowering Students in Mathematics";
-      const typingHero = document.getElementById('typing-hero');
-      let typingIdx = 0;
-      let typingForward = true;
-      function typeHero() {
-        if (!typingHero) return;
-        if (typingForward) {
-          typingHero.textContent = typingText.slice(0, typingIdx);
-          typingIdx++;
-          if (typingIdx > typingText.length) {
-            typingForward = false;
-            setTimeout(typeHero, 1000); // Pause at end
-            return;
-          }
-        } else {
-          typingHero.textContent = typingText.slice(0, typingIdx);
-          typingIdx--;
-          if (typingIdx < 0) {
-            typingForward = true;
-            setTimeout(typeHero, 500); // Pause before restart
-            return;
-          }
-        }
-        setTimeout(typeHero, 60);
-      }
-      typeHero();
-      // Notification bell dropdown
-      const notifBell = document.getElementById('notifBell');
-      const notifDropdown = document.getElementById('notifDropdown');
+      document.addEventListener('DOMContentLoaded', function() {
+        var notifBell = document.getElementById('notifBell');
+        var notifDropdown = document.getElementById('notifDropdown');
+        var notifContainer = document.getElementById('notifBellContainer');
       if (notifBell && notifDropdown) {
         notifBell.addEventListener('click', function(e) {
           notifDropdown.style.display = notifDropdown.style.display === 'block' ? 'none' : 'block';
@@ -529,49 +467,11 @@
           notifDropdown.style.display = 'none';
         });
         notifDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
-      }
-
-      // Minimal FAQ accordion
-      document.querySelectorAll('.faq-question').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const answer = this.parentElement.querySelector('.faq-answer');
-          const open = answer.style.maxHeight && answer.style.maxHeight !== '0px';
-          // Close all
-          document.querySelectorAll('.faq-answer').forEach(a => a.style.maxHeight = '0');
-          document.querySelectorAll('.faq-question span').forEach(s => s.style.transform = 'rotate(0deg)');
-          // Open this one if not already open
-          if (!open) {
-            answer.style.maxHeight = answer.scrollHeight + 'px';
-            this.querySelector('span').style.transform = 'rotate(180deg)';
-          }
-        });
-      });
-
-      document.addEventListener('DOMContentLoaded', function() {
-        const programsLink = document.getElementById('programsLink');
-        const programsMenu = document.getElementById('programsMenu');
-        const programsDropdown = document.getElementById('programsDropdown');
-
-        // Show mega menu on click
-        programsLink.addEventListener('click', function(e) {
-          e.preventDefault();
-          programsMenu.style.display = (programsMenu.style.display === 'block') ? 'none' : 'block';
-        });
-
-        // Show mega menu on hover
-        programsDropdown.addEventListener('mouseenter', function() {
-          programsMenu.style.display = 'block';
-        });
-        programsDropdown.addEventListener('mouseleave', function() {
-          programsMenu.style.display = 'none';
-        });
-
-        // Hide mega menu when clicking outside
-        document.addEventListener('click', function(e) {
-          if (!programsDropdown.contains(e.target)) {
-            programsMenu.style.display = 'none';
-          }
-        });
+          // Extra: close dropdown if window resizes
+          window.addEventListener('resize', function() {
+            notifDropdown.style.display = 'none';
+          });
+        }
       });
     </script>
     <style>

@@ -109,8 +109,7 @@
           {% elif role %}
           <section id="no-class" class="card-section" style="max-width: 500px; margin: 2rem auto; text-align:center;">
             <h2>No Live Class</h2>
-            <img src="bulk_upload/live.jpg" alt="No Live Class" style="max-width:300px; width:100%; margin:1.5rem auto; display:block; border-radius:18px; box-shadow:0 4px 24px rgba(100,100,255,0.10);" />
-            <p style="color:#888; margin-top:1rem;">Your teacher has not started a live class yet. Please check back later.</p>
+            <p>Your teacher has not started a live class yet. Please check back later.</p>
           </section>
           {% endif %}
         </div>
@@ -169,7 +168,7 @@
       }
     </script>
     <script>
-      // Notification bell dropdown
+      document.addEventListener('DOMContentLoaded', function() {
       const notifBell = document.getElementById('notifBell');
       const notifDropdown = document.getElementById('notifDropdown');
       if (notifBell && notifDropdown) {
@@ -182,6 +181,7 @@
         });
         notifDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
       }
+      });
     </script>
   </body>
 </html>

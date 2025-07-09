@@ -171,16 +171,14 @@ class StudyResourcesBulkUploadHandler:
             return None, None
     
     def save_to_study_resources(self, file_data):
-        """Save file information to study resources database"""
+        """Save file information to study resources database and send notification"""
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
-            
             # Get class ID
             class_id = self.get_class_id(file_data['class'])
             if class_id is None:
                 return False
-            
             # Insert into resources table
             cursor.execute('''
                 INSERT INTO resources 
@@ -194,12 +192,17 @@ class StudyResourcesBulkUploadHandler:
                 file_data['description'],
                 file_data['category']
             ))
-            
+            # Send notification to all users of the class
+            try:
+                from auth_handler import add_notification
+                paid_categories = ['worksheet', 'formula', 'formula sheet']
+                target_paid_status = 'paid' if file_data['category'].lower() in paid_categories else 'all'
+                add_notification('A new resource has been uploaded!', class_id, target_paid_status)
+            except Exception as e:
+                logger.error(f"Error sending notification: {str(e)}")
             conn.commit()
             conn.close()
-            
             return True
-            
         except Exception as e:
             logger.error(f"Error saving to study resources: {str(e)}")
             return False

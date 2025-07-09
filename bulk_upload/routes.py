@@ -6,6 +6,7 @@ from datetime import datetime
 from .bulk_upload_handler import BulkUploadHandler
 from .study_resources_handler import StudyResourcesBulkUploadHandler
 import logging
+import glob
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -105,7 +106,8 @@ def confirm_upload():
     """Confirm and process the upload after user review"""
     try:
         data = request.json
-        excel_path = data.get('excel_path')
+        # Accept both 'excel_path' (old) and 'file_path' (new)
+        excel_path = data.get('excel_path') or data.get('file_path')
         uploaded_by = data.get('uploaded_by', 'admin')
         
         if not excel_path or not os.path.exists(excel_path):
@@ -117,12 +119,14 @@ def confirm_upload():
         # Process the Excel file
         results = study_resources_handler.process_study_resources_excel(excel_path, uploaded_by)
         
-        # Clean up temporary file
+        # Only delete the file if it is a temp file (not in xlsx folder)
+        xlsx_folder = os.path.join(os.getcwd(), 'xlsx')
         try:
-            os.remove(excel_path)
-            temp_dir = os.path.dirname(excel_path)
-            if os.path.exists(temp_dir):
-                os.rmdir(temp_dir)
+            if not excel_path.startswith(xlsx_folder):
+                os.remove(excel_path)
+                temp_dir = os.path.dirname(excel_path)
+                if os.path.exists(temp_dir):
+                    os.rmdir(temp_dir)
         except:
             pass
         
@@ -323,6 +327,43 @@ def preview_excel():
             'success': False,
             'error': f'Preview failed: {str(e)}'
         }), 500
+
+@bulk_upload_bp.route('/list-xlsx-files')
+def list_xlsx_files():
+    xlsx_folder = os.path.join(os.getcwd(), 'xlsx')
+    if not os.path.exists(xlsx_folder):
+        return jsonify({'success': True, 'files': [], 'message': 'xlsx folder does not exist'})
+    files = sorted([
+        os.path.basename(f)
+        for f in glob.glob(os.path.join(xlsx_folder, '*.xlsx')) + glob.glob(os.path.join(xlsx_folder, '*.xls'))
+        if os.path.isfile(f)
+    ])
+    return jsonify({'success': True, 'files': files, 'message': f'Found {len(files)} file(s).' if files else 'No Excel files found.'})
+
+@bulk_upload_bp.route('/preview-xlsx-file', methods=['POST'])
+def preview_xlsx_file():
+    data = request.get_json()
+    filename = data.get('filename')
+    if not filename:
+        return jsonify({'success': False, 'error': 'No filename provided'})
+    xlsx_folder = os.path.join(os.getcwd(), 'xlsx')
+    file_path = os.path.join(xlsx_folder, filename)
+    if not os.path.exists(file_path):
+        return jsonify({'success': False, 'error': 'File not found'})
+    try:
+        import pandas as pd
+        df = pd.read_excel(file_path)
+        preview_data = df.head(10).to_dict('records')
+        return jsonify({
+            'success': True,
+            'preview_data': preview_data,
+            'total_rows': len(df),
+            'columns': list(df.columns),
+            'file_path': file_path,
+            'message': f'Excel file loaded. Found {len(df)} rows.'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': f'Error reading Excel file: {str(e)}'})
 
 # Error handlers
 @bulk_upload_bp.errorhandler(413)

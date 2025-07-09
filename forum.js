@@ -578,13 +578,9 @@ function isOwnMessage(msg) {
 }
 
 function friendlyTime(ts) {
+  // Parse as UTC and convert to IST
   const date = new Date(ts);
-  const now = new Date();
-  const diff = Math.floor((now - date) / 1000);
-  if (diff < 60) return 'Just now';
-  if (diff < 3600) return `${Math.floor(diff/60)} min ago`;
-  if (diff < 86400) return `${Math.floor(diff/3600)} hr ago`;
-  return date.toLocaleString();
+  return date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 }
 
 function scrollToBottom() {
