@@ -110,18 +110,27 @@
           <section id="no-class" class="card-section" style="max-width: 500px; margin: 2rem auto; text-align:center;">
             <h2>No Live Class</h2>
             <p>Your teacher has not started a live class yet. Please check back later.</p>
+            <img src="bulk_upload/live.jpg" alt="No Live Class" style="max-width:320px; width:100%; margin:1.5rem auto 0 auto; display:block; border-radius:18px; box-shadow:0 2px 12px rgba(100,100,100,0.10);" />
           </section>
           {% endif %}
         </div>
         <div id="upcoming-tab-content" class="tab-content" style="display:none;">
           <h2 style="text-align:center;">Upcoming Classes</h2>
           <p style="text-align:center;">See which classes are scheduled to go live soon.</p>
-          <!-- Upcoming class content goes here -->
+          {% if not upcoming_classes or upcoming_classes|length == 0 %}
+          <div style="text-align:center; margin-top:2rem;">
+            <img src="bulk_upload/live.jpg" alt="No Upcoming Classes" style="max-width:320px; width:100%; border-radius:18px; box-shadow:0 2px 12px rgba(100,100,100,0.10);" />
+          </div>
+          {% endif %}
         </div>
         <div id="schedule-tab-content" class="tab-content" style="display:none;">
           <h2 style="text-align:center;">Class Schedule</h2>
           <p style="text-align:center;">View the full schedule of all classes.</p>
-          <!-- Schedule content goes here -->
+          {% if not schedule_classes or schedule_classes|length == 0 %}
+          <div style="text-align:center; margin-top:2rem;">
+            <img src="bulk_upload/live.jpg" alt="No Scheduled Classes" style="max-width:320px; width:100%; border-radius:18px; box-shadow:0 2px 12px rgba(100,100,100,0.10);" />
+          </div>
+          {% endif %}
         </div>
       </section>
       <script>

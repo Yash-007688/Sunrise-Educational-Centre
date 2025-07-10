@@ -721,3 +721,36 @@ def delete_live_class_message(message_id):
     c.execute('DELETE FROM live_class_messages WHERE id = ?', (message_id,))
     conn.commit()
     conn.close()
+
+def block_user(user_id, reason='Blocked by admin'):
+    import sys
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    # Get username
+    c.execute('SELECT username FROM users WHERE id=?', (user_id,))
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        return False
+    username = row[0]
+    # Insert into blocked_users
+    c.execute('INSERT INTO blocked_users (user_id, username, banned_at, reason) VALUES (?, ?, ?, ?)',
+              (user_id, username, datetime.now(timezone.utc).isoformat(), reason))
+    # Optionally, update user status in users table (e.g., set banned=1 if such a column exists)
+    try:
+        c.execute('UPDATE users SET banned=1 WHERE id=?', (user_id,))
+    except Exception:
+        pass  # If no banned column, ignore
+    conn.commit()
+    conn.close()
+    # Send personal notification
+    try:
+        from auth_handler import add_personal_notification
+    except ImportError:
+        add_personal_notification = None
+    if 'add_personal_notification' in globals() or add_personal_notification:
+        try:
+            add_personal_notification("You have been blocked by the admin. Contact Mohit Sir or admin for help.", user_id)
+        except Exception as e:
+            print(f"Failed to send notification: {e}", file=sys.stderr)
+    return True

@@ -80,11 +80,7 @@
       <div class="container hero-content">
         <h1>Student Forum</h1>
         <p>Ask questions, share ideas, and connect with your peers!</p>
-        {% if user_paid_status %}
-        <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
-          Status: <span style="color: {{ '#10b981' if user_paid_status == 'paid' else '#6b7280' }}; font-weight: 600;">{{ user_paid_status|title }}</span>
-        </p>
-        {% endif %}
+        <!-- Removed paid/not paid status line from hero banner -->
       </div>
     </header>
     <main class="container main-content">

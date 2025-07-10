@@ -11,7 +11,7 @@ from auth_handler import (
     mark_notification_as_seen, delete_notification,
     save_forum_message, get_forum_messages, vote_on_message, delete_forum_message,
     create_topic, delete_topic, get_all_topics, get_topics_for_user, can_user_access_topic,
-    update_user_with_password, add_personal_notification
+    update_user_with_password, add_personal_notification, block_user
 )
 import csv
 from io import StringIO
@@ -246,7 +246,7 @@ def api_vote_on_message(message_id):
     if not session.get('user_id'):
         return jsonify({'error': 'Unauthorized'}), 401
     data = request.json
-    vote_type = data.get('vote_type')
+    vote_type = data.get('vote_type') if data else None
     if vote_type not in ['upvote', 'downvote']:
         return jsonify({'error': 'Invalid vote type'}), 400
     vote_on_message(message_id, vote_type)
@@ -303,8 +303,10 @@ def start_live_class():
     description = request.form.get('description', '')
     room_name = f"SunriseEducation-{secrets.token_hex(8)}"
     meeting_url = f"https://meet.jit.si/{room_name}"
+    class_code = ''.join(secrets.choice('0123456789') for i in range(6))
+    pin = ''.join(secrets.choice('0123456789') for i in range(4))
     # Only one live class per class_id
-    create_live_class(class_id, meeting_url, topic, description)
+    create_live_class(class_code, pin, meeting_url, topic, description)
     # Send notification to all users of the class
     add_notification('A live class has started! Join now.', class_id, 'all')
     flash('Live class started!', 'success')
@@ -326,7 +328,7 @@ def auth():
     if request.method == 'POST':
         class_id = request.form.get('class_id')
         all_classes_dict = {str(c[0]): c[1] for c in get_all_classes()}
-        selected_role = all_classes_dict.get(class_id)
+        selected_role = all_classes_dict.get(str(class_id)) if class_id else None
         username = request.form.get('username')
         password = request.form.get('password')
         admin_code = request.form.get('admin_code')
@@ -363,7 +365,7 @@ def register():
     class_id = request.form.get('class_id')
     
     all_classes_dict = {str(c[0]): c[1] for c in get_all_classes()}
-    role = all_classes_dict.get(class_id)
+    role = all_classes_dict.get(str(class_id)) if class_id else None
     
     admin_code = request.form.get('admin_code')
     if role == 'admin':
@@ -421,8 +423,11 @@ def admin_panel():
                     user_row = c.fetchone()
                     if user_row:
                         notification_usernames[notif_id] = user_row[0]
+        # Fetch blocked users
+        c.execute('SELECT * FROM blocked_users ORDER BY banned_at DESC')
+        blocked_users = c.fetchall()
         conn.close()
-        return render_template('admin.html', resources=resources, users=users, search_query=q, all_notifications=all_notifications, notification_usernames=notification_usernames, active_classes=active_classes, forum_messages=forum_messages, forum_search_query=forum_q, all_classes=all_classes, total_users=total_users, total_forum_posts=total_forum_posts, total_resources=total_resources, total_classes=total_classes, most_active_users=most_active_users, most_resource_classes=most_resource_classes, all_topics=all_topics)
+        return render_template('admin.html', resources=resources, users=users, search_query=q, all_notifications=all_notifications, notification_usernames=notification_usernames, active_classes=active_classes, forum_messages=forum_messages, forum_search_query=forum_q, all_classes=all_classes, total_users=total_users, total_forum_posts=total_forum_posts, total_resources=total_resources, total_classes=total_classes, most_active_users=most_active_users, most_resource_classes=most_resource_classes, all_topics=all_topics, blocked_users=blocked_users)
     else:
         return redirect(url_for('auth'))
 
@@ -474,7 +479,7 @@ def upload_resource():
             flash('File, class, and category selection are required.', 'error')
         elif not allowed_file(file.filename):
             flash('File type not allowed.', 'error')
-        else:
+        elif file and file.filename:
             filename = secure_filename(file.filename)
             filepath = os.path.join(UPLOAD_FOLDER, filename)
             file.save(filepath)
@@ -484,7 +489,7 @@ def upload_resource():
             if category and category.lower() in paid_categories:
                 add_notification('A new resource has been uploaded!', class_id, 'paid')
             else:
-            add_notification('A new resource has been uploaded!', class_id, 'all')
+                add_notification('A new resource has been uploaded!', class_id, 'all')
             flash('Resource uploaded successfully!', 'success')
             return redirect(url_for('admin_panel'))
     return render_template('upload_resource.html')
@@ -574,7 +579,7 @@ def mark_notification_seen_route():
         return {'status': 'error', 'message': 'User not logged in'}, 401
     
     data = request.json
-    notification_id = data.get('notification_id')
+    notification_id = data.get('notification_id') if data else None
     
     if not notification_id:
         return {'status': 'error', 'message': 'Notification ID is required'}, 400
@@ -821,11 +826,61 @@ def admin_ban_user(user_id):
     # Schedule ban to take effect in 24 hours
     ban_time = (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
     c.execute('UPDATE users SET ban_effective_at=? WHERE id=?', (ban_time, user_id))
+    # Insert into blocked_users table
+    c.execute('INSERT INTO blocked_users (user_id, username, banned_at, reason) VALUES (?, ?, ?, ?)',
+              (user_id, user[1], datetime.now(timezone.utc).isoformat(), 'Banned by admin'))
     conn.commit()
     conn.close()
     
     flash(f'User {user[1]} will be banned in 24 hours and has been personally notified.', 'success')
     return redirect(url_for('admin_panel', _anchor='users'))
+
+@app.route('/admin/block-user/<int:user_id>', methods=['POST'])
+def admin_block_user(user_id):
+    if session.get('role') not in ['admin', 'teacher']:
+        return redirect(url_for('auth'))
+    import sqlite3
+    from datetime import datetime, timedelta, timezone
+    from auth_handler import add_personal_notification
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    # Schedule block to take effect in 24 hours
+    block_time = (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
+    c.execute('UPDATE users SET ban_effective_at=? WHERE id=?', (block_time, user_id))
+    conn.commit()
+    conn.close()
+    # Send block notification
+    block_warning = "You will be blocked within 24 hours. Call Mohit Sir or admin."
+    add_personal_notification(block_warning, user_id)
+    flash('User will be blocked in 24 hours and has been personally notified.', 'success')
+    return redirect(url_for('user_info', user_id=user_id))
+
+# Background check to move users to blocked_users after 24 hours
+import threading, time
+from auth_handler import block_user
+
+def block_user_background_job():
+    while True:
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc)
+        c.execute('SELECT id, ban_effective_at FROM users WHERE ban_effective_at IS NOT NULL')
+        for user_id, ban_effective_at in c.fetchall():
+            if ban_effective_at:
+                try:
+                    ban_time = datetime.fromisoformat(ban_effective_at)
+                    if now >= ban_time:
+                        block_user(user_id)
+                        c.execute('UPDATE users SET ban_effective_at=NULL WHERE id=?', (user_id,))
+                        conn.commit()
+                except Exception:
+                    continue
+        conn.close()
+        time.sleep(3600)  # Check every hour
+
+# Start the background job
+threading.Thread(target=block_user_background_job, daemon=True).start()
 
 @app.route('/admin/create-topic', methods=['GET'])
 @admin_required

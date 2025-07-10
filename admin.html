@@ -415,6 +415,8 @@
               <th style="padding:0.7rem 1rem; text-align:left;">Username</th>
               <th style="padding:0.7rem 1rem; text-align:left;">Role</th>
               <th style="padding:0.7rem 1rem; text-align:left;">Paid</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Mobile Number</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Email Address</th>
               <th style="padding:0.7rem 1rem; text-align:left;">Action</th>
             </tr>
           </thead>
@@ -425,6 +427,8 @@
               <td style="padding:0.7rem 1rem;">{{ username }}</td>
               <td style="padding:0.7rem 1rem;">{{ name }}</td>
               <td style="padding:0.7rem 1rem;">{{ paid }}</td>
+              <td style="padding:0.7rem 1rem;">{{ mobile_no or '' }}</td>
+              <td style="padding:0.7rem 1rem;">{{ email_address or '' }}</td>
               <td style="padding:0.7rem 1rem;">
                 <a href="/user-info/{{ id }}" class="btn btn-primary" style="background:#6a82fb; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px; margin-left:0.5rem;">Edit</a>
               </td>
@@ -680,6 +684,29 @@
                   <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Delete</button>
                 </form>
               </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section id="blocked-users" class="admin-section" aria-label="Blocked Users">
+      <h2>Blocked Users</h2>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f3f6fa;">
+              <th style="padding:0.7rem 1rem; text-align:left;">Username</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Banned At</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in blocked_users %}
+            <tr style="border-bottom:1px solid #eee;">
+              <td style="padding:0.7rem 1rem;">{{ user[2] }}</td>
+              <td style="padding:0.7rem 1rem;">{{ user[3][:19].replace('T', ' ') }}</td>
+              <td style="padding:0.7rem 1rem;">{{ user[4] }}</td>
             </tr>
             {% endfor %}
           </tbody>

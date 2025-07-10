@@ -188,6 +188,7 @@
               <th>Parent Phone</th>
               <th>Photo</th>
               <th>Submitted At</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -200,17 +201,111 @@
               <td>{{ adm[9] }}</td>
               <td>{{ adm[3] }}</td>
               <td>{{ adm[4] }}</td>
-              <td>{{ adm[10] }}</td>
-              <td>{{ adm[11] }}</td>
-              <td>{{ adm[12] }}</td>
               <td>{{ adm[5] }}</td>
               <td>{{ adm[6] }}</td>
-              <td>
-                {% if adm[7] %}
-                  <img src="/uploads/admission_photos/{{ adm[7] }}" alt="Photo" style="width:48px; height:48px; object-fit:cover; border-radius:8px;">
-                {% else %}-{% endif %}
-              </td>
+              <td>{{ adm[7] }}</td>
               <td>{{ adm[8] }}</td>
+              <td>{{ adm[10] }}</td>
+              <td><img src="{{ adm[11] }}" alt="Photo" style="max-width:60px; max-height:60px;" /></td>
+              <td>{{ adm[12] }}</td>
+              <td>
+                <form method="POST" action="/admissions/approve/{{ adm[0] }}" style="display:inline;">
+                  <button type="submit" class="btn btn-primary" style="background:#22c55e; color:#fff; border-radius:8px; padding:0.4rem 1rem; margin-right:0.5rem;">Approve</button>
+                </form>
+                <form method="POST" action="/admissions/disapprove/{{ adm[0] }}" style="display:inline;">
+                  <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; border-radius:8px; padding:0.4rem 1rem;">Disapprove</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="card-section" style="max-width:1100px; margin:2.5rem auto 0 auto;">
+      <h2>Approved Admissions</h2>
+      <div style="overflow-x:auto;">
+        <table class="admissions-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Student Name</th>
+              <th>DOB</th>
+              <th>Class</th>
+              <th>School</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Maths Marks (/80)</th>
+              <th>Maths Rating (/10)</th>
+              <th>Last %</th>
+              <th>Parent Name</th>
+              <th>Parent Phone</th>
+              <th>Photo</th>
+              <th>Submitted At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for adm in approved_admissions %}
+            <tr>
+              <td>{{ adm[0] }}</td>
+              <td>{{ adm[1] }}</td>
+              <td>{{ adm[13] }}</td>
+              <td>{{ adm[2] }}</td>
+              <td>{{ adm[9] }}</td>
+              <td>{{ adm[3] }}</td>
+              <td>{{ adm[4] }}</td>
+              <td>{{ adm[5] }}</td>
+              <td>{{ adm[6] }}</td>
+              <td>{{ adm[7] }}</td>
+              <td>{{ adm[8] }}</td>
+              <td>{{ adm[10] }}</td>
+              <td><img src="{{ adm[11] }}" alt="Photo" style="max-width:60px; max-height:60px;" /></td>
+              <td>{{ adm[12] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="card-section" style="max-width:1100px; margin:2.5rem auto 0 auto;">
+      <h2>Disapproved Admissions</h2>
+      <div style="overflow-x:auto;">
+        <table class="admissions-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Student Name</th>
+              <th>DOB</th>
+              <th>Class</th>
+              <th>School</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Maths Marks (/80)</th>
+              <th>Maths Rating (/10)</th>
+              <th>Last %</th>
+              <th>Parent Name</th>
+              <th>Parent Phone</th>
+              <th>Photo</th>
+              <th>Submitted At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for adm in disapproved_admissions %}
+            <tr>
+              <td>{{ adm[0] }}</td>
+              <td>{{ adm[1] }}</td>
+              <td>{{ adm[13] }}</td>
+              <td>{{ adm[2] }}</td>
+              <td>{{ adm[9] }}</td>
+              <td>{{ adm[3] }}</td>
+              <td>{{ adm[4] }}</td>
+              <td>{{ adm[5] }}</td>
+              <td>{{ adm[6] }}</td>
+              <td>{{ adm[7] }}</td>
+              <td>{{ adm[8] }}</td>
+              <td>{{ adm[10] }}</td>
+              <td><img src="{{ adm[11] }}" alt="Photo" style="max-width:60px; max-height:60px;" /></td>
+              <td>{{ adm[12] }}</td>
             </tr>
             {% endfor %}
           </tbody>
