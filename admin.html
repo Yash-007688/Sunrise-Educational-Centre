@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Dashboard - Sunrise Education Centre</title>
+  <title>Admin Dashboard</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="forum.css" />
@@ -310,7 +310,7 @@
     <div class="container nav-content">
       <div class="nav-logo">
         <img src="attached_assets/image_1750584670920.png" alt="Logo">
-        <span>Sunrise Admin Panel</span>
+        <span>Admin Panel</span>
       </div>
       <ul class="nav-links">
         <li><a href="#dashboard">Dashboard</a></li>
@@ -519,61 +519,9 @@
         </div>
       </div>
     </section>
-    <section id="classes" class="admin-section" aria-label="Class management">
-      <h2>Class & Content Management</h2>
-      <form method="POST" action="/create-live-class" class="login-form" style="margin-bottom:2rem; max-width:500px;">
-        <input type="text" name="topic" placeholder="Class Topic (e.g., Algebra Basics)" required style="margin-bottom:0.7rem;" />
-        <textarea name="description" placeholder="Short Description (e.g., Covering linear equations and practice problems)" required rows="3" style="border-radius:14px; padding:0.7rem 1.1rem; margin-bottom:0.7rem;"></textarea>
-        <button type="submit" class="btn btn-primary">Create Live Class</button>
-      </form>
-      {% if class_details %}
-      <section class="card-section" style="margin-top:2rem; text-align:center;">
-          <h2>Class Created Successfully!</h2>
-          <p>Share these details with your students.</p>
-          <div class="card animated-card" style="max-width:400px; margin: 1rem auto; text-align:left;">
-              <h3>{{ class_details.topic }}</h3>
-              <p>{{ class_details.description }}</p>
-              <hr style="border:0; border-top: 1px solid #eee; margin: 1rem 0;">
-              <p><strong>Code:</strong> <span style="font-size: 1.2rem; color: #fc5c7d;">{{ class_details.code }}</span></p>
-              <p><strong>PIN:</strong> <span style="font-size: 1.2rem; color: #fc5c7d;">{{ class_details.pin }}</span></p>
-              <p><strong>Join Link:</strong> <a href="{{ class_details.url }}" target="_blank">{{ class_details.url }}</a></p>
-          </div>
-      </section>
-      {% endif %}
-      <div style="margin-top:2.5rem;">
-        <h3>Active & Past Live Classes</h3>
-        <div style="overflow-x:auto;">
-          <table style="width:100%; border-collapse:collapse;">
-            <thead>
-              <tr style="background:#f3f6fa;">
-                <th style="padding:0.7rem 1rem; text-align:left;">Topic</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Code</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">PIN</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Join Link</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Status</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for id, class_code, pin, meeting_url, topic, description in active_classes %}
-              <tr style="border-bottom:1px solid #eee;">
-                <td style="padding:0.7rem 1rem;">{{ topic or 'N/A' }}</td>
-                <td style="padding:0.7rem 1rem;">{{ class_code }}</td>
-                <td style="padding:0.7rem 1rem;">{{ pin }}</td>
-                <td style="padding:0.7rem 1rem;"><a href="{{ meeting_url }}" target="_blank">Join</a></td>
-                <td style="padding:0.7rem 1rem;"><span style="color:#888;">Unknown</span></td>
-                <td style="padding:0.7rem 1rem;">
-                  <a href="{{ meeting_url }}" target="_blank" class="btn btn-primary" style="margin-bottom:0.3rem;">Join as Host</a>
-                  <form method="POST" action="/admin/delete-live-class/{{ id }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this live class?');">
-                    <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px; margin-top:0.3rem;">Delete</button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <!-- Content Management Section -->
+    <section id="content-management" class="admin-section" aria-label="Content management">
+      <h2>Content Management</h2>
       <div style="overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse;">
           <thead>
@@ -607,73 +555,21 @@
     </section>
     <section id="resources" class="admin-section" aria-label="Resource management">
       <h2>Resource Management</h2>
-      <a href="/upload-resource" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">+ Upload Resource</a>
+      <a href="/upload-resource" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">📁 Resource Management</a>
       <a href="/bulk-upload" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block; margin-left:1rem;">📁 Bulk Upload</a>
-      <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse;">
-          <thead>
-            <tr style="background:#f3f6fa;">
-              <th style="padding:0.7rem 1rem; text-align:left;">File</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Class</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Title</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Description</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Category</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for filename, class_id, filepath, title, description, category in resources %}
-            <tr style="border-bottom:1px solid #eee;">
-              <td style="padding:0.7rem 1rem;">{{ filename }}</td>
-              <td style="padding:0.7rem 1rem;">
-                {% for cid, cname in all_classes %}{% if cid == class_id %}{{ cname|title }}{% endif %}{% endfor %}
-              </td>
-              <td style="padding:0.7rem 1rem;">{{ title }}</td>
-              <td style="padding:0.7rem 1rem; max-width:220px; white-space:pre-line;">{{ description }}</td>
-              <td style="padding:0.7rem 1rem;">{{ category|title }}</td>
-              <td style="padding:0.7rem 1rem;">
-                <a href="/uploads/{{ filename }}" target="_blank" class="btn btn-primary" style="margin-bottom:0.3rem;">Download/View</a>
-                <form method="POST" action="/admin/delete-resource/{{ filename }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this resource?');">
-                  <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Delete</button>
-                </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+      <p style="color: #666; margin-bottom: 1rem;">Click "Resource Management" to upload, schedule, and manage all educational resources with our new comprehensive interface.</p>
     </section>
     <section id="notifications" class="admin-section" aria-label="Notifications">
       <h2>Notifications & Announcements</h2>
       <a href="/send-notification" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">+ Send Notification</a>
-      <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse;">
-          <thead>
-            <tr style="background:#f3f6fa;">
-              <th style="padding:0.7rem 1rem; text-align:left;">Message</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Class</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Date</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Audience</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for id, message, class_name, created_at, target_paid_status in all_notifications %}
-            <tr style="border-bottom:1px solid #eee;">
-              <td style="padding:0.7rem 1rem; max-width:320px; white-space:pre-line;">{{ message }}</td>
-              <td style="padding:0.7rem 1rem;">{{ class_name or 'All' }}</td>
-              <td style="padding:0.7rem 1rem;">{{ created_at[:19].replace('T', ' ') }}</td>
-              <td style="padding:0.7rem 1rem;">{{ target_paid_status|title }}</td>
-              <td style="padding:0.7rem 1rem;">
-                <form method="POST" action="/admin/delete-notification/{{ id }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this notification?');">
-                  <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Delete</button>
-                </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+      <!-- Notification history table removed; now on send notification page -->
+    </section>
+    <!-- Live Class Management Section -->
+    <section id="live-classes" class="admin-section" aria-label="Live class management">
+      <h2>Live Class Management</h2>
+      <a href="/live-class-management" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">🎥 Manage Live Classes</a>
+      <p style="color:#666; margin-bottom:2rem;">Create, schedule, and manage all live classes from the dedicated management page.</p>
+      <!-- No table here, only link and description -->
     </section>
   </main>
   <script src="script.js"></script>

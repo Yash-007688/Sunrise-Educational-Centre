@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Class Management - Admin</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .management-container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+    .header-section { text-align: center; margin-bottom: 3rem; }
+    .header-section h1 { color: #232946; font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .header-section p { color: #666; font-size: 1.1rem; }
+    
+    .tab-container { display: flex; background: #f8f9ff; border-radius: 12px; padding: 0.5rem; margin-bottom: 2rem; }
+    .tab-btn { flex: 1; padding: 1rem; background: none; border: none; cursor: pointer; font-weight: 500; color: #666; border-radius: 8px; transition: all 0.3s; }
+    .tab-btn.active { background: #6a82fb; color: #fff; }
+    .tab-btn:hover:not(.active) { background: rgba(106,130,251,0.1); }
+    
+    .tab-content { display: none; background: #fff; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 24px rgba(100,100,255,0.08); }
+    .tab-content.active { display: block; }
+    
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem; transition: all 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #6a82fb; box-shadow: 0 0 0 3px rgba(106,130,251,0.1); }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    
+    .btn-primary { background: linear-gradient(135deg, #6a82fb 0%, #5a6fd8 100%); color: #fff; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(106,130,251,0.3); }
+    .btn-secondary { background: linear-gradient(135deg, #fc5c7d 0%, #e74c3c 100%); color: #fff; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(252,92,125,0.3); }
+    .btn-success { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: #fff; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-success:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(72,187,120,0.3); }
+    
+    .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+    .class-card { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(100,100,255,0.08); border: 1px solid #e0e7ff; transition: all 0.2s; }
+    .class-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(100,100,255,0.12); }
+    .class-status { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500; margin-bottom: 1rem; }
+    .status-active { background: #d4edda; color: #155724; }
+    .status-scheduled { background: #fff3cd; color: #856404; }
+    .status-completed { background: #d1ecf1; color: #0c5460; }
+    
+    .device-settings { background: #f8f9ff; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .device-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+    .device-item { background: #fff; border-radius: 8px; padding: 1rem; border: 1px solid #e0e7ff; }
+    .device-item h4 { margin-bottom: 0.5rem; color: #232946; }
+    .device-select { width: 100%; padding: 0.5rem; border: 1px solid #e0e7ff; border-radius: 6px; margin-bottom: 0.5rem; }
+    .device-controls { display: flex; gap: 0.5rem; }
+    .device-btn { padding: 0.4rem 0.8rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .test-btn { background: #6a82fb; color: #fff; }
+    .mute-btn { background: #fc5c7d; color: #fff; }
+    
+    .back-link { display: inline-block; margin-bottom: 2rem; color: #6a82fb; text-decoration: none; font-weight: 500; }
+    .back-link:hover { text-decoration: underline; }
+    
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .class-grid { grid-template-columns: 1fr; }
+      .tab-container { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="management-container">
+    <a href="/admin" class="back-link">&larr; Back to Admin Panel</a>
+    
+    <div class="header-section">
+      <h1>🎥 Live Class Management</h1>
+      <p>Create, schedule, and manage all your live classes from one place</p>
+    </div>
+    
+    <div class="tab-container">
+      <button class="tab-btn active" onclick="showTab('create')">Create Class</button>
+      <button class="tab-btn" onclick="showTab('schedule')">Scheduled</button>
+      <button class="tab-btn" onclick="showTab('active')">Active</button>
+      <button class="tab-btn" onclick="showTab('completed')">Completed</button>
+      <button class="tab-btn" onclick="showTab('devices')">Device Settings</button>
+    </div>
+    
+    <!-- Create Class Tab -->
+    <div id="create-tab" class="tab-content active">
+      <h2>Create New Live Class</h2>
+      <form id="createClassForm" method="POST" action="/create-live-class" enctype="multipart/form-data">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="topic">Class Topic *</label>
+            <input type="text" id="topic" name="topic" placeholder="e.g., Algebra Basics - Chapter 5" required>
+          </div>
+          <div class="form-group">
+            <label for="class_type">Class Type</label>
+            <select id="class_type" name="class_type">
+              <option value="lecture">Lecture</option>
+              <option value="discussion">Discussion</option>
+              <option value="practice">Practice Session</option>
+              <option value="quiz">Quiz/Test</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="target_class">Target Class</label>
+            <select id="target_class" name="target_class">
+              <option value="all">All Classes</option>
+              <option value="9">Class 9</option>
+              <option value="10">Class 10</option>
+              <option value="11">Class 11</option>
+              <option value="12">Class 12</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="paid_status">Paid Status</label>
+            <select id="paid_status" name="paid_status">
+              <option value="paid">Paid</option>
+              <option value="unpaid">Free</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" placeholder="Brief description of what will be covered in this class..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="video_file">Upload Video (MP4/WebM)</label>
+          <input type="file" id="video_file" name="video_file" accept="video/mp4,video/webm" required>
+          <small style="color: #666;">Upload a pre-recorded video for this class</small>
+        </div>
+        
+        <div class="form-group">
+          <label for="schedule_date">Schedule Date & Time</label>
+          <input type="datetime-local" id="schedule_date" name="schedule_date">
+          <small style="color: #666;">Leave empty to start immediately</small>
+        </div>
+        
+        <button type="submit" class="btn-primary">Create Live Class</button>
+      </form>
+    </div>
+    
+    <!-- Scheduled Classes Tab -->
+    <div id="schedule-tab" class="tab-content">
+      <h2>Scheduled Live Classes</h2>
+      <div class="class-grid">
+        <div class="class-card">
+          <span class="class-status status-scheduled">Scheduled</span>
+          <h3>Quadratic Equations</h3>
+          <p><strong>Type:</strong> Lecture</p>
+          <p><strong>Target:</strong> Class 10</p>
+          <p><strong>Scheduled:</strong> Tomorrow, 10:00 AM</p>
+          <p><strong>Status:</strong> Paid</p>
+          <div style="margin-top: 1rem;">
+            <button class="btn-success" onclick="startClass(1)">Start Now</button>
+            <button class="btn-secondary" onclick="editClass(1)">Edit</button>
+            <button class="btn-secondary" onclick="deleteClass(1)">Delete</button>
+          </div>
+        </div>
+        
+        <div class="class-card">
+          <span class="class-status status-scheduled">Scheduled</span>
+          <h3>Physics Lab Session</h3>
+          <p><strong>Type:</strong> Practice Session</p>
+          <p><strong>Target:</strong> Class 11</p>
+          <p><strong>Scheduled:</strong> Friday, 2:00 PM</p>
+          <p><strong>Status:</strong> Free</p>
+          <div style="margin-top: 1rem;">
+            <button class="btn-success" onclick="startClass(2)">Start Now</button>
+            <button class="btn-secondary" onclick="editClass(2)">Edit</button>
+            <button class="btn-secondary" onclick="deleteClass(2)">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Active Classes Tab -->
+    <div id="active-tab" class="tab-content">
+      <h2>Active Live Classes</h2>
+      <div class="class-grid">
+        {% for id, class_code, pin, meeting_url, topic, description, paid in active_classes %}
+        <div class="class-card">
+          <span class="class-status status-active">Live Now</span>
+          <h3>{{ topic or 'Live Class' }}</h3>
+          <p><strong>Code:</strong> {{ class_code }}</p>
+          <p><strong>PIN:</strong> {{ pin }}</p>
+          <p><strong>Status:</strong> {{ paid|title }}</p>
+          <div style="margin-top: 1rem;">
+            <a href="/join-class-host/{{ id }}" class="btn-primary">Join as Host</a>
+            <button class="btn-secondary" onclick="endClass({{ id }})">End Class</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    
+    <!-- Completed Classes Tab -->
+    <div id="completed-tab" class="tab-content">
+      <h2>Completed Live Classes</h2>
+      <div class="class-grid">
+        <div class="class-card">
+          <span class="class-status status-completed">Completed</span>
+          <h3>Introduction to Calculus</h3>
+          <p><strong>Duration:</strong> 45 minutes</p>
+          <p><strong>Students:</strong> 23 attended</p>
+          <p><strong>Completed:</strong> Yesterday, 3:00 PM</p>
+          <div style="margin-top: 1rem;">
+            <button class="btn-primary">View Recording</button>
+            <button class="btn-secondary">Download Stats</button>
+          </div>
+        </div>
+        
+        <div class="class-card">
+          <span class="class-status status-completed">Completed</span>
+          <h3>Chemistry Quiz</h3>
+          <p><strong>Duration:</strong> 30 minutes</p>
+          <p><strong>Students:</strong> 18 attended</p>
+          <p><strong>Completed:</strong> 2 days ago</p>
+          <div style="margin-top: 1rem;">
+            <button class="btn-primary">View Recording</button>
+            <button class="btn-secondary">Download Stats</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Device Settings Tab -->
+    <div id="devices-tab" class="tab-content">
+      <h2>Device Settings</h2>
+      
+      <div class="device-settings">
+        <h3>Camera Settings</h3>
+        <div class="device-grid">
+          <div class="device-item">
+            <h4>Camera</h4>
+            <select class="device-select" id="cameraSelect">
+              <option value="">Select Camera</option>
+              <option value="default">Default Camera</option>
+              <option value="external">External Webcam</option>
+            </select>
+            <div class="device-controls">
+              <button class="device-btn test-btn" onclick="testCamera()">Test</button>
+              <button class="device-btn mute-btn" onclick="toggleCamera()">Toggle</button>
+            </div>
+          </div>
+          
+          <div class="device-item">
+            <h4>Microphone</h4>
+            <select class="device-select" id="micSelect">
+              <option value="">Select Microphone</option>
+              <option value="default">Default Microphone</option>
+              <option value="external">External Mic</option>
+            </select>
+            <div class="device-controls">
+              <button class="device-btn test-btn" onclick="testMic()">Test</button>
+              <button class="device-btn mute-btn" onclick="toggleMic()">Mute</button>
+            </div>
+          </div>
+          
+          <div class="device-item">
+            <h4>Speaker</h4>
+            <select class="device-select" id="speakerSelect">
+              <option value="">Select Speaker</option>
+              <option value="default">Default Speaker</option>
+              <option value="headphones">Headphones</option>
+            </select>
+            <div class="device-controls">
+              <button class="device-btn test-btn" onclick="testSpeaker()">Test</button>
+              <button class="device-btn mute-btn" onclick="toggleSpeaker()">Mute</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="device-settings">
+        <h3>Quality Settings</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="videoQuality">Video Quality</label>
+            <select id="videoQuality">
+              <option value="720p">720p HD</option>
+              <option value="1080p" selected>1080p Full HD</option>
+              <option value="480p">480p</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="audioQuality">Audio Quality</label>
+            <select id="audioQuality">
+              <option value="low">Low (64kbps)</option>
+              <option value="medium" selected>Medium (128kbps)</option>
+              <option value="high">High (256kbps)</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+      </div>
+    </div>
+
+    <!-- Live Class Table (moved from admin panel) -->
+    <div style="margin-top:2.5rem;">
+      <h3>Active & Past Live Classes</h3>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f3f6fa;">
+              <th style="padding:0.7rem 1rem; text-align:left;">Topic</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Code</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">PIN</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Join Link</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Paid Status</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Status</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for id, class_code, pin, meeting_url, topic, description, paid in active_classes %}
+            <tr style="border-bottom:1px solid #eee;">
+              <td style="padding:0.7rem 1rem;">{{ topic or 'N/A' }}</td>
+              <td style="padding:0.7rem 1rem;">{{ class_code }}</td>
+              <td style="padding:0.7rem 1rem;">{{ pin }}</td>
+              <td style="padding:0.7rem 1rem;"><a href="{{ meeting_url }}" target="_blank">Join</a></td>
+              <td style="padding:0.7rem 1rem;">
+                <span style="font-weight:600; color:{% if paid == 'paid' %}#6a82fb{% else %}#fc5c7d{% endif %}; text-transform:capitalize;">{{ paid }}</span>
+              </td>
+              <td style="padding:0.7rem 1rem;"><span style="color:#888;">Unknown</span></td>
+              <td style="padding:0.7rem 1rem;">
+                <a href="/join-class-host/{{ id }}" class="btn btn-primary" style="margin-bottom:0.3rem;">Join as Host</a>
+                <form method="POST" action="/admin/delete-live-class/{{ id }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to end this live class?');">
+                  <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px; margin-top:0.3rem;">End</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showTab(tabName) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      
+      // Show selected tab
+      document.getElementById(tabName + '-tab').classList.add('active');
+      event.target.classList.add('active');
+    }
+    
+    function startClass(classId) {
+      if (confirm('Start this live class now?')) {
+        // Add logic to start class
+        alert('Class started successfully!');
+      }
+    }
+    
+    function editClass(classId) {
+      // Add logic to edit class
+      alert('Edit functionality coming soon!');
+    }
+    
+    function deleteClass(classId) {
+      if (confirm('Are you sure you want to delete this class?')) {
+        // Add logic to delete class
+        alert('Class deleted successfully!');
+      }
+    }
+    
+    function endClass(classId) {
+      if (confirm('Are you sure you want to end this class?')) {
+        // Add logic to end class
+        alert('Class ended successfully!');
+      }
+    }
+    
+    // Device testing functions
+    function testCamera() {
+      alert('Camera test started. Check your camera preview.');
+    }
+    
+    function testMic() {
+      alert('Microphone test started. Speak to test audio levels.');
+    }
+    
+    function testSpeaker() {
+      alert('Speaker test started. You should hear a test tone.');
+    }
+    
+    function toggleCamera() {
+      alert('Camera toggled.');
+    }
+    
+    function toggleMic() {
+      alert('Microphone toggled.');
+    }
+    
+    function toggleSpeaker() {
+      alert('Speaker toggled.');
+    }
+    
+    function saveSettings() {
+      alert('Device settings saved successfully!');
+    }
+    
+    // Auto-populate device options
+    document.addEventListener('DOMContentLoaded', function() {
+      // This would normally populate with actual device options
+      console.log('Device settings loaded');
+    });
+  </script>
+</body>
+</html> 

@@ -22,9 +22,12 @@
   <main class="container main-content">
     <section class="user-info-section">
       <h2>Create a New Live Class</h2>
-      <form method="POST" action="/create-live-class" class="login-form">
+      <form method="POST" action="/create-live-class" class="login-form" enctype="multipart/form-data">
         <input type="text" name="topic" placeholder="Class Topic (e.g., Algebra Basics)" required />
         <textarea name="description" placeholder="Short Description (e.g., Covering linear equations and practice problems)" required rows="3" style="border-radius:14px; padding:0.7rem 1.1rem;"></textarea>
+        <label style="margin-bottom:0.7rem; display:block;">Upload Video (MP4/WebM):
+          <input type="file" name="video_file" accept="video/mp4,video/webm" required style="margin-top:0.3rem;" />
+        </label>
         <button type="submit" class="btn btn-primary">Create Class & Get Details</button>
       </form>
     </section>

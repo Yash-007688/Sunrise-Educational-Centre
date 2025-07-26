@@ -981,3 +981,31 @@
     font-size: 0.8rem;
   }
 }
+
+.forum-bubble.selected-for-delete::after {
+  content: '✔';
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  color: #10b981;
+  font-size: 1.3rem;
+  background: #fff;
+  border-radius: 50%;
+  padding: 2px 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.forum-bubble {
+  position: relative;
+}
+
+body.dark-mode .chat-input-bar textarea,
+body.dark-mode .chat-input-bar input[type="text"] {
+  background: #23272f;
+  color: #f3f4f6;
+  border: 1px solid #444b5a;
+}
+body.dark-mode .chat-input-bar textarea::placeholder,
+body.dark-mode .chat-input-bar input[type="text"]::placeholder {
+  color: #b0b3b8;
+}

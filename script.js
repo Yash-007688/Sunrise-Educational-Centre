@@ -20,6 +20,12 @@ document.addEventListener('DOMContentLoaded', function() {
       // Remove typing cursor after completion
       setTimeout(() => {
         headingElement.style.borderRight = 'none';
+        setTimeout(() => {
+          headingElement.textContent = '';
+          headingElement.style.borderRight = '';
+          index = 0;
+          setTimeout(typeText, 500); // Pause before restarting
+        }, 1500); // Pause after finishing
       }, 1000);
     }
   }

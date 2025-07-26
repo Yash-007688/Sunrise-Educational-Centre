@@ -11,19 +11,14 @@ from auth_handler import (
     mark_notification_as_seen, delete_notification,
     save_forum_message, get_forum_messages, vote_on_message, delete_forum_message,
     create_topic, delete_topic, get_all_topics, get_topics_for_user, can_user_access_topic,
-    update_user_with_password, add_personal_notification
+    update_user_with_password, add_personal_notification, get_live_class_messages, save_live_class_message
 )
 import csv
 from io import StringIO
 from collections import Counter
 from functools import wraps
 import sqlite3
-from datetime import datetime
-import flask
-import gunicorn
-import werkzeug
-import pandas
-import openpyxl
+from datetime import datetime, timedelta, timezone
 
 # Import bulk upload routes
 from bulk_upload.routes import bulk_upload_bp
@@ -141,7 +136,9 @@ def forum():
     
     # Get topics for this user/class with paid status filtering
     all_topics = get_topics_for_user(role, user_paid_status)
-    return render_template('forum.html', username=username, all_topics=all_topics, role=role, user_paid_status=user_paid_status)
+    paid_topics = [t for t in all_topics if t[4] == 'paid']
+    unpaid_topics = [t for t in all_topics if t[4] != 'paid']
+    return render_template('forum.html', username=username, paid_topics=paid_topics, unpaid_topics=unpaid_topics, role=role, user_paid_status=user_paid_status)
 
 @app.route('/api/forum/messages', methods=['GET'])
 def api_get_forum_messages():
@@ -280,22 +277,53 @@ def online_class():
         flash('You must be logged in to access the online class.', 'error')
         return redirect(url_for('auth'))
 
-    # Teacher/admin: show start/end controls and active class info
+    # Teacher/admin: show all active classes
     if role in ['admin', 'teacher']:
         active_classes = get_active_classes()
         all_classes = get_all_classes()
         return render_template('online-class.html', role=role, active_classes=active_classes, all_classes=all_classes, username=username)
 
-    # Student: check if a live class is active for their class
-    all_classes_dict_rev = {c[1]: c[0] for c in get_all_classes()}
-    class_id = all_classes_dict_rev.get(role)
+    # Student: filter by paid status
+    from auth_handler import get_user_by_id
+    user = get_user_by_id(user_id)
+    user_paid_status = None
+    if user and len(user) > 3:
+        user_paid_status = user[3]  # paid status is 4th column in users table
     active_classes = get_active_classes()
-    meeting_url = None
-    for c in active_classes:
-        if c[5] == class_id:  # c[5] is target_class_id
-            meeting_url = c[2]  # c[2] is meeting_url
-            break
-    return render_template('online-class.html', role=role, meeting_url=meeting_url, username=username)
+    if user_paid_status != 'paid':
+        # Only show unpaid classes to unpaid users
+        active_classes = [c for c in active_classes if len(c) > 6 and (c[6] == 'unpaid')]
+    return render_template('online-class.html', role=role, active_classes=active_classes, username=username)
+
+@app.route('/join-class/<int:class_id>')
+def join_class(class_id):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('SELECT meeting_url, topic, description FROM live_classes WHERE id=?', (class_id,))
+    row = c.fetchone()
+    conn.close()
+    if not row:
+        flash('Class not found.', 'error')
+        return redirect(url_for('online_class'))
+    meeting_url, topic, description = row
+    return render_template('join_class.html', meeting_url=meeting_url, topic=topic, description=description)
+
+@app.route('/join-class-host/<int:class_id>')
+def join_class_host(class_id):
+    if session.get('role') not in ['admin', 'teacher']:
+        flash('Access denied. Only hosts can access this page.', 'error')
+        return redirect(url_for('admin_panel'))
+    
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('SELECT meeting_url, topic, description FROM live_classes WHERE id=?', (class_id,))
+    row = c.fetchone()
+    conn.close()
+    if not row:
+        flash('Class not found.', 'error')
+        return redirect(url_for('admin_panel'))
+    meeting_url, topic, description = row
+    return render_template('join_class_host.html', meeting_url=meeting_url, topic=topic, description=description)
 
 @app.route('/start-live-class', methods=['POST'])
 def start_live_class():
@@ -406,11 +434,26 @@ def admin_panel():
         # Most uploaded resources by class
         class_resource_counts = Counter([r[1] for r in get_all_resources()])
         most_resource_classes = [(cid, count) for cid, count in class_resource_counts.most_common(5)]
-        
         # Get all topics for topic management
         all_topics = get_all_topics()
-        
-        return render_template('admin.html', resources=resources, users=users, search_query=q, all_notifications=all_notifications, active_classes=active_classes, forum_messages=forum_messages, forum_search_query=forum_q, all_classes=all_classes, total_users=total_users, total_forum_posts=total_forum_posts, total_resources=total_resources, total_classes=total_classes, most_active_users=most_active_users, most_resource_classes=most_resource_classes, all_topics=all_topics)
+        # Build notification_usernames for personal ban notifications
+        notification_usernames = {}
+        import sqlite3
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        for n in all_notifications:
+            notif_id, message, class_name, created_at, target_paid_status = n
+            if target_paid_status == 'personal' and 'ban' in message.lower():
+                c.execute('SELECT user_id FROM user_notification_status WHERE notification_id=?', (notif_id,))
+                row = c.fetchone()
+                if row:
+                    user_id = row[0]
+                    c.execute('SELECT username FROM users WHERE id=?', (user_id,))
+                    user_row = c.fetchone()
+                    if user_row:
+                        notification_usernames[notif_id] = user_row[0]
+        conn.close()
+        return render_template('admin.html', resources=resources, users=users, search_query=q, all_notifications=all_notifications, notification_usernames=notification_usernames, active_classes=active_classes, forum_messages=forum_messages, forum_search_query=forum_q, all_classes=all_classes, total_users=total_users, total_forum_posts=total_forum_posts, total_resources=total_resources, total_classes=total_classes, most_active_users=most_active_users, most_resource_classes=most_resource_classes, all_topics=all_topics)
     else:
         return redirect(url_for('auth'))
 
@@ -433,8 +476,20 @@ def create_live_class_page():
     if request.method == 'POST':
         topic = request.form.get('topic')
         description = request.form.get('description')
-        room_name = f"SunriseEducation-{secrets.token_hex(8)}"
-        meeting_url = f"https://meet.jit.si/{room_name}"
+        video_file = request.files.get('video_file')
+        if not video_file or video_file.filename == '':
+            flash('Video file is required.', 'error')
+            return render_template('create_class.html', class_details=None)
+        if not video_file.filename.lower().endswith(('.mp4', '.webm')):
+            flash('Only MP4 and WebM video files are allowed.', 'error')
+            return render_template('create_class.html', class_details=None)
+        filename = secure_filename(video_file.filename)
+        video_folder = os.path.join('uploads', 'videos')
+        os.makedirs(video_folder, exist_ok=True)
+        unique_name = f"{secrets.token_hex(8)}_{filename}"
+        video_path = os.path.join(video_folder, unique_name)
+        video_file.save(video_path)
+        meeting_url = f"/uploads/videos/{unique_name}"
         class_code = ''.join(secrets.choice('0123456789') for i in range(6))
         pin = ''.join(secrets.choice('0123456789') for i in range(4))
         new_class_id = create_live_class(class_code, pin, meeting_url, topic, description)
@@ -444,7 +499,6 @@ def create_live_class_page():
             'code': details[0], 'pin': details[1], 'url': details[2]
         }
         return render_template('create_class.html', class_details=class_details)
-        
     return render_template('create_class.html', class_details=None)
 
 # Upload resource route
@@ -452,12 +506,16 @@ def create_live_class_page():
 def upload_resource():
     if session.get('role') not in ['admin', 'teacher']:
         return redirect(url_for('auth'))
+
     if request.method == 'POST':
         class_id = request.form.get('class_id')
         file = request.files.get('file')
         title = request.form.get('title')
         description = request.form.get('description')
         category = request.form.get('category')
+        paid_status = request.form.get('paid_status', 'unpaid')
+        schedule_date = request.form.get('schedule_date')
+
         if not file or file.filename == '' or not class_id or not category:
             flash('File, class, and category selection are required.', 'error')
         elif not allowed_file(file.filename):
@@ -467,11 +525,20 @@ def upload_resource():
             filepath = os.path.join(UPLOAD_FOLDER, filename)
             file.save(filepath)
             save_resource(filename, class_id, filepath, title, description, category)
-            # Send notification to all users of the class
-            add_notification('A new resource has been uploaded!', class_id, 'all')
+
+            # Send notification based on paid status
+            if paid_status == 'paid':
+                add_notification('A new paid resource has been uploaded!', class_id, 'paid')
+            else:
+                add_notification('A new resource has been uploaded!', class_id, 'all')
+
             flash('Resource uploaded successfully!', 'success')
-            return redirect(url_for('admin_panel'))
-    return render_template('upload_resource.html')
+            return redirect(url_for('upload_resource'))
+
+    # Get all resources for history tab
+    resources = get_all_resources()
+    all_classes = get_all_classes()
+    return render_template('upload_resource.html', resources=resources, all_classes=all_classes)
 
 # Serve uploaded files
 @app.route('/uploads/<filename>')
@@ -775,19 +842,40 @@ def admin_ban_user(user_id):
         flash('User not found.', 'error')
         return redirect(url_for('admin_panel', _anchor='users'))
     
+    # Prevent banning admin or teacher
+    if user[4] in ['admin', 'teacher']:
+        flash('You cannot ban an admin or teacher.', 'error')
+        return redirect(url_for('admin_panel', _anchor='users'))
+    
+    # Prevent banning again on the same day
+    import sqlite3
+    from datetime import datetime, timedelta, timezone
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('SELECT ban_effective_at FROM users WHERE id=?', (user_id,))
+    row = c.fetchone()
+    if row and row[0]:
+        try:
+            ban_time = datetime.fromisoformat(row[0])
+            now = datetime.now(timezone.utc)
+            if ban_time.date() == now.date():
+                flash('User is already scheduled to be banned today.', 'error')
+                conn.close()
+                return redirect(url_for('admin_panel', _anchor='users'))
+        except Exception:
+            pass
+    
     # Send 24-hour ban warning notification to the user only
     ban_warning = "You will be banned within 24 hours. Call Mohit Sir or admin."
     add_personal_notification(ban_warning, user_id)
     
-    # Set user as banned using direct SQL
-    import sqlite3
-    conn = sqlite3.connect('users.db')
-    c = conn.cursor()
-    c.execute('UPDATE users SET banned=1 WHERE id=?', (user_id,))
+    # Schedule ban to take effect in 24 hours
+    ban_time = (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
+    c.execute('UPDATE users SET ban_effective_at=? WHERE id=?', (ban_time, user_id))
     conn.commit()
     conn.close()
     
-    flash(f'User {user[1]} has been banned and personally notified.', 'success')
+    flash(f'User {user[1]} will be banned in 24 hours and has been personally notified.', 'success')
     return redirect(url_for('admin_panel', _anchor='users'))
 
 @app.route('/admin/create-topic', methods=['GET'])
@@ -845,10 +933,32 @@ def special_dashboard():
 def view_admissions():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
-    c.execute('''SELECT id, student_name, class, student_phone, student_email, parent_name, parent_phone, passport_photo, submitted_at, school_name, maths_marks, maths_rating, last_percentage, dob FROM admissions ORDER BY submitted_at DESC''')
+    c.execute('''SELECT id, student_name, dob, class, school_name, student_phone, student_email, maths_marks, maths_rating, last_percentage, parent_name, parent_phone, passport_photo, status, submitted_at FROM admissions ORDER BY submitted_at DESC''')
     admissions = c.fetchall()
     conn.close()
     return render_template('view_admission.html', admissions=admissions)
+
+@app.route('/admin/admissions/approve/<int:admission_id>', methods=['POST'])
+@admin_required
+def approve_admission(admission_id):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('UPDATE admissions SET status = ? WHERE id = ?', ('approved', admission_id))
+    conn.commit()
+    conn.close()
+    flash('Admission approved.', 'success')
+    return redirect(url_for('view_admissions'))
+
+@app.route('/admin/admissions/disapprove/<int:admission_id>', methods=['POST'])
+@admin_required
+def disapprove_admission(admission_id):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('UPDATE admissions SET status = ? WHERE id = ?', ('disapproved', admission_id))
+    conn.commit()
+    conn.close()
+    flash('Admission disapproved.', 'info')
+    return redirect(url_for('view_admissions'))
 
 @app.route('/submit-query', methods=['POST'])
 def submit_query():
@@ -862,6 +972,119 @@ def submit_query():
                   (name, email, message, submitted_at))
         conn.commit()
     return redirect(url_for('home'))
+
+@app.before_request
+def require_login():
+    allowed_routes = ['home', 'auth', 'register', 'static_files', 'submit_admission']
+    if request.endpoint not in allowed_routes and not session.get('user_id'):
+        return redirect(url_for('auth'))
+
+@app.route('/admission', methods=['POST'])
+def submit_admission():
+    print('--- Admission form submitted ---')
+    # Handle admission form submission
+    required_fields = [
+        'student_name', 'dob', 'student_phone', 'student_email', 'class',
+        'school_name', 'maths_marks', 'maths_rating', 'last_percentage',
+        'parent_name', 'parent_phone'
+    ]
+    for field in required_fields:
+        value = request.form.get(field)
+        print(f'Field {field}:', value)
+        if not value:
+            print(f'Missing required field: {field}')
+            flash(f"Missing required field: {field}", 'error')
+            return redirect(url_for('home'))
+
+    # Handle file upload
+    photo = request.files.get('passport_photo')
+    print('Photo:', photo)
+    if not photo or photo.filename == '':
+        print('Passport photo is required.')
+        flash('Passport photo is required.', 'error')
+        return redirect(url_for('home'))
+    if not ('.' in photo.filename and photo.filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}):
+        print('Invalid photo format:', photo.filename)
+        flash('Invalid photo format. Only PNG, JPG, JPEG allowed.', 'error')
+        return redirect(url_for('home'))
+    filename = secure_filename(photo.filename)
+    unique_name = secrets.token_hex(8) + '_' + filename
+    photo_path = os.path.join('uploads', 'admission_photos', unique_name)
+    print('Saving photo to:', photo_path)
+    photo.save(photo_path)
+
+    # Insert into DB
+    try:
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        print('Inserting into DB...')
+        c.execute('''INSERT INTO admissions (
+            student_name, dob, student_phone, student_email, class, school_name,
+            maths_marks, maths_rating, last_percentage, parent_name, parent_phone, passport_photo, status, submitted_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
+            request.form['student_name'],
+            request.form['dob'],
+            request.form['student_phone'],
+            request.form['student_email'],
+            request.form['class'],
+            request.form['school_name'],
+            request.form['maths_marks'],
+            request.form['maths_rating'],
+            request.form['last_percentage'],
+            request.form['parent_name'],
+            request.form['parent_phone'],
+            unique_name,
+            'pending',
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        ))
+        conn.commit()
+        print('Admission saved successfully!')
+        conn.close()
+    except Exception as e:
+        print('Error inserting admission:', e)
+        flash(f'Error saving admission: {e}', 'error')
+        return redirect(url_for('home'))
+    flash('Your admission form has been submitted successfully!', 'success')
+    return redirect(url_for('home'))
+
+@app.route('/live-class-management')
+def live_class_management():
+    if session.get('role') not in ['admin', 'teacher']:
+        flash('Access denied. Only hosts can access this page.', 'error')
+        return redirect(url_for('admin_panel'))
+    
+    active_classes = get_active_classes()
+    return render_template('live_class_management.html', active_classes=active_classes)
+
+@app.route('/api/live-class/<int:class_id>/messages', methods=['GET'])
+def get_live_class_messages_api(class_id):
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    messages = get_live_class_messages(class_id)
+    return jsonify([
+        {
+            'id': msg[0], 'user_id': msg[1], 'username': msg[2], 
+            'message': msg[3], 'media_url': msg[4], 'timestamp': msg[5]
+        } for msg in messages
+    ])
+
+@app.route('/api/live-class/<int:class_id>/messages', methods=['POST'])
+def send_live_class_message(class_id):
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.json
+    message = data.get('message')
+    if not message:
+        return jsonify({'error': 'Message required'}), 400
+    
+    user_id = session.get('user_id')
+    username = session.get('username')
+    
+    save_live_class_message(class_id, user_id, username, message)
+    
+    return jsonify({'success': True}), 201
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))

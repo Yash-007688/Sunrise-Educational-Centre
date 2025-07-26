@@ -890,3 +890,46 @@ body.dark-mode .tab-button.active {
   color: #bfc7d5 !important;
   background: none;
 }
+body.dark-mode, .dark-mode body {
+  background: #181c2a !important;
+  color: #f4f4f4 !important;
+}
+body.dark-mode .card, .dark-mode .card, body.dark-mode .admission-card, .dark-mode .admission-card {
+  background: #232946 !important;
+  color: #f4f4f4 !important;
+  box-shadow: 0 4px 32px rgba(35,41,70,0.25) !important;
+}
+body.dark-mode .navbar, .dark-mode .navbar {
+  background: #232946 !important;
+  color: #f4f4f4 !important;
+}
+body.dark-mode .btn, .dark-mode .btn {
+  background: #232946 !important;
+  color: #fff !important;
+  border-color: #6a82fb !important;
+}
+body.dark-mode input, body.dark-mode select, body.dark-mode textarea,
+.dark-mode input, .dark-mode select, .dark-mode textarea {
+  background: #181c2a !important;
+  color: #f4f4f4 !important;
+  border: 1.5px solid #444a6d !important;
+}
+body.dark-mode input:focus, body.dark-mode select:focus, body.dark-mode textarea:focus,
+.dark-mode input:focus, .dark-mode select:focus, .dark-mode textarea:focus {
+  border-color: #6a82fb !important;
+  background: #232946 !important;
+}
+body.dark-mode .footer, .dark-mode .footer {
+  background: #232946 !important;
+  color: #f4f4f4 !important;
+}
+body.dark-mode .btn-primary, .dark-mode .btn-primary {
+  background: linear-gradient(90deg, #232946 0%, #6a82fb 100%) !important;
+  color: #fff !important;
+}
+body.dark-mode .btn-primary:hover, .dark-mode .btn-primary:hover {
+  background: linear-gradient(90deg, #6a82fb 0%, #232946 100%) !important;
+}
+body.dark-mode .success-message, .dark-mode .success-message {
+  color: #10b981 !important;
+}

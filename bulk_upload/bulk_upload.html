@@ -740,12 +740,10 @@
                   <polyline points="10,9 9,9 8,9"></polyline>
                 </svg>
               </div>
-              <h3>Upload Excel File</h3>
-              <p>Upload an Excel file with study resources information</p>
-              <input type="file" id="excel-input" accept=".xlsx,.xls" style="display: none;">
-              <button class="btn btn-secondary" onclick="document.getElementById('excel-input').click()">
-                Choose Excel File
-              </button>
+              <h3>Bulk Upload from xlsx Folder</h3>
+              <p>Place your Excel file in the <b>xlsx</b> folder in the project directory. Then click below to scan and select a file.</p>
+              <button class="btn btn-secondary" id="scan-xlsx-btn">Scan xlsx Folder</button>
+              <div id="xlsx-file-list" style="margin-top:1rem;"></div>
             </div>
 
             <div class="template-download">

@@ -163,15 +163,13 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmUploadBtn.textContent = 'Processing...';
 
         // Send confirmation request
+        const payload = excelFilePath.startsWith('/home') ? { file_path: excelFilePath, uploaded_by: 'admin' } : { excel_path: excelFilePath, uploaded_by: 'admin' };
         fetch('/bulk-upload/confirm-upload', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                excel_path: excelFilePath,
-                uploaded_by: 'admin'
-            })
+            body: JSON.stringify(payload)
         })
         .then(response => response.json())
         .then(data => {
@@ -331,4 +329,55 @@ document.addEventListener('DOMContentLoaded', function() {
             }, index * 100);
         });
     });
+
+    const scanXlsxBtn = document.getElementById('scan-xlsx-btn');
+    const xlsxFileList = document.getElementById('xlsx-file-list');
+
+    scanXlsxBtn.addEventListener('click', function() {
+        fetch('/bulk-upload/list-xlsx-files')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    xlsxFileList.innerHTML = '';
+                    if (data.files.length === 0) {
+                        xlsxFileList.innerHTML = '<p>No Excel files found in xlsx folder.</p>';
+                    } else {
+                        data.files.forEach(file => {
+                            const btn = document.createElement('button');
+                            btn.className = 'btn btn-outline';
+                            btn.textContent = file;
+                            btn.onclick = function() { selectXlsxFile(file); };
+                            xlsxFileList.appendChild(btn);
+                        });
+                    }
+                } else {
+                    xlsxFileList.innerHTML = '<p>Error: ' + data.error + '</p>';
+                }
+            });
+    });
+
+    function selectXlsxFile(filename) {
+        showProgress('Validating Excel file...', 2000);
+        fetch('/bulk-upload/preview-xlsx-file', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideProgress();
+            if (data.success) {
+                previewData = data.preview_data;
+                displayFilePreview(data);
+                showSuccess(data.message);
+                excelFilePath = data.file_path;
+            } else {
+                showError(data.error);
+            }
+        })
+        .catch(error => {
+            hideProgress();
+            showError('Error reading file: ' + error.message);
+        });
+    }
 }); 

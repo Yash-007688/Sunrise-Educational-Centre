@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">python3 adism.py
-  Error: File 'img/yash.jpg' does not exist.
-  
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -13,6 +11,57 @@
       background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
       color: #1e293b;
       font-family: 'Inter', sans-serif;
+    }
+    /* Enhanced Navbar */
+    .navbar {
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 2px 12px rgba(100,100,255,0.07);
+      border-radius: 0 0 18px 18px;
+      padding: 0.7rem 0;
+      margin-bottom: 2.2rem;
+    }
+    .nav-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    .nav-logo img {
+      height: 44px;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(100,100,255,0.10);
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 1.2rem;
+      margin: 0;
+      padding: 0;
+      align-items: center;
+    }
+    .nav-links a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.05rem;
+      padding: 0.4rem 1.1rem;
+      border-radius: 8px;
+      transition: background 0.18s, color 0.18s;
+    }
+    .nav-links a.btn-primary {
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(106,130,251,0.13);
+    }
+    .nav-links a:hover {
+      background: #e0e7ff;
+      color: #6a82fb;
+    }
+    .nav-links a.btn-primary:hover {
+      background: linear-gradient(135deg, #fc5c7d 0%, #6a82fb 100%);
+      color: #fff;
     }
     table.admissions-table {
       width: 100%;
@@ -55,7 +104,54 @@
       color: #1e293b;
     }
     .footer {
-      background: #e0e7ff;
+      background: linear-gradient(90deg, #e0e7ff 0%, #f8fafc 100%);
+      padding: 2.2rem 0 1.2rem 0;
+      border-radius: 18px 18px 0 0;
+      box-shadow: 0 -2px 12px rgba(100,100,255,0.07);
+      margin-top: 2.5rem;
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 0 1.5rem;
+    }
+    .footer-social, .footer-links {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .footer a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.01rem;
+      border-radius: 7px;
+      padding: 0.2rem 0.7rem;
+      transition: background 0.18s, color 0.18s;
+    }
+    .footer a:hover {
+      background: #dbeafe;
+      color: #fc5c7d;
+    }
+    .footer-copy {
+      color: #6a82fb;
+      font-size: 0.98rem;
+      margin-top: 0.7rem;
+    }
+    @media (max-width: 700px) {
+      .nav-content, .footer-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.7rem;
+      }
+      .nav-links, .footer-social, .footer-links {
+        gap: 0.7rem;
+      }
     }
   </style>
 </head>
@@ -91,6 +187,8 @@
               <th>Parent Name</th>
               <th>Parent Phone</th>
               <th>Photo</th>
+              <th>Status</th>
+              <th>Actions</th>
               <th>Submitted At</th>
             </tr>
           </thead>
@@ -113,6 +211,17 @@
                 {% if adm[7] %}
                   <img src="/uploads/admission_photos/{{ adm[7] }}" alt="Photo" style="width:48px; height:48px; object-fit:cover; border-radius:8px;">
                 {% else %}-{% endif %}
+              </td>
+              <td>
+                <span style="font-weight:600; text-transform:capitalize;">{{ adm[13] }}</span>
+              </td>
+              <td>
+                <form method="POST" action="/admin/admissions/approve/{{ adm[0] }}" style="display:inline;">
+                  <button type="submit" class="btn btn-primary" {% if adm[13] == 'approved' %}disabled{% endif %}>Approve</button>
+                </form>
+                <form method="POST" action="/admin/admissions/disapprove/{{ adm[0] }}" style="display:inline; margin-left:0.5rem;">
+                  <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff;" {% if adm[13] == 'disapproved' %}disabled{% endif %}>Disapprove</button>
+                </form>
               </td>
               <td>{{ adm[8] }}</td>
             </tr>

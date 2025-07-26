@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Join Live Class</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .join-container { display: flex; max-width: 1100px; margin: 3rem auto; background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(100,100,255,0.10); }
+    .video-section { flex: 2; padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%); }
+    .info-section { flex: 1; padding: 2.5rem 2rem; border-left: 1.5px solid #eee; display: flex; flex-direction: column; justify-content: flex-start; background: #fff; }
+    .video-player { width: 100%; max-width: 640px; height: 360px; background: #000; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); margin-bottom: 1.5rem; }
+    .class-info { width: 100%; max-width: 640px; text-align: left; }
+    .class-title { font-size: 1.5rem; font-weight: 600; color: #232946; margin-bottom: 0.5rem; }
+    .class-description { color: #666; line-height: 1.5; margin-bottom: 1rem; }
+    .back-link { color: #6a82fb; text-decoration: none; font-weight: 500; }
+    .back-link:hover { text-decoration: underline; }
+    .chat-card { margin-top:1rem; background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%); border-radius:12px; box-shadow: 0 4px 16px rgba(100,100,255,0.08); padding:2rem 1.5rem 1.2rem 1.5rem; max-height:520px; min-height:340px; display:flex; flex-direction:column; border: 1px solid #e0e7ff; }
+    .chat-messages { flex:1; overflow-y:auto; min-height:220px; max-height:340px; margin-bottom:1.2rem; border-bottom:1px solid #e0e7ff; padding-bottom:0.7rem; font-size:1.08rem; }
+    .chat-input { flex:1; border-radius:8px; border:1px solid #e0e7ff; padding:0.5rem 0.8rem; background: #fff; }
+    .chat-input:focus { outline: none; border-color: #6a82fb; box-shadow: 0 0 0 2px rgba(106,130,251,0.1); }
+    .chat-send-btn { border-radius:8px; background: linear-gradient(135deg, #6a82fb 0%, #5a6fd8 100%); border: none; color: #fff; padding: 0.5rem 1rem; cursor: pointer; transition: all 0.2s; }
+    .chat-send-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(106,130,251,0.3); }
+    .chat-message { margin: 0.3rem 0; padding: 0.4rem 0.7rem; background: #fff; border-radius: 7px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 3px solid #6a82fb; }
+    @media (max-width: 900px) {
+      .join-container { flex-direction: column; }
+      .info-section { border-left: none; border-top: 1.5px solid #eee; }
+      .video-section, .info-section { padding: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="join-container">
+    <div class="video-section">
+      <video class="video-player" controls>
+        <source src="{{ meeting_url }}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <div class="class-info">
+        <h2 class="class-title">{{ topic or 'Live Class' }}</h2>
+        <p class="class-description">{{ description or '' }}</p>
+        <a href="/online-class" class="back-link">&larr; Back to Online Classes</a>
+      </div>
+    </div>
+    <div class="info-section">
+      <div class="chat-card">
+        <div id="chatMessages" class="chat-messages">
+          <!-- Chat messages will appear here -->
+        </div>
+        <form id="chatForm" style="display:flex; gap:0.5rem;">
+          <input type="text" id="chatInput" placeholder="Type a message..." class="chat-input" autocomplete="off" />
+          <button type="submit" class="chat-send-btn">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+<script>
+// Get class ID from URL
+const classId = window.location.pathname.split('/').pop();
+
+// Load existing messages
+function loadMessages() {
+  fetch(`/api/live-class/${classId}/messages`)
+    .then(response => response.json())
+    .then(messages => {
+      const chat = document.getElementById('chatMessages');
+      chat.innerHTML = '';
+      messages.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'chat-message';
+        div.innerHTML = `<strong>${msg.username}:</strong> ${msg.message}`;
+        chat.appendChild(div);
+      });
+      chat.scrollTop = chat.scrollHeight;
+    })
+    .catch(error => console.error('Error loading messages:', error));
+}
+
+// Send message
+document.getElementById('chatForm').onsubmit = function(e) {
+  e.preventDefault();
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  
+  fetch(`/api/live-class/${classId}/messages`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ message: msg })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      input.value = '';
+      loadMessages(); // Reload messages to show the new one
+    }
+  })
+  .catch(error => console.error('Error sending message:', error));
+};
+
+// Load messages on page load
+document.addEventListener('DOMContentLoaded', function() {
+  loadMessages();
+  // Auto-refresh messages every 3 seconds
+  setInterval(loadMessages, 3000);
+});
+</script>
+</body>
+</html> 

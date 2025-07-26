@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS admissions (
     parent_name TEXT NOT NULL,
     parent_phone TEXT NOT NULL,
     passport_photo TEXT,
+    status TEXT DEFAULT 'pending',
     submitted_at TEXT DEFAULT CURRENT_TIMESTAMP
 )
 ''')
