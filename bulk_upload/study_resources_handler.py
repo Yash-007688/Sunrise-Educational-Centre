@@ -197,7 +197,13 @@ class StudyResourcesBulkUploadHandler:
                 from auth_handler import add_notification
                 paid_categories = ['worksheet', 'formula', 'formula sheet']
                 target_paid_status = 'paid' if file_data['category'].lower() in paid_categories else 'all'
-                add_notification('A new resource has been uploaded!', class_id, target_paid_status)
+                add_notification(
+                    f'New {file_data["category"]} uploaded: {file_data["title"]}', 
+                    class_id, 
+                    target_paid_status,
+                    status='active',
+                    notification_type='study_resource'
+                )
             except Exception as e:
                 logger.error(f"Error sending notification: {str(e)}")
             conn.commit()

@@ -1,845 +1,661 @@
-// Forum functionality
-
-let currentPage = 1;
-let currentCategory = 'all';
-let currentTopic = 'all';
-let posts = [];
-let selectedMediaFile = null;
+// Forum JavaScript - Complete rewrite for proper API handling
+let currentTopic = null;
+let currentTopicName = '';
 let selectedMessageId = null;
+let replyToMessageId = null;
+let replyToUsername = '';
+let replyToMessage = '';
+let mediaFile = null;
 
-// Sample forum posts data
-const samplePosts = [
-  {
-    id: 1,
-    title: "Help with Quadratic Equations",
-    content: "I'm struggling with solving quadratic equations using the quadratic formula. Can someone explain the steps?",
-    author: "Rahul Kumar",
-    category: "math-10",
-    categoryLabel: "Class 10",
-    timestamp: "2024-01-15T10:30:00Z",
-    replies: 5,
-    likes: 12
-  },
-  {
-    id: 2,
-    title: "Trigonometry Tips for Board Exams",
-    content: "What are the most important trigonometry formulas to remember for Class 12 board exams?",
-    author: "Priya Sharma",
-    category: "math-12",
-    categoryLabel: "Class 12",
-    timestamp: "2024-01-14T15:45:00Z",
-    replies: 8,
-    likes: 20
-  },
-  {
-    id: 3,
-    title: "Coordinate Geometry Practice Problems",
-    content: "Looking for more practice problems on coordinate geometry. Any good resources?",
-    author: "Amit Singh",
-    category: "math-11",
-    categoryLabel: "Class 11",
-    timestamp: "2024-01-14T09:20:00Z",
-    replies: 3,
-    likes: 7
-  },
-  {
-    id: 4,
-    title: "Algebra Basics - Need Clarification",
-    content: "Can someone help me understand the basics of algebraic expressions and their simplification?",
-    author: "Sneha Patel",
-    category: "math-9",
-    categoryLabel: "Class 9",
-    timestamp: "2024-01-13T14:15:00Z",
-    replies: 6,
-    likes: 15
-  },
-  {
-    id: 5,
-    title: "Study Group for Mathematics",
-    content: "Anyone interested in forming an online study group for mathematics? We can meet weekly to discuss problems.",
-    author: "Vikash Gupta",
-    category: "general",
-    categoryLabel: "General",
-    timestamp: "2024-01-13T11:00:00Z",
-    replies: 12,
-    likes: 25
-  },
-  {
-    id: 6,
-    title: "Integration Techniques",
-    content: "What are the different methods of integration? I'm finding substitution method particularly challenging.",
-    author: "Anita Rao",
-    category: "math-12",
-    categoryLabel: "Class 12",
-    timestamp: "2024-01-12T16:30:00Z",
-    replies: 4,
-    likes: 10
-  }
-];
-
-// Initialize forum
+// Initialize forum when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  posts = [...samplePosts];
-  displayPosts();
-  updateStats();
-  setupEventListeners();
-  setupDarkMode();
-  
-  // Initial fetch will be handled by setupEventListeners
-  setInterval(() => fetchMessages(currentTopic), 30000);
+    console.log('Forum initialized');
+    setupEventListeners();
+    setupDarkMode();
+    setupDragAndDrop();
+    
+    // Auto-select first topic if user is not admin/teacher
+    setTimeout(() => {
+        if (!currentTopic) {
+            autoSelectTopic();
+        }
+    }, 500);
 });
 
-function updateInputFieldState(topicId, topicName) {
-  const forumInput = document.getElementById('forumInput');
-  const forumSendBtn = document.getElementById('forumSendBtn');
-  const userPaidStatus = document.body.getAttribute('data-user-paid');
-  
-  if (!forumInput) return;
-  
-  // Check if this is a paid topic and user is unpaid
-  const activeBtn = document.querySelector(`[data-topic="${topicId}"]`);
-  const accessLock = activeBtn?.querySelector('.access-lock');
-  
-  if (accessLock) {
-    forumInput.placeholder = `Viewing ${topicName} (paid topic - upgrade to post)`;
-    forumInput.disabled = true;
-    if (forumSendBtn) forumSendBtn.disabled = true;
-  } else {
-    forumInput.placeholder = `Type your message in ${topicName}...`;
-    forumInput.disabled = false;
-    if (forumSendBtn) forumSendBtn.disabled = false;
-  }
-}
-
+// Setup all event listeners
 function setupEventListeners() {
-  // Topic tab functionality (like study-resources)
-  const tabBtns = document.querySelectorAll('.tab-button');
-  const userRole = document.body.getAttribute('data-user-role');
-  const userPaidStatus = document.body.getAttribute('data-user-paid');
-  
-  tabBtns.forEach(btn => {
-    const topicId = btn.getAttribute('data-topic');
-    const topicName = btn.getAttribute('data-topic-name');
+    console.log('Setting up event listeners');
     
-    // Check if user can access this topic
-    if (topicId !== 'all') {
-      const accessLock = btn.querySelector('.access-lock');
-      
-      if (accessLock) {
-        // User can't access this paid topic
-        btn.classList.add('disabled');
-        btn.title = 'This is a paid topic. Upgrade your subscription to access it.';
-      } else {
-        // User can see the topic but can't post (paid topic for unpaid user)
-        btn.title = 'Click to view this discussion topic';
-      }
-    }
-    
-    btn.addEventListener('click', function() {
-      // Don't allow clicking on disabled buttons
-      if (this.classList.contains('disabled')) {
-        alert('This is a paid topic. Please upgrade your subscription to access it.');
-        return;
-      }
-      
-      // Remove active class from all buttons
-      tabBtns.forEach(b => b.classList.remove('active'));
-      // Add active class to clicked button
-      this.classList.add('active');
-      
-      // Update current topic
-      currentTopic = topicId;
-      
-      console.log('Switching to topic:', topicId, topicName);
-      
-      // Fetch messages for the selected topic
-      fetchMessages(currentTopic);
-      
-      // Update input field state
-      updateInputFieldState(topicId, topicName);
+    // Topic selection buttons
+    const topicButtons = document.querySelectorAll('.tab-button');
+    topicButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const topicId = this.getAttribute('data-topic');
+            const topicName = this.getAttribute('data-topic-name');
+            console.log('Topic selected:', topicId, topicName);
+            
+            // Update active state
+            topicButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update current topic
+            currentTopic = topicId;
+            currentTopicName = topicName;
+            
+            // Fetch messages for this topic
+            fetchMessages(topicId);
+        });
     });
-  });
-  
-  // Auto-assign user to their class topic if they're a student, or first available topic
-  if (userRole && userRole !== 'admin' && userRole !== 'teacher') {
-    const userClassBtn = document.querySelector(`[data-topic-name="${userRole}"]`);
-    if (userClassBtn && !userClassBtn.classList.contains('disabled')) {
-      // Add active to user's class button
-      userClassBtn.classList.add('active');
-      currentTopic = userClassBtn.getAttribute('data-topic');
-      
-      console.log('Auto-assigned to class topic:', currentTopic, userRole);
-      
-      // Fetch messages for the user's class
-      fetchMessages(currentTopic);
-      
-      // Update input field state
-      updateInputFieldState(currentTopic, userRole);
-    } else {
-      // If user's class topic is not available, select first available topic
-      const firstAvailableBtn = document.querySelector('.tab-button:not(.disabled)');
-      if (firstAvailableBtn) {
-        firstAvailableBtn.classList.add('active');
-        currentTopic = firstAvailableBtn.getAttribute('data-topic');
-        const topicName = firstAvailableBtn.getAttribute('data-topic-name');
-        
-        console.log('Auto-assigned to first available topic:', currentTopic, topicName);
-        
-        fetchMessages(currentTopic);
-        updateInputFieldState(currentTopic, topicName);
-      }
-    }
-  } else {
-    // For admin/teacher, select first available topic
-    const firstAvailableBtn = document.querySelector('.tab-button:not(.disabled)');
-    if (firstAvailableBtn) {
-      firstAvailableBtn.classList.add('active');
-      currentTopic = firstAvailableBtn.getAttribute('data-topic');
-      const topicName = firstAvailableBtn.getAttribute('data-topic-name');
-      
-      console.log('Auto-assigned to first available topic:', currentTopic, topicName);
-      
-      fetchMessages(currentTopic);
-      updateInputFieldState(currentTopic, topicName);
-    }
-  }
-
-  // Media upload
-  const forumUploadBtn = document.getElementById('forumUploadBtn');
-  const forumMediaInput = document.getElementById('forumMediaInput');
-  const forumMediaPreview = document.getElementById('forumMediaPreview');
-  
-  if (forumUploadBtn && forumMediaInput) {
-    forumUploadBtn.addEventListener('click', () => forumMediaInput.click());
-    forumMediaInput.addEventListener('change', handleMediaUpload);
-  }
-
-  // Send message
-  const forumSendBtn = document.getElementById('forumSendBtn');
-  const forumInput = document.getElementById('forumInput');
-  
-  if (forumSendBtn) {
-    forumSendBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      sendMessage();
-    });
-  }
-  
-  if (forumInput) {
-    forumInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-  }
-
-  // Emoji picker
-  setupEmojiPicker();
-  setupDragAndDrop();
-}
-
-function updateCurrentTopicDisplay(topicId, topicName) {
-  // This function is no longer needed since we removed the current topic display card
-  // Keeping it empty to avoid breaking any existing calls
-}
-
-function handleMediaUpload(e) {
-  const file = e.target.files[0];
-  selectedMediaFile = file || null;
-  const forumMediaPreview = document.getElementById('forumMediaPreview');
-  if (!forumMediaPreview) return;
-  
-  forumMediaPreview.innerHTML = '';
-  if (file) {
-    if (file.type.startsWith('image/')) {
-      const img = document.createElement('img');
-      img.src = URL.createObjectURL(file);
-      img.style.maxWidth = '180px';
-      img.style.maxHeight = '120px';
-      img.style.borderRadius = '10px';
-      img.onload = () => URL.revokeObjectURL(img.src);
-      forumMediaPreview.appendChild(img);
-    } else if (file.type.startsWith('video/')) {
-      const video = document.createElement('video');
-      video.src = URL.createObjectURL(file);
-      video.controls = true;
-      video.style.maxWidth = '180px';
-      video.style.maxHeight = '120px';
-      video.style.borderRadius = '10px';
-      video.onloadeddata = () => URL.revokeObjectURL(video.src);
-      forumMediaPreview.appendChild(video);
-    } else {
-      forumMediaPreview.textContent = 'Unsupported file type.';
-    }
-  }
-}
-
-function showNewTopicForm() {
-  const form = document.getElementById('new-topic-form');
-  if (form) {
-    form.style.display = 'block';
-    const titleInput = document.getElementById('topic-title');
-    if (titleInput) titleInput.focus();
-  }
-}
-
-function hideNewTopicForm() {
-  const form = document.getElementById('new-topic-form');
-  if (form) {
-    form.style.display = 'none';
-    const formElement = form.querySelector('form');
-    if (formElement) formElement.reset();
-  }
-}
-
-function createNewTopic(event) {
-  event.preventDefault();
-  
-  const category = document.getElementById('topic-category')?.value || 'general';
-  const title = document.getElementById('topic-title')?.value || '';
-  const content = document.getElementById('topic-content')?.value || '';
-  
-  if (!title || !content) {
-    alert('Please fill in all fields');
-    return;
-  }
-  
-  const currentUser = localStorage.getItem('currentUser');
-  let author = 'Anonymous User';
-  
-  if (currentUser) {
-    try {
-      const userData = JSON.parse(currentUser);
-      author = userData.name || userData.email || author;
-    } catch (e) {
-      console.error('Error parsing user data:', e);
-    }
-  }
-  
-  const newPost = {
-    id: posts.length + 1,
-    title: title,
-    content: content,
-    author: author,
-    category: category,
-    categoryLabel: getCategoryLabel(category),
-    timestamp: new Date().toISOString(),
-    replies: 0,
-    likes: 0
-  };
-  
-  posts.unshift(newPost);
-  hideNewTopicForm();
-  displayPosts();
-  updateStats();
-  alert('Your discussion has been posted successfully!');
-}
-
-function getCategoryLabel(category) {
-  const labels = {
-    'math-9': 'Class 9',
-    'math-10': 'Class 10',
-    'math-11': 'Class 11',
-    'math-12': 'Class 12',
-    'general': 'General',
-    'homework': 'Homework',
-    'exam-prep': 'Exam Prep'
-  };
-  return labels[category] || 'General';
-}
-
-function showCategory(category) {
-  currentCategory = category;
-  currentPage = 1;
-  
-  document.querySelectorAll('.category-btn').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  event.target.classList.add('active');
-  
-  displayPosts();
-}
-
-function displayPosts() {
-  const postsContainer = document.getElementById('forum-posts');
-  if (!postsContainer) return;
-  
-  let filteredPosts = posts;
-  if (currentCategory !== 'all') {
-    filteredPosts = posts.filter(post => post.category === currentCategory);
-  }
-  
-  const postsPerPage = 5;
-  const startIndex = (currentPage - 1) * postsPerPage;
-  const endIndex = startIndex + postsPerPage;
-  const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
-  
-  postsContainer.innerHTML = '';
-  
-  paginatedPosts.forEach(post => {
-    const postElement = createPostElement(post);
-    postsContainer.appendChild(postElement);
-  });
-  
-  const pageInfo = document.getElementById('page-info');
-  if (pageInfo) {
-    const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
-    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-  }
-  
-  const prevBtn = document.querySelector('.pagination button:first-child');
-  const nextBtn = document.querySelector('.pagination button:last-child');
-  
-  if (prevBtn && nextBtn) {
-    const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
-    prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-  }
-}
-
-function createPostElement(post) {
-  const postDiv = document.createElement('div');
-  postDiv.className = 'post-card';
-  postDiv.onclick = () => openPost(post.id);
-  
-  const timeAgo = getTimeAgo(new Date(post.timestamp));
-  
-  postDiv.innerHTML = `
-    <div class="post-header">
-      <h3 class="post-title">${post.title}</h3>
-      <span class="post-category">${post.categoryLabel}</span>
-    </div>
-    <div class="post-content">
-      ${post.content}
-    </div>
-    <div class="post-meta">
-      <div class="post-author">
-        <span>👤 ${post.author}</span>
-        <span>• ${timeAgo}</span>
-      </div>
-      <div class="post-stats">
-        <span>💬 ${post.replies} replies</span>
-        <span>👍 ${post.likes} likes</span>
-      </div>
-    </div>
-  `;
-  
-  return postDiv;
-}
-
-function getTimeAgo(date) {
-  const now = new Date();
-  const diffInSeconds = Math.floor((now - date) / 1000);
-  
-  if (diffInSeconds < 60) return 'Just now';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-  return `${Math.floor(diffInSeconds / 86400)} days ago`;
-}
-
-function openPost(postId) {
-  const post = posts.find(p => p.id === postId);
-  if (post) {
-    alert(`Opening post: "${post.title}"\n\nThis would navigate to a detailed view of the post with replies and comments.`);
-  }
-}
-
-function previousPage() {
-  if (currentPage > 1) {
-    currentPage--;
-    displayPosts();
-  }
-}
-
-function nextPage() {
-  const postsPerPage = 5;
-  let filteredPosts = posts;
-  
-  if (currentCategory !== 'all') {
-    filteredPosts = posts.filter(post => post.category === currentCategory);
-  }
-  
-  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
-  
-  if (currentPage < totalPages) {
-    currentPage++;
-    displayPosts();
-  }
-}
-
-function updateStats() {
-  const activeUsers = document.getElementById('active-users');
-  if (activeUsers) {
-    activeUsers.textContent = Math.floor(Math.random() * 50) + 20;
-  }
-  
-  const totalPosts = document.getElementById('total-posts');
-  if (totalPosts) {
-    totalPosts.textContent = posts.length;
-  }
-}
-
-async function sendMessage() {
-  const forumInput = document.getElementById('forumInput');
-  const forumSendBtn = document.getElementById('forumSendBtn');
-  
-  if (!forumInput || !forumSendBtn) return;
-  
-  const message = forumInput.value.trim();
-  if (!message && !selectedMediaFile) return;
-  
-  forumSendBtn.disabled = true;
-  
-  try {
-    let response;
-    if (selectedMediaFile) {
-      const formData = new FormData();
-      formData.append("message", message);
-      formData.append("media", selectedMediaFile);
-      formData.append("topic_id", currentTopic === "all" ? null : currentTopic);
-      response = await fetch('/api/forum/messages', {
-        method: "POST",
-        body: formData
-      });
-    } else {
-      response = await fetch('/api/forum/messages', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          message,
-          topic_id: currentTopic === "all" ? null : parseInt(currentTopic)
-        })
-      });
+    
+    // Send message button
+    const sendBtn = document.getElementById('forumSendBtn');
+    if (sendBtn) {
+        sendBtn.addEventListener('click', sendMessage);
     }
     
-    if (response.ok) {
-      forumInput.value = "";
-      selectedMediaFile = null;
-      const forumMediaInput = document.getElementById('forumMediaInput');
-      if (forumMediaInput) forumMediaInput.value = "";
-      const forumMediaPreview = document.getElementById('forumMediaPreview');
-      if (forumMediaPreview) forumMediaPreview.innerHTML = "";
-      
-      // Refresh messages for current topic
-      fetchMessages(currentTopic);
-    } else {
-      const errorData = await response.json().catch(() => ({}));
-      if (response.status === 403) {
-        if (errorData.error && errorData.error.includes('Access denied')) {
-          alert('You do not have access to post in this topic. This might be a paid topic that requires a paid subscription.');
-        } else {
-          alert('Access denied to this topic. Please check your subscription status.');
-        }
-      } else {
-        alert(`Failed to post message: ${errorData.error || 'Unknown error'}`);
-      }
-    }
-  } catch (error) {
-    console.error("Error posting message:", error);
-    alert("An error occurred. Please try again.");
-  } finally {
-    forumSendBtn.disabled = false;
-  }
-}
-
-async function fetchMessages(topicId = 'all') {
-  try {
-    let url = '/api/forum/messages';
-    if (topicId && topicId !== 'all') {
-      url += `?topic_id=${topicId}`;
-    }
-    
-    console.log('Fetching messages for topic:', topicId, 'URL:', url);
-    
-    const response = await fetch(url);
-    if (response.ok) {
-      const messages = await response.json();
-      console.log('Received messages:', messages.length);
-      renderMessages(messages);
-    } else {
-      console.error('Failed to fetch messages:', response.status, response.statusText);
-    }
-  } catch (error) {
-    console.error('Error fetching messages:', error);
-  }
-}
-
-function getInitials(name) {
-  if (!name) return '?';
-  const parts = name.trim().split(' ');
-  if (parts.length === 1) return parts[0][0].toUpperCase();
-  return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
-}
-
-function isOwnMessage(msg) {
-  const myName = window.currentUsername || (window.username || '');
-  return msg.username && myName && msg.username === myName;
-}
-
-function friendlyTime(ts) {
-  // Parse as UTC and convert to IST
-  const date = new Date(ts);
-  return date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-}
-
-function scrollToBottom() {
-  const forumMessages = document.getElementById('forumMessages');
-  if (forumMessages) {
-    forumMessages.scrollTop = forumMessages.scrollHeight;
-  }
-}
-
-let emojiPicker = null;
-function showEmojiPicker() {
-  const forumInput = document.getElementById('forumInput');
-  if (!forumInput) return;
-  
-  if (emojiPicker) { 
-    emojiPicker.remove(); 
-    emojiPicker = null; 
-    return; 
-  }
-  
-  emojiPicker = document.createElement('div');
-  emojiPicker.className = 'emoji-picker';
-  emojiPicker.setAttribute('role', 'dialog');
-  
-  const emojis = ['😀','😂','😍','😎','👍','🙏','🎉','😢','😮','😡','❤️','🔥','🤔','😇','🥳','😅','😜','😏','😬','😱'];
-  emojis.forEach(e => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = e;
-    btn.onclick = () => {
-      forumInput.value += e;
-      forumInput.focus();
-      emojiPicker.remove();
-      emojiPicker = null;
-    };
-    emojiPicker.appendChild(btn);
-  });
-  
-  const chatInputBar = document.querySelector('.chat-input-bar');
-  if (chatInputBar) {
-    chatInputBar.appendChild(emojiPicker);
-  }
-}
-
-function setupEmojiPicker() {
-  let emojiBtn = document.getElementById('forumEmojiBtn');
-  if (!emojiBtn) {
-    emojiBtn = document.createElement('button');
-    emojiBtn.id = 'forumEmojiBtn';
-    emojiBtn.type = 'button';
-    emojiBtn.className = 'btn btn-secondary';
-    emojiBtn.style.padding = '0.5rem 0.8rem';
-    emojiBtn.innerHTML = '<span style="font-size:1.3rem;">😊</span>';
-    
-    const chatInputBar = document.querySelector('.chat-input-bar');
+    // Enter key in input
     const forumInput = document.getElementById('forumInput');
-    if (chatInputBar && forumInput) {
-      chatInputBar.insertBefore(emojiBtn, forumInput);
+    if (forumInput) {
+        forumInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Auto-resize textarea
+        forumInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
     }
-  }
-  emojiBtn.onclick = showEmojiPicker;
+    
+    // Emoji button
+    const emojiBtn = document.getElementById('forumEmojiBtn');
+    if (emojiBtn) {
+        emojiBtn.addEventListener('click', showEmojiPicker);
+    }
+    
+    // Media upload button
+    const uploadBtn = document.getElementById('forumUploadBtn');
+    const mediaInput = document.getElementById('forumMediaInput');
+    if (uploadBtn && mediaInput) {
+        uploadBtn.addEventListener('click', () => mediaInput.click());
+        mediaInput.addEventListener('change', handleMediaUpload);
+    }
+    
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+    }
 }
 
-function setupDragAndDrop() {
-  const chatInputBar = document.querySelector('.chat-input-bar');
-  if (!chatInputBar) return;
-  
-  chatInputBar.addEventListener('dragover', e => { 
-    e.preventDefault(); 
-    chatInputBar.classList.add('dragover'); 
-  });
-  chatInputBar.addEventListener('dragleave', e => { 
-    chatInputBar.classList.remove('dragover'); 
-  });
-  chatInputBar.addEventListener('drop', e => {
-    e.preventDefault();
-    chatInputBar.classList.remove('dragover');
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const forumMediaInput = document.getElementById('forumMediaInput');
-      if (forumMediaInput) {
-        forumMediaInput.files = e.dataTransfer.files;
-        const event = new Event('change');
-        forumMediaInput.dispatchEvent(event);
-      }
-    }
-  });
-}
-
-function renderMessages(messages) {
-  const forumMessages = document.getElementById('forumMessages');
-  const emptyForumMsg = document.getElementById('emptyForumMsg');
-  const forumDeleteBtn = document.getElementById('forumDeleteBtn');
-  selectedMessageId = null;
-  if (forumDeleteBtn) forumDeleteBtn.disabled = true;
-
-  if (!forumMessages) return;
-  if (messages.length === 0) {
-    if (emptyForumMsg) emptyForumMsg.style.display = 'block';
-    forumMessages.innerHTML = '';
-  } else {
-    if (emptyForumMsg) emptyForumMsg.style.display = 'none';
-    forumMessages.innerHTML = '';
-    messages.forEach(msg => {
-      const isOwn = isOwnMessage(msg);
-      const postDiv = document.createElement('div');
-      postDiv.className = 'forum-post';
-      postDiv.setAttribute('role', 'listitem');
-      postDiv.dataset.messageId = msg.id;
-      
-      const avatar = document.createElement('div');
-      avatar.className = 'forum-avatar';
-      avatar.textContent = getInitials(msg.username);
-      
-      const bubble = document.createElement('div');
-      bubble.className = 'forum-bubble' + (isOwn ? ' own' : '');
-      bubble.tabIndex = 0;
-      
-      const uname = document.createElement('div');
-      uname.style.fontWeight = '600';
-      uname.style.fontSize = '1.01rem';
-      uname.textContent = msg.username;
-      
-      if (msg.topic_id && msg.topic_id !== 'all') {
-        const classLabel = document.createElement('span');
-        classLabel.style.background = '#6a82fb';
-        classLabel.style.color = 'white';
-        classLabel.style.padding = '0.2rem 0.5rem';
-        classLabel.style.borderRadius = '10px';
-        classLabel.style.fontSize = '0.7rem';
-        classLabel.style.marginLeft = '0.5rem';
-        classLabel.style.fontWeight = '500';
-        classLabel.textContent = msg.topic_id;
-        uname.appendChild(classLabel);
-      }
-      
-      bubble.appendChild(uname);
-      
-      const mtext = document.createElement('div');
-      mtext.innerHTML = msg.message.replace(/\n/g, '<br>');
-      bubble.appendChild(mtext);
-      
-      if (msg.media_url) {
-        if (msg.media_url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-          const img = document.createElement('img');
-          img.src = msg.media_url;
-          img.alt = 'attachment';
-          img.style.maxWidth = '180px';
-          img.style.maxHeight = '120px';
-          img.style.borderRadius = '10px';
-          img.style.marginTop = '0.5rem';
-          bubble.appendChild(img);
-        } else if (msg.media_url.match(/\.(mp4|webm|ogg)$/i)) {
-          const video = document.createElement('video');
-          video.src = msg.media_url;
-          video.controls = true;
-          video.style.maxWidth = '180px';
-          video.style.maxHeight = '120px';
-          video.style.borderRadius = '10px';
-          video.style.marginTop = '0.5rem';
-          bubble.appendChild(video);
+// Auto-select topic based on user role
+function autoSelectTopic() {
+    const userRole = document.body.getAttribute('data-user-role') || '';
+    console.log('Auto-selecting topic for user role:', userRole);
+    
+    if (userRole && userRole !== 'admin' && userRole !== 'teacher') {
+        // Try to find a topic that matches the user's class
+        const topicButtons = document.querySelectorAll('.tab-button');
+        let selectedButton = null;
+        
+        // First try exact match
+        for (let btn of topicButtons) {
+            const topicName = btn.getAttribute('data-topic-name');
+            if (topicName && topicName.toLowerCase().includes(userRole.toLowerCase())) {
+                selectedButton = btn;
+                break;
+            }
         }
-      }
-      
-      const ts = document.createElement('span');
-      ts.className = 'forum-timestamp';
-      ts.textContent = friendlyTime(msg.timestamp);
-      bubble.appendChild(ts);
-      
-      if (msg.reply_to) {
-        const reply = document.createElement('div');
-        reply.className = 'forum-reply';
-        reply.textContent = msg.reply_to;
-        bubble.insertBefore(reply, mtext);
-      }
-      
-      const urlMatch = msg.message.match(/https?:\/\/[\w\.-]+(\.[\w\.-]+)+[\w\-\._~:/?#[\]@!$&'()*+,;=.]+/);
-      if (urlMatch) {
-        const preview = document.createElement('div');
-        preview.className = 'forum-link-preview';
-        preview.style.marginTop = '0.4rem';
-        preview.style.fontSize = '0.97rem';
-        preview.innerHTML = `<a href="${urlMatch[0]}" target="_blank" rel="noopener">${urlMatch[0]}</a>`;
-        bubble.appendChild(preview);
-      }
-      
-      if (isOwn) {
-        bubble.onclick = function() {
-          // Select this message for deletion
-          selectedMessageId = msg.id;
-          if (forumDeleteBtn) forumDeleteBtn.disabled = false;
-          // Highlight selected
-          document.querySelectorAll('.forum-bubble.own').forEach(b => b.classList.remove('selected-for-delete'));
-          bubble.classList.add('selected-for-delete');
-        };
-      }
-      
-      const replyBtn = document.createElement('button');
-      replyBtn.className = 'forum-action-btn reply-btn';
-      replyBtn.textContent = 'Reply';
-      replyBtn.title = 'Reply to this message';
-      replyBtn.onclick = () => alert('Reply not implemented yet');
-      bubble.appendChild(replyBtn);
-      
-      if (isOwn) {
-        postDiv.appendChild(bubble);
-        postDiv.appendChild(avatar);
-      } else {
-        postDiv.appendChild(avatar);
-        postDiv.appendChild(bubble);
-      }
-      forumMessages.appendChild(postDiv);
-    });
-    scrollToBottom();
-  }
-}
-
-// Setup delete button logic
-const forumDeleteBtn = document.getElementById('forumDeleteBtn');
-if (forumDeleteBtn) {
-  forumDeleteBtn.addEventListener('click', async function() {
-    if (!selectedMessageId) return;
-    if (!confirm('Are you sure you want to delete this message?')) return;
-    forumDeleteBtn.disabled = true;
-    try {
-      const response = await fetch(`/api/forum/messages/${selectedMessageId}`, { method: 'DELETE' });
-      if (response.ok) {
-        // Remove the message from the UI
-        fetchMessages(currentTopic);
-        selectedMessageId = null;
-      } else {
-        alert('Failed to delete message.');
-      }
-    } catch (e) {
-      alert('Error deleting message.');
-    } finally {
-      forumDeleteBtn.disabled = true;
-    }
-  });
-}
-
-function setupDarkMode() {
-  const toggleBtn = document.getElementById('darkModeToggle');
-  if (!toggleBtn) return;
-  
-  function setDarkMode(on) {
-    if (on) {
-      document.body.classList.add('dark-mode');
-      localStorage.setItem('darkMode', 'on');
+        
+        // If no match found, select first available topic
+        if (!selectedButton && topicButtons.length > 0) {
+            selectedButton = topicButtons[0];
+        }
+        
+        if (selectedButton) {
+            selectedButton.click();
+        } else {
+            // Fallback: fetch all messages
+            console.log('No topics available, fetching all messages');
+            fetchMessages('all');
+        }
     } else {
-      document.body.classList.remove('dark-mode');
-      localStorage.setItem('darkMode', 'off');
+        // Admin/teacher: select first topic or fetch all
+        const firstButton = document.querySelector('.tab-button');
+        if (firstButton) {
+            firstButton.click();
+        } else {
+            fetchMessages('all');
+        }
     }
-  }
-  
-  toggleBtn.addEventListener('click', () => {
-    setDarkMode(!document.body.classList.contains('dark-mode'));
-  });
-  
-  if (localStorage.getItem('darkMode') === 'on') {
-    document.body.classList.add('dark-mode');
-  }
-} 
+}
+
+// Fetch messages from API
+async function fetchMessages(topicId = 'all') {
+    try {
+        console.log('Fetching messages for topic:', topicId);
+        
+        let url = '/api/forum/messages';
+        if (topicId && topicId !== 'all') {
+            url += `?topic_id=${topicId}`;
+        }
+        
+        const response = await fetch(url);
+        console.log('Response status:', response.status);
+        
+        if (response.status === 401) {
+            showError('Please login first to access the forum');
+            return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const messages = await response.json();
+        console.log('Received messages:', messages.length);
+        renderMessages(messages);
+        
+    } catch (error) {
+        console.error('Error fetching messages:', error);
+        showError('Failed to load messages. Please try again.');
+    }
+}
+
+// Render messages in the forum
+function renderMessages(messages) {
+    const forumMessages = document.getElementById('forumMessages');
+    const emptyForumMsg = document.getElementById('emptyForumMsg');
+    
+    if (!forumMessages) {
+        console.error('Forum messages container not found');
+        return;
+    }
+    
+    console.log('Rendering', messages.length, 'messages');
+    
+    if (messages.length === 0) {
+        forumMessages.innerHTML = `
+            <div id="emptyForumMsg" style="color:#888; text-align:center; padding:2rem;">
+                No messages yet. Start the conversation!
+            </div>
+        `;
+        return;
+    }
+    
+    // Clear existing messages
+    forumMessages.innerHTML = '';
+    
+    // Render each message
+    messages.forEach(message => {
+        const messageElement = createMessageElement(message);
+        forumMessages.appendChild(messageElement);
+    });
+    
+    // Scroll to bottom
+    setTimeout(() => {
+        scrollToBottom();
+    }, 100);
+}
+
+// Create a message element
+function createMessageElement(message) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message';
+    messageDiv.setAttribute('data-message-id', message.id);
+    
+    const isOwnMessage = message.username === (window.currentUsername || window.username || '');
+    const messageClass = isOwnMessage ? 'own-message' : 'other-message';
+    
+    // Get user initials for avatar
+    const userInitials = message.username ? message.username.charAt(0).toUpperCase() : 'U';
+    
+    let mediaHtml = '';
+    if (message.media_url) {
+        if (message.media_url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+            mediaHtml = `<img src="${message.media_url}" alt="Media" loading="lazy">`;
+        } else if (message.media_url.match(/\.(mp4|webm|ogg)$/i)) {
+            mediaHtml = `<video controls><source src="${message.media_url}" type="video/mp4">Your browser does not support video.</video>`;
+        }
+    }
+    
+    let replyHtml = '';
+    if (message.reply_to_username && message.reply_to_message) {
+        replyHtml = `
+            <div class="reply-to">
+                <strong>Replying to ${message.reply_to_username}:</strong> ${message.reply_to_message.substring(0, 50)}${message.reply_to_message.length > 50 ? '...' : ''}
+            </div>
+        `;
+    }
+    
+    // Enhanced timestamp formatting
+    const timestamp = new Date(message.timestamp);
+    const now = new Date();
+    const timeDiff = now - timestamp;
+    const minutes = Math.floor(timeDiff / 60000);
+    const hours = Math.floor(timeDiff / 3600000);
+    const days = Math.floor(timeDiff / 86400000);
+    
+    let timeDisplay = '';
+    if (minutes < 1) {
+        timeDisplay = 'Just now';
+    } else if (minutes < 60) {
+        timeDisplay = `${minutes}m ago`;
+    } else if (hours < 24) {
+        timeDisplay = `${hours}h ago`;
+    } else if (days < 7) {
+        timeDisplay = `${days}d ago`;
+    } else {
+        timeDisplay = timestamp.toLocaleDateString();
+    }
+    
+    messageDiv.innerHTML = `
+        <div class="message-content ${messageClass}">
+            <div class="message-avatar">${userInitials}</div>
+            <div class="message-header">
+                <div class="message-info">
+                    <strong>${message.username}</strong>
+                    <span class="message-timestamp">${timeDisplay}</span>
+                </div>
+                <div class="message-actions">
+                    <button onclick="startReply(${message.id}, '${message.username}', '${message.message.replace(/'/g, "\\'")}')" class="reply-btn">
+                        💬 Reply
+                    </button>
+                    ${isOwnMessage ? `
+                        <button onclick="deleteMessage(${message.id})" class="delete-btn">
+                            🗑️ Delete
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+            ${replyHtml}
+            <div class="message-text">${escapeHtml(message.message)}</div>
+            ${mediaHtml}
+            <div class="message-votes">
+                <button onclick="voteMessage(${message.id}, 'up')" class="vote-btn">
+                    👍 <span class="vote-count">${message.upvotes || 0}</span>
+                </button>
+                <button onclick="voteMessage(${message.id}, 'down')" class="vote-btn">
+                    👎 <span class="vote-count">${message.downvotes || 0}</span>
+                </button>
+            </div>
+        </div>
+    `;
+    
+    return messageDiv;
+}
+
+// Send a new message
+async function sendMessage() {
+    const forumInput = document.getElementById('forumInput');
+    const message = forumInput.value.trim();
+    
+    if (!message && !mediaFile) {
+        return;
+    }
+    
+    if (!currentTopic) {
+        showError('Please select a topic first');
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('message', message);
+        formData.append('topic_id', currentTopic);
+        
+        if (replyToMessageId) {
+            formData.append('parent_id', replyToMessageId);
+        }
+        
+        if (mediaFile) {
+            formData.append('media', mediaFile);
+        }
+        
+        console.log('Sending message to topic:', currentTopic);
+        
+        const response = await fetch('/api/forum/messages', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.status === 401) {
+            showError('Please login first to send messages');
+            return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Clear input and reset state
+            forumInput.value = '';
+            forumInput.style.height = 'auto';
+            mediaFile = null;
+            updateMediaPreview();
+            cancelReply();
+            
+            // Refresh messages
+            fetchMessages(currentTopic);
+            
+            console.log('Message sent successfully');
+        } else {
+            showError(result.error || 'Failed to send message');
+        }
+        
+    } catch (error) {
+        console.error('Error sending message:', error);
+        showError('Failed to send message. Please try again.');
+    }
+}
+
+// Start reply to a message
+function startReply(messageId, username, originalMessage) {
+    replyToMessageId = messageId;
+    replyToUsername = username;
+    replyToMessage = originalMessage;
+    
+    const forumInput = document.getElementById('forumInput');
+    forumInput.placeholder = `Replying to ${username}...`;
+    forumInput.focus();
+    
+    showReplyIndicator(username, originalMessage);
+}
+
+// Cancel reply
+function cancelReply() {
+    replyToMessageId = null;
+    replyToUsername = '';
+    replyToMessage = '';
+    
+    const forumInput = document.getElementById('forumInput');
+    forumInput.placeholder = 'Type your message...';
+    
+    hideReplyIndicator();
+}
+
+// Show reply indicator
+function showReplyIndicator(username, originalMessage) {
+    let indicator = document.getElementById('replyIndicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'replyIndicator';
+        indicator.style.cssText = `
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+        `;
+        
+        const chatInputBar = document.querySelector('.chat-input-bar');
+        if (chatInputBar) {
+            chatInputBar.parentNode.insertBefore(indicator, chatInputBar);
+        }
+    }
+    
+    indicator.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <strong>Replying to ${username}:</strong>
+                <div style="font-size:0.9em; opacity:0.8;">${originalMessage.substring(0, 100)}${originalMessage.length > 100 ? '...' : ''}</div>
+            </div>
+            <button onclick="cancelReply()" style="background:none; border:none; cursor:pointer; font-size:1.2em;">×</button>
+        </div>
+    `;
+}
+
+// Hide reply indicator
+function hideReplyIndicator() {
+    const indicator = document.getElementById('replyIndicator');
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+// Handle media upload
+function handleMediaUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        mediaFile = file;
+        updateMediaPreview();
+    }
+}
+
+// Update media preview
+function updateMediaPreview() {
+    const preview = document.getElementById('forumMediaPreview');
+    if (!preview) return;
+    
+    if (mediaFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (mediaFile.type.startsWith('image/')) {
+                preview.innerHTML = `
+                    <div style="position:relative; display:inline-block;">
+                        <img src="${e.target.result}" style="max-width:200px; max-height:150px; border-radius:8px;">
+                        <button onclick="removeMedia()" style="position:absolute; top:-8px; right:-8px; background:#ff6b6b; color:white; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer;">×</button>
+                    </div>
+                `;
+            } else if (mediaFile.type.startsWith('video/')) {
+                preview.innerHTML = `
+                    <div style="position:relative; display:inline-block;">
+                        <video controls style="max-width:200px; max-height:150px; border-radius:8px;">
+                            <source src="${e.target.result}" type="${mediaFile.type}">
+                        </video>
+                        <button onclick="removeMedia()" style="position:absolute; top:-8px; right:-8px; background:#ff6b6b; color:white; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer;">×</button>
+                    </div>
+                `;
+            }
+        };
+        reader.readAsDataURL(mediaFile);
+    } else {
+        preview.innerHTML = '';
+    }
+}
+
+// Remove media
+function removeMedia() {
+    mediaFile = null;
+    updateMediaPreview();
+    document.getElementById('forumMediaInput').value = '';
+}
+
+// Delete message
+async function deleteMessage(messageId) {
+    if (!confirm('Are you sure you want to delete this message?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/forum/messages/${messageId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            fetchMessages(currentTopic);
+        } else {
+            showError('Failed to delete message');
+        }
+    } catch (error) {
+        console.error('Error deleting message:', error);
+        showError('Failed to delete message');
+    }
+}
+
+// Vote on message
+async function voteMessage(messageId, voteType) {
+    try {
+        const response = await fetch(`/api/forum/messages/${messageId}/vote`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ vote_type: voteType })
+        });
+        
+        if (response.ok) {
+            fetchMessages(currentTopic);
+        }
+    } catch (error) {
+        console.error('Error voting on message:', error);
+    }
+}
+
+// Show emoji picker
+function showEmojiPicker() {
+    const emojis = ['😀', '😂', '😍', '😎', '👍', '🙏', '🎉', '😢', '😮', '😡', '❤️', '🔥', '🤔', '😇', '🥳'];
+    
+    let picker = document.getElementById('emojiPicker');
+    if (picker) {
+        picker.remove();
+        return;
+    }
+    
+    picker = document.createElement('div');
+    picker.id = 'emojiPicker';
+    picker.style.cssText = `
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 0.5rem;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.25rem;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    `;
+    
+    emojis.forEach(emoji => {
+        const button = document.createElement('button');
+        button.textContent = emoji;
+        button.style.cssText = `
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+        `;
+        button.onclick = () => {
+            const forumInput = document.getElementById('forumInput');
+            forumInput.value += emoji;
+            forumInput.focus();
+            picker.remove();
+        };
+        picker.appendChild(button);
+    });
+    
+    const emojiBtn = document.getElementById('forumEmojiBtn');
+    if (emojiBtn) {
+        emojiBtn.parentNode.appendChild(picker);
+    }
+}
+
+// Setup drag and drop for media
+function setupDragAndDrop() {
+    const forumInput = document.getElementById('forumInput');
+    if (!forumInput) return;
+    
+    forumInput.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        forumInput.style.borderColor = '#6a82fb';
+    });
+    
+    forumInput.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        forumInput.style.borderColor = '';
+    });
+    
+    forumInput.addEventListener('drop', (e) => {
+        e.preventDefault();
+        forumInput.style.borderColor = '';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+                mediaFile = file;
+                updateMediaPreview();
+            }
+        }
+    });
+}
+
+// Setup dark mode
+function setupDarkMode() {
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+    }
+}
+
+// Toggle dark mode
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', isDarkMode);
+}
+
+// Scroll to bottom
+function scrollToBottom() {
+    const forumMessages = document.getElementById('forumMessages');
+    if (forumMessages) {
+        forumMessages.scrollTop = forumMessages.scrollHeight;
+    }
+}
+
+// Show error message
+function showError(message) {
+    const forumMessages = document.getElementById('forumMessages');
+    if (forumMessages) {
+        forumMessages.innerHTML = `
+            <div style="color:#ff6b6b; text-align:center; padding:2rem;">
+                ${message}
+            </div>
+        `;
+    }
+}
+
+// Format timestamp
+function formatTime(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now - date;
+    
+    if (diff < 60000) { // Less than 1 minute
+        return 'Just now';
+    } else if (diff < 3600000) { // Less than 1 hour
+        const minutes = Math.floor(diff / 60000);
+        return `${minutes}m ago`;
+    } else if (diff < 86400000) { // Less than 1 day
+        const hours = Math.floor(diff / 3600000);
+        return `${hours}h ago`;
+    } else {
+        return date.toLocaleDateString();
+    }
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Auto-refresh messages every 30 seconds
+setInterval(() => {
+    if (currentTopic) {
+        fetchMessages(currentTopic);
+    }
+}, 30000); 

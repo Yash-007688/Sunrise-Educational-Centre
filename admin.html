@@ -8,6 +8,407 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="forum.css" />
   <style>
+    /* Admin panel - PERMANENT WHITE THEME */
+    body {
+      background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%) !important;
+      color: #232946 !important;
+    }
+    
+    .navbar,
+    .glassmorphic {
+      background: rgba(255,255,255,0.95) !important;
+      border-bottom: 1px solid rgba(106,130,251,0.2) !important;
+    }
+    
+    .nav-links a {
+      color: #232946 !important;
+    }
+    
+    .nav-links a:hover, 
+    .nav-links .btn-primary {
+      background: linear-gradient(90deg, #6a82fb 0%, #5a6fd8 100%) !important;
+      color: #fff !important;
+    }
+    
+    .card {
+      background: #fff !important;
+      color: #232946 !important;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+    }
+    
+    .card h3, 
+    .card p {
+      color: #232946 !important;
+    }
+    
+    .btn,
+    .btn-primary,
+    .btn-cta {
+      background: #6a82fb !important;
+      color: #fff !important;
+      border: 1px solid #6a82fb !important;
+    }
+    
+    .btn:hover,
+    .btn-primary:hover,
+    .btn-cta:hover {
+      background: #5a6fd8 !important;
+      color: #fff !important;
+    }
+    
+    input,
+    select,
+    textarea {
+      background: #fff !important;
+      color: #232946 !important;
+      border: 1px solid #d1d5db !important;
+    }
+    
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #6a82fb !important;
+      outline: none !important;
+      box-shadow: 0 0 0 2px rgba(106,130,251,0.2) !important;
+    }
+    
+    input::placeholder,
+    textarea::placeholder {
+      color: #6b7280 !important;
+    }
+    
+    /* Admin panel - PERMANENT WHITE THEME specific styles */
+    .admin-layout {
+      background: #f8fafc !important;
+    }
+    
+    .admin-sidebar {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-sidebar .logo {
+      color: #6a82fb !important;
+    }
+    
+    .admin-sidebar nav a {
+      color: #232946 !important;
+    }
+    
+    .admin-sidebar nav a:hover {
+      background: #f3f4f6 !important;
+      color: #6a82fb !important;
+    }
+    
+    .admin-sidebar nav a.active {
+      background: #6a82fb !important;
+      color: #fff !important;
+    }
+    
+    .admin-main {
+      background: #f8fafc !important;
+      color: #232946 !important;
+    }
+    
+    .admin-header {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-header h1 {
+      color: #232946 !important;
+    }
+    
+    .admin-content {
+      background: #f8fafc !important;
+      color: #232946 !important;
+    }
+    
+    .stats-grid {
+      background: #fff !important;
+    }
+    
+    .stat-card {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    .stat-card h3 {
+      color: #232946 !important;
+    }
+    
+    .stat-card .stat-value {
+      color: #6a82fb !important;
+    }
+    
+    .stat-card .stat-label {
+      color: #6b7280 !important;
+    }
+    
+    .admin-table {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-table th {
+      background: #f9fafb !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    .admin-table td {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    .admin-table tr:hover {
+      background: #f9fafb !important;
+    }
+    
+    .admin-form {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-form label {
+      color: #232946 !important;
+    }
+    
+    .admin-form input,
+    .admin-form select,
+    .admin-form textarea {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #d1d5db !important;
+    }
+    
+    .admin-form input:focus,
+    .admin-form select:focus,
+    .admin-form textarea:focus {
+      border-color: #6a82fb !important;
+      box-shadow: 0 0 0 2px rgba(106,130,251,0.2) !important;
+    }
+    
+    .admin-form input::placeholder,
+    .admin-form textarea::placeholder {
+      color: #6b7280 !important;
+    }
+    
+    .admin-modal {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-modal-header {
+      background: #f9fafb !important;
+      color: #232946 !important;
+    }
+    
+    .admin-modal-title {
+      color: #232946 !important;
+    }
+    
+    .admin-modal-body {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-modal-footer {
+      background: #f9fafb !important;
+      border-top-color: #e5e7eb !important;
+    }
+    
+    .admin-alert {
+      color: #232946 !important;
+    }
+    
+    .admin-alert-success {
+      background: #48bb78 !important;
+      color: #fff !important;
+    }
+    
+    .admin-alert-error {
+      background: #fc5c7d !important;
+      color: #fff !important;
+    }
+    
+    .admin-alert-warning {
+      background: #ffa726 !important;
+      color: #fff !important;
+    }
+    
+    .admin-alert-info {
+      background: #6a82fb !important;
+      color: #fff !important;
+    }
+    
+    .admin-badge {
+      color: #232946 !important;
+    }
+    
+    .admin-badge-success {
+      background: #48bb78 !important;
+      color: #fff !important;
+    }
+    
+    .admin-badge-error {
+      background: #fc5c7d !important;
+      color: #fff !important;
+    }
+    
+    .admin-badge-warning {
+      background: #ffa726 !important;
+      color: #fff !important;
+    }
+    
+    .admin-badge-info {
+      background: #6a82fb !important;
+      color: #fff !important;
+    }
+    
+    .admin-dropdown {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    .admin-dropdown-item {
+      color: #232946 !important;
+    }
+    
+    .admin-dropdown-item:hover {
+      background: #f9fafb !important;
+    }
+    
+    .admin-tooltip {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    /* Override any inline styles in admin panel */
+    [style*="color: #232946"] {
+      color: #232946 !important;
+    }
+    
+    [style*="color: #666"] {
+      color: #6b7280 !important;
+    }
+    
+    [style*="color: #999"] {
+      color: #6b7280 !important;
+    }
+    
+    [style*="background: #fff"] {
+      background: #fff !important;
+    }
+    
+    [style*="background: #f8f9ff"] {
+      background: #f9fafb !important;
+    }
+    
+    [style*="background: #f8fafc"] {
+      background: #f8fafc !important;
+    }
+    
+    [style*="border-color: #e0e7ff"] {
+      border-color: #e5e7eb !important;
+    }
+    
+    [style*="border-color: #d1d5db"] {
+      border-color: #d1d5db !important;
+    }
+    
+    /* Additional admin panel permanent white styles */
+    h1, h2, h3, h4, h5, h6 {
+      color: #232946 !important;
+    }
+    
+    p, span, div, label {
+      color: #232946 !important;
+    }
+    
+    a {
+      color: #6a82fb !important;
+    }
+    
+    a:hover {
+      color: #5a6fd8 !important;
+    }
+    
+    /* Table styles */
+    table {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    th {
+      background: #f9fafb !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    td {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    tr:hover {
+      background: #f9fafb !important;
+    }
+    
+    /* Notification dropdown styles */
+    #notifDropdown {
+      background: #fff !important;
+      color: #232946 !important;
+      border: 1px solid #e5e7eb !important;
+    }
+    
+    .notification-item {
+      background: #f9fafb !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    .notification-item:hover {
+      background: #f3f4f6 !important;
+    }
+    
+    /* Override any dark mode styles from global CSS */
+    body.dark-mode {
+      background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%) !important;
+      color: #232946 !important;
+    }
+    
+    body.dark-mode * {
+      color: inherit !important;
+    }
+    
+    body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, 
+    body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
+      color: #232946 !important;
+    }
+    
+    body.dark-mode p, body.dark-mode span, body.dark-mode div, 
+    body.dark-mode label, body.dark-mode td, body.dark-mode th {
+      color: #232946 !important;
+    }
+    
+    body.dark-mode .card, body.dark-mode .admin-card {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    body.dark-mode input, body.dark-mode select, body.dark-mode textarea {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #d1d5db !important;
+    }
+    
+    /* Admin panel specific styles */
     body { margin: 0; font-family: 'Inter', sans-serif; }
     .admin-layout { display: flex; min-height: 100vh; background: var(--pico-primary-background, #f4f6fb); }
     .admin-sidebar {
@@ -82,24 +483,6 @@
       font-weight: 700;
       font-size: 1.2rem;
     }
-    .admin-header .dark-toggle {
-      margin-left: 1.5rem;
-      cursor: pointer;
-      font-size: 1.3rem;
-      color: #6a82fb;
-      background: none;
-      border: none;
-      border-radius: 50%;
-      width: 38px;
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s;
-    }
-    .admin-header .dark-toggle:hover {
-      background: #eaf0ff;
-    }
     .admin-dashboard-cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -146,162 +529,7 @@
     @media (max-width: 600px) {
       .admin-dashboard-cards { grid-template-columns: 1fr; }
       .admin-section { padding: 1rem; }
-    /* Dark mode for admin panel */
-    body.dark-mode .admin-main {
-      background: #232946;
-      color: #f4f4f4;
-    }
-    
-    body.dark-mode .admin-header {
-      background: #232946;
-      color: #f4f4f4;
-      border-bottom: 1px solid #444;
-    }
-    
-    body.dark-mode .admin-dashboard-cards {
-      background: transparent;
-    }
-    
-    body.dark-mode .admin-card {
-      background: #16161a;
-      color: #f4f4f4;
-      border: 1px solid #444;
-    }
-    
-    body.dark-mode .admin-card .card-title {
-      color: #6a82fb;
-    }
-    
-    body.dark-mode .admin-card .card-value {
-      color: #f4f4f4;
-    }
-    
-    body.dark-mode .admin-section {
-      background: #16161a;
-      color: #f4f4f4;
-      border: 1px solid #444;
-    }
-    
-    body.dark-mode .admin-section h2,
-    body.dark-mode .admin-section h3 {
-      color: #6a82fb;
-    }
-    
-    body.dark-mode .admin-sidebar {
-      background: #232946;
-      color: #f4f4f4;
-      border-right: 1px solid #444;
-    }
-    
-    body.dark-mode .admin-sidebar h2 {
-      color: #6a82fb;
-    }
-    
-    body.dark-mode .admin-sidebar nav a {
-      color: #f4f4f4;
-      border: 1px solid #444;
-    }
-    
-    body.dark-mode .admin-sidebar nav a:hover,
-    body.dark-mode .admin-sidebar nav a.active {
-      background: #6a82fb;
-      color: #fff;
-      border-color: #6a82fb;
-    }
-    
-    body.dark-mode table {
-      background: #16161a;
-    }
-    
-    body.dark-mode table thead tr {
-      background: #232946 !important;
-    }
-    
-    body.dark-mode table th {
-      color: #6a82fb;
-    }
-    
-    body.dark-mode table tbody tr {
-      border-bottom: 1px solid #444;
-    }
-    
-    body.dark-mode table td {
-      color: #f4f4f4;
-    }
-    
-    body.dark-mode .btn {
-      background: #232946;
-      color: #f4f4f4;
-      border: 1px solid #444;
-    }
-    
-    body.dark-mode .btn:hover {
-      background: #6a82fb;
-      color: #fff;
-      border-color: #6a82fb;
-    }
-    
-    body.dark-mode .btn.btn-primary {
-      background: #6a82fb;
-      color: #fff;
-      border-color: #6a82fb;
-    }
-    
-    body.dark-mode .btn.btn-primary:hover {
-      background: #5a6fd8;
-    }
-    
-    body.dark-mode input[type="text"],
-    body.dark-mode input[type="password"],
-    body.dark-mode select,
-    body.dark-mode textarea {
-      background: #16161a;
-      color: #f4f4f4;
-      border: 1px solid #444;
-    }
-    
-    body.dark-mode input[type="text"]:focus,
-    body.dark-mode input[type="password"]:focus,
-    body.dark-mode select:focus,
-    body.dark-mode textarea:focus {
-      border-color: #6a82fb;
-      outline: none;
-    }
-    
-    body.dark-mode a {
-      color: #6a82fb;
-    }
-    
-    body.dark-mode a:hover {
-      color: #5a6fd8;
-    }
-    
-    body.dark-mode hr {
-      border-color: #444;
-    }
-    
-    body.dark-mode .card {
-      background: #16161a;
-      color: #f4f4f4;
-      border: 1px solid #444;
-    }
-    
-    body.dark-mode .card h3 {
-      color: #6a82fb;
-    }
-    
-    body.dark-mode .animated-card {
-      background: #16161a;
-      border: 1px solid #444;
-    }
-    
-    body.dark-mode .card-section {
-      color: #f4f4f4;
-    }
-    
-    body.dark-mode .card-section h2 {
-      color: #6a82fb;
-    }
+
     }
   </style>
 </head>
@@ -313,33 +541,32 @@
         <span>Admin Panel</span>
       </div>
       <ul class="nav-links">
-        <li><a href="#dashboard">Dashboard</a></li>
-        <li><a href="#users">Users</a></li>
-        <li><a href="/admin/admissions">Admissions</a></li>
-        <li><a href="#forum">Forum</a></li>
-        <li><a href="#classes">Classes</a></li>
-        <li><a href="#resources">Resources</a></li>
-        <li><a href="#notifications">Notifications</a></li>
-        <li><a href="#analytics">Analytics</a></li>
-        <li><a href="#settings">Settings</a></li>
-        <li style="position:relative;">
-          <button id="notifBell" style="background:none; border:none; cursor:pointer; position:relative;">
+        
+        <li><a href="#about-us">About</a></li>
+        <li><a href="/online-class">Live Class</a></li>
+        <li><a href="/study-resources">Study Resources</a></li>
+        <li><a href="/forum">Forum</a></li>
+        <li><a href="/admin/status-management">Status Management</a></li>
+        <!-- Notification Bell (rebuilt, now before login/logout) -->
+        <li id="notifBellContainer" style="position:relative; z-index:9999;">
+          <button id="notifBell" style="background:none; border:none; cursor:pointer; position:relative; z-index:10000; padding:0;">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.63-5.64-5-6.32V4a1 1 0 1 0-2 0v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29A1 1 0 0 0 6 19h12a1 1 0 0 0 .71-1.71L18 16z" fill="#6a82fb"/></svg>
             {% if user_notifications and user_notifications|length > 0 %}
             <span style="position:absolute;top:0;right:0;width:10px;height:10px;background:#fc5c7d;border-radius:50%;"></span>
             {% endif %}
           </button>
-          <div id="notifDropdown" style="display:none; position:absolute; right:0; top:36px; background:#fff; min-width:260px; box-shadow:0 4px 24px rgba(100,100,255,0.13); border-radius:12px; z-index:100; padding:1rem;">
-            <strong style="color:#6a82fb;">Notifications</strong>
-            <ul style="list-style:none; padding:0; margin:0;">
+          <div id="notifDropdown" style="display:none; position:absolute; right:0; top:36px; background:#fff; min-width:320px; box-shadow:0 4px 24px rgba(100,100,255,0.13); border-radius:12px; z-index:10001; padding:1rem;">
+            <strong style="color:#6a82fb; font-size:1.15rem;">Notifications</strong>
+            <ul style="list-style:none; padding:0; margin:0; max-height:320px; overflow-y:auto;">
               {% if user_notifications and user_notifications|length > 0 %}
-                {% for id, message, created_at in user_notifications %}
-                <li style="padding:0.5rem 0; border-bottom:1px solid #eee; font-size:0.98rem; color:#232946;">
-                  {{ message }}<br><span style="font-size:0.85rem; color:#888;">{{ created_at[:19].replace('T', ' ') }}</span>
-                </li>
-                {% endfor %}
+                                  {% for id, message, created_at, status, notification_type, scheduled_time in user_notifications %}
+                  <li class="notification-item" data-notification-id="{{ id }}" style="padding:0.9rem 1.2rem; border-bottom:1px solid #eee; font-size:1.05rem; color:#232946; background:#f8fafc; border-radius:10px; margin-bottom:0.7rem; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#f8fafc'">
+                    <strong>{{ message }}</strong><br>
+                    <span style="font-size:0.92rem; color:#888;">{{ format_datetime_for_display(created_at) }}</span>
+                  </li>
+                  {% endfor %}
               {% else %}
-                <li style="padding:0.7rem 0; color:#888; text-align:center;">No new notifications.</li>
+                <li style="padding:1.1rem 1.2rem; color:#888; text-align:center; background:#f8fafc; border-radius:10px;">No new notifications.</li>
               {% endif %}
             </ul>
           </div>
@@ -402,157 +629,49 @@
     </section>
     <section id="users" class="admin-section" aria-label="User management">
       <h2>User Management</h2>
-      <a href="/admin/create-user" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">+ Create User</a>
-      <form method="GET" action="/admin" style="margin-bottom:1rem; text-align:right;">
-        <input type="text" name="q" placeholder="Search by username" value="{{ search_query or '' }}" style="padding:0.5rem 1rem; border-radius:8px; border:1px solid #ccc; min-width:200px;" />
-        <button type="submit" class="btn btn-primary" style="margin-left:0.5rem;">Search</button>
-      </form>
-      <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse;">
-          <thead>
-            <tr style="background:#f3f6fa;">
-              <th style="padding:0.7rem 1rem; text-align:left;">ID</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Username</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Role</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Paid</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for id, username, name, paid, mobile_no, email_address in users %}
-            <tr style="border-bottom:1px solid #eee;">
-              <td style="padding:0.7rem 1rem;">{{ id }}</td>
-              <td style="padding:0.7rem 1rem;">{{ username }}</td>
-              <td style="padding:0.7rem 1rem;">{{ name }}</td>
-              <td style="padding:0.7rem 1rem;">{{ paid }}</td>
-              <td style="padding:0.7rem 1rem;">
-                <a href="/user-info/{{ id }}" class="btn btn-primary" style="background:#6a82fb; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px; margin-left:0.5rem;">Edit</a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <p style="color: #666; margin-bottom: 1.5rem;">Create and manage user accounts with comprehensive tools and statistics.</p>
+      <a href="/admin/create-user" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">👥 User Management Dashboard</a>
+      <p style="color: #666; margin-bottom: 1rem;">Access the comprehensive user management interface with advanced search, filtering, and user statistics.</p>
+      
+      <!-- Quick User Stats -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Total Users</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ users|length }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Paid Users</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ paid_users|default(0) }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Admin Users</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ admin_users|default(0) }}</p>
+        </div>
       </div>
-    </section>
-    <section id="admissions" class="admin-section" aria-label="Admissions management">
-      <h2>Admissions Management</h2>
-      <p>View and manage student admissions here.</p>
-      <a href="/admin/admissions" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">View Admissions</a>
     </section>
     <section id="forum" class="admin-section" aria-label="Forum moderation">
-      <h2>Forum Moderation & Topic Management</h2>
-      
-      <!-- Forum Topic Management -->
-      <div style="margin-bottom: 2rem;">
-        <h3>Forum Topics</h3>
-        <a href="/admin/create-topic" class="btn btn-primary" style="margin-bottom:1rem;">+ Create New Topic</a>
-        <div style="overflow-x:auto;">
-          <table style="width:100%; border-collapse:collapse;">
-            <thead>
-              <tr style="background:#f3f6fa;">
-                <th style="padding:0.7rem 1rem; text-align:left;">ID</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Topic Name</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Description</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Paid Only</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for topic in all_topics %}
-              <tr style="border-bottom:1px solid #eee;">
-                <td style="padding:0.7rem 1rem;">{{ topic[0] }}</td>
-                <td style="padding:0.7rem 1rem;">{{ topic[1] }}</td>
-                <td style="padding:0.7rem 1rem;">{{ topic[2] }}</td>
-                <td style="padding:0.7rem 1rem;">{{ "Yes" if topic[3] else "No" }}</td>
-                <td style="padding:0.7rem 1rem;">
-                  <form method="POST" action="/admin/delete-topic/{{ topic[0] }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this topic? All messages will be lost.');">
-                    <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Delete Topic</button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Forum Discussion Management -->
-      <div style="margin-bottom: 2rem;">
-        <h3>Forum Discussions</h3>
-        <form method="GET" action="/admin" style="margin-bottom:1rem; text-align:right;">
-          <input type="text" name="forum_q" placeholder="Search by username or message" value="{{ forum_search_query or "" }}" style="padding:0.5rem 1rem; border-radius:8px; border:1px solid #ccc; min-width:200px;" />
-          <button type="submit" class="btn btn-primary" style="margin-left:0.5rem;">Search</button>
-        </form>
-        <div style="overflow-x:auto;">
-          <table style="width:100%; border-collapse:collapse;">
-            <thead>
-              <tr style="background:#f3f6fa;">
-                <th style="padding:0.7rem 1rem; text-align:left;">ID</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Username</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Topic</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Message</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Timestamp</th>
-                <th style="padding:0.7rem 1rem; text-align:left;">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for msg in forum_messages %}
-              <tr style="border-bottom:1px solid #eee;">
-                <td style="padding:0.7rem 1rem;">{{ msg[0] }}</td>
-                <td style="padding:0.7rem 1rem;">{{ msg[2] }}</td>
-                <td style="padding:0.7rem 1rem;">
-                  {% for topic in all_topics %}
-                    {% if topic[0] == msg[6] %}{{ topic[1] }}{% endif %}
-                  {% endfor %}
-                </td>
-                <td style="padding:0.7rem 1rem; max-width:320px; white-space:pre-line;">{{ msg[3] }}</td>
-                <td style="padding:0.7rem 1rem;">{{ msg[7][:19].replace("T", " ") if msg[7] else "" }}</td>
-                <td style="padding:0.7rem 1rem;">
-                  <form method="POST" action="/admin/delete-forum-message/{{ msg[0] }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this message?');">
-                    <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Delete</button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-    <!-- Content Management Section -->
-    <section id="content-management" class="admin-section" aria-label="Content management">
       <h2>Content Management</h2>
-      <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse;">
-          <thead>
-            <tr style="background:#f3f6fa;">
-              <th style="padding:0.7rem 1rem; text-align:left;">ID</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Class Name</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for class_id, class_name in all_classes %}
-            <tr style="border-bottom:1px solid #eee;">
-              <td style="padding:0.7rem 1rem;">{{ class_id }}</td>
-              <td style="padding:0.7rem 1rem;">
-                <form method="POST" action="/admin/classes/edit/{{ class_id }}" style="display:flex; gap:0.5rem; align-items:center;">
-                  <input type="text" name="name" value="{{ class_name }}" required style="padding:0.3rem 0.7rem; border-radius:8px; border:1px solid #ccc; min-width:120px;" />
-                  <button type="submit" class="btn btn-primary" style="padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Save</button>
-                </form>
-              </td>
-              <td style="padding:0.7rem 1rem;">
-                <form method="POST" action="/admin/classes/delete/{{ class_id }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this class?');">
-                  <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff; padding:0.3rem 0.8rem; font-size:0.95rem; border-radius:8px;">Delete</button>
-                </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <p style="color: #666; margin-bottom: 1.5rem;">Comprehensive management of forum topics, discussions, and content moderation.</p>
+      <a href="/content-management" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">📝 Content Management Dashboard</a>
+      <p style="color: #666; margin-bottom: 1rem;">Access the new comprehensive content management interface with advanced filtering, analytics, and moderation tools.</p>
+      
+      <!-- Quick Overview -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Forum Topics</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ all_topics|length }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Forum Messages</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ forum_messages|length }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Active Classes</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ all_classes|length }}</p>
+        </div>
       </div>
-      <div style="margin-top:2rem; color:#888; font-size:0.98rem;">(Assigning users to classes coming soon.)</div>
     </section>
+
     <section id="resources" class="admin-section" aria-label="Resource management">
       <h2>Resource Management</h2>
       <a href="/upload-resource" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">📁 Resource Management</a>
@@ -564,16 +683,75 @@
       <a href="/send-notification" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">+ Send Notification</a>
       <!-- Notification history table removed; now on send notification page -->
     </section>
+    <!-- Query Management Section -->
+    <section id="queries" class="admin-section" aria-label="Query management">
+      <h2>Query Management</h2>
+      <p style="color: #666; margin-bottom: 1.5rem;">View and respond to user queries, support requests, and feedback submissions.</p>
+      <a href="/query-management" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">📋 Query Management Dashboard</a>
+      <p style="color: #666; margin-bottom: 1rem;">Access the comprehensive query management interface to view, filter, and respond to user queries with advanced tools.</p>
+      
+      <!-- Quick Query Stats -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Total Queries</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ total_queries|default(0) }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Pending Queries</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ pending_queries|default(0) }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Resolved Queries</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ resolved_queries|default(0) }}</p>
+        </div>
+      </div>
+    </section>
     <!-- Live Class Management Section -->
     <section id="live-classes" class="admin-section" aria-label="Live class management">
       <h2>Live Class Management</h2>
       <a href="/live-class-management" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">🎥 Manage Live Classes</a>
-      <p style="color:#666; margin-bottom:2rem;">Create, schedule, and manage all live classes from the dedicated management page.</p>
+      
+      <p style="color:#666; margin-bottom:2rem;">Create, schedule, and manage all live classes. Use the dashboard for real-time status monitoring and automatic class transitions.</p>
       <!-- No table here, only link and description -->
     </section>
   </main>
   <script src="script.js"></script>
   <script>
+    // Force light mode for admin panel - aggressive prevention
+    function forceLightMode() {
+      // Remove any dark mode class
+      document.body.classList.remove('dark-mode');
+      // Clear any dark mode preference
+      localStorage.removeItem('darkMode');
+      localStorage.removeItem('adminDarkMode');
+      // Ensure light mode is set
+      document.body.classList.add('light-mode');
+    }
+    
+    // Run immediately
+    forceLightMode();
+    
+    // Run on DOM content loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      forceLightMode();
+    });
+    
+    // Run periodically to prevent dark mode from being applied
+    setInterval(forceLightMode, 1000);
+    
+    // Override any dark mode toggle attempts
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'darkModeToggle' || e.target.closest('#darkModeToggle')) {
+        e.preventDefault();
+        e.stopPropagation();
+        forceLightMode();
+        return false;
+      }
+    });
+    
+    // Mega dropdown functionality (copied from homepage)
+
+    
     // Notification bell dropdown (copied from homepage)
     const notifBell = document.getElementById('notifBell');
     const notifDropdown = document.getElementById('notifDropdown');
@@ -587,6 +765,7 @@
       });
       notifDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
     }
+    
     // Hamburger menu (copied from homepage)
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
@@ -596,10 +775,8 @@
         navLinks.classList.toggle('active');
       });
     }
-    // Dark mode toggle for admin (optional, can be added to navbar if desired)
-    if (localStorage.getItem('adminDarkMode') === 'on') {
-      document.body.classList.add('dark-mode');
-    }
+    
+
   </script>
 </body>
 </html> 

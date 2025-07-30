@@ -64,6 +64,7 @@
       <button id="darkModeToggle" class="btn btn-primary" style="min-width:160px;">Toggle Dark Mode</button>
     </div>
   </body>
+  <script src="script.js"></script>
   <script>
     // Toggle between Login and Sign Up forms
     const loginForm = document.getElementById('loginForm');
@@ -79,23 +80,6 @@
       formTitle.textContent = isLogin ? 'Login' : 'Sign Up';
       toggleForm.textContent = isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login";
     });
-    // Dark mode toggle
-    const toggleBtn = document.getElementById('darkModeToggle');
-    function setDarkMode(on) {
-      if (on) {
-        document.body.classList.add('dark-mode');
-        localStorage.setItem('darkMode', 'on');
-      } else {
-        document.body.classList.remove('dark-mode');
-        localStorage.setItem('darkMode', 'off');
-      }
-    }
-    toggleBtn.addEventListener('click', () => {
-      setDarkMode(!document.body.classList.contains('dark-mode'));
-    });
-    if (localStorage.getItem('darkMode') === 'on') {
-      document.body.classList.add('dark-mode');
-    }
     // Show/hide admin code input on role change
     const signupRole = document.getElementById('signupRole');
     const signupAdminCodeInput = document.getElementById('signupAdminCodeInput');

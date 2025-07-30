@@ -6,6 +6,7 @@
   <title>Edit User - Admin</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
   <link rel="stylesheet" href="style.css" />
+  <script src="script.js"></script>
   <style>
     body {
       background: #f4f6fb;
@@ -167,6 +168,51 @@
       background: #fff;
       color: #232946;
     }
+    
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background: #1a1a2e;
+      color: #fff;
+    }
+    
+    body.dark-mode .user-info-section {
+      background: #232946;
+      box-shadow: 0 2px 8px rgba(100,100,255,0.15);
+    }
+    
+    body.dark-mode .user-info-section h2 {
+      color: #fff;
+    }
+    
+    body.dark-mode .user-info-section label {
+      color: #fff;
+    }
+    
+    body.dark-mode .user-info-section input[type="text"],
+    body.dark-mode .user-info-section input[type="password"],
+    body.dark-mode .user-info-section input[type="tel"],
+    body.dark-mode .user-info-section input[type="email"],
+    body.dark-mode .user-info-section select {
+      background: #1a1a2e;
+      border-color: #3a3a4a;
+      color: #fff;
+    }
+    
+    body.dark-mode .user-info-section input[type="text"]:focus,
+    body.dark-mode .user-info-section input[type="password"]:focus,
+    body.dark-mode .user-info-section input[type="tel"]:focus,
+    body.dark-mode .user-info-section input[type="email"]:focus,
+    body.dark-mode .user-info-section select:focus {
+      border-color: #6a82fb;
+      box-shadow: 0 0 0 2px rgba(106,130,251,0.2);
+    }
+    
+    body.dark-mode .user-info-section input[type="text"]::placeholder,
+    body.dark-mode .user-info-section input[type="password"]::placeholder,
+    body.dark-mode .user-info-section input[type="tel"]::placeholder,
+    body.dark-mode .user-info-section input[type="email"]::placeholder {
+      color: #b8c5d6;
+    }
   </style>
 </head>
 <body>
@@ -177,6 +223,7 @@
       </div>
       <ul class="nav-links">
         <li><a href="/admin">Admin Panel</a></li>
+        <li><button id="darkModeToggle" class="btn btn-primary" style="min-width:160px;">Toggle Dark Mode</button></li>
         <li><a href="/logout" class="btn btn-primary">Logout</a></li>
       </ul>
     </div>

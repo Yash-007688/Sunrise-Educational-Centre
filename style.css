@@ -392,6 +392,7 @@ body.dark-mode .hamburger .bar {
         flex-direction: row;
         justify-content: space-between;
         width: 100%;
+        padding: 0 1rem;
     }
 
     .nav-links {
@@ -419,6 +420,7 @@ body.dark-mode .hamburger .bar {
 
     .nav-links a {
         padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
     }
     
     /* --- Adjust main content for mobile --- */
@@ -430,6 +432,104 @@ body.dark-mode .hamburger .bar {
     }
     .card-section h2 {
         font-size: 1.8rem;
+    }
+    
+    /* Mobile container adjustments */
+    .container {
+        padding: 0 1rem;
+    }
+    
+    /* Mobile card adjustments */
+    .card {
+        margin: 1rem 0;
+        padding: 1.5rem;
+    }
+    
+    /* Mobile contact grid */
+    .contact-grid {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .contact-card {
+        min-width: auto;
+        max-width: none;
+    }
+}
+
+/* --- Small Mobile Styles (320px - 480px) --- */
+@media (max-width: 480px) {
+    .nav-content {
+        padding: 0 0.5rem;
+    }
+    
+    .nav-links a {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.85rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 1.8rem;
+    }
+    
+    .hero-content p {
+        font-size: 1rem;
+    }
+    
+    .card-section h2 {
+        font-size: 1.5rem;
+    }
+    
+    .container {
+        padding: 0 0.5rem;
+    }
+    
+    .card {
+        padding: 1rem;
+        margin: 0.5rem 0;
+    }
+    
+    .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-cta {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* --- Extra Small Mobile Styles (320px and below) --- */
+@media (max-width: 320px) {
+    .nav-links a {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.8rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 1.5rem;
+    }
+    
+    .hero-content p {
+        font-size: 0.9rem;
+    }
+    
+    .card-section h2 {
+        font-size: 1.3rem;
+    }
+    
+    .container {
+        padding: 0 0.3rem;
+    }
+    
+    .card {
+        padding: 0.8rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
     }
 }
 
@@ -671,6 +771,76 @@ body.dark-mode .user-info-section .back-link a {
   }
   .footer {
     padding: 1rem 0 0.5rem 0;
+  }
+  
+  /* YouTube section mobile adjustments */
+  #youtube-section {
+    padding: 2rem 0;
+  }
+  
+  #youtube-section h2 {
+    font-size: 2rem;
+  }
+  
+  #youtube-section p {
+    font-size: 1rem;
+  }
+  
+  /* Contact cards mobile */
+  .contact-grid {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .contact-card {
+    min-width: auto;
+    max-width: none;
+    padding: 1.5rem;
+  }
+  
+  /* About teacher section mobile */
+  #about-teacher .card-section {
+    padding: 2rem 1rem;
+  }
+  
+  #about-teacher .card-section > div {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  #about-teacher img {
+    width: 200px !important;
+    height: 250px !important;
+  }
+  
+  /* Live class tabs mobile */
+  .tab-btn {
+    padding: 0.6rem 1.2rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  /* Forum mobile adjustments */
+  .message {
+    margin: 0.8rem 0;
+    padding: 0.8rem;
+  }
+  
+  .message-content {
+    font-size: 0.9rem;
+  }
+  
+  /* Study resources mobile */
+  .resource-card {
+    padding: 1rem;
+    margin: 0.5rem 0;
+  }
+  
+  .resource-card h3 {
+    font-size: 1.1rem;
+  }
+  
+  .resource-card p {
+    font-size: 0.9rem;
   }
 }
 
@@ -932,4 +1102,426 @@ body.dark-mode .btn-primary:hover, .dark-mode .btn-primary:hover {
 }
 body.dark-mode .success-message, .dark-mode .success-message {
   color: #10b981 !important;
+}
+
+/* Global Dark Mode Overrides - Ensure Everything is Visible */
+body.dark-mode * {
+  color: inherit !important;
+}
+
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
+  color: #fff !important;
+}
+
+body.dark-mode p, body.dark-mode span, body.dark-mode div, body.dark-mode li {
+  color: #f4f4f4 !important;
+}
+
+body.dark-mode strong, body.dark-mode b {
+  color: #fff !important;
+}
+
+body.dark-mode a {
+  color: #6a82fb !important;
+}
+
+body.dark-mode a:hover {
+  color: #fc5c7d !important;
+}
+
+body.dark-mode label {
+  color: #fff !important;
+}
+
+body.dark-mode input, body.dark-mode select, body.dark-mode textarea {
+  background: #1a1a2e !important;
+  color: #fff !important;
+  border-color: #3a3a4a !important;
+}
+
+body.dark-mode input::placeholder, body.dark-mode textarea::placeholder {
+  color: #b8c5d6 !important;
+}
+
+body.dark-mode input:focus, body.dark-mode select:focus, body.dark-mode textarea:focus {
+  border-color: #6a82fb !important;
+  box-shadow: 0 0 0 2px rgba(106,130,251,0.2) !important;
+}
+
+body.dark-mode button {
+  color: #fff !important;
+}
+
+body.dark-mode .btn {
+  color: #fff !important;
+}
+
+body.dark-mode .btn-primary {
+  background: #6a82fb !important;
+  color: #fff !important;
+}
+
+body.dark-mode .btn-secondary {
+  background: #fc5c7d !important;
+  color: #fff !important;
+}
+
+body.dark-mode .btn-success {
+  background: #48bb78 !important;
+  color: #fff !important;
+}
+
+body.dark-mode .btn-warning {
+  background: #ffa726 !important;
+  color: #fff !important;
+}
+
+body.dark-mode .card, body.dark-mode .section, body.dark-mode .container {
+  background: #232946 !important;
+  color: #f4f4f4 !important;
+}
+
+body.dark-mode .header-section h1 {
+  color: #fff !important;
+}
+
+body.dark-mode .header-section p {
+  color: #b8c5d6 !important;
+}
+
+body.dark-mode .section-title {
+  color: #fff !important;
+}
+
+body.dark-mode .form-group label {
+  color: #fff !important;
+}
+
+body.dark-mode .alert {
+  color: #fff !important;
+}
+
+body.dark-mode .alert-error {
+  background: #fc5c7d !important;
+  color: #fff !important;
+}
+
+body.dark-mode .alert-success {
+  background: #48bb78 !important;
+  color: #fff !important;
+}
+
+body.dark-mode .alert-warning {
+  background: #ffa726 !important;
+  color: #fff !important;
+}
+
+body.dark-mode .alert-info {
+  background: #6a82fb !important;
+  color: #fff !important;
+}
+
+body.dark-mode .tab-btn {
+  color: #b8c5d6 !important;
+}
+
+body.dark-mode .tab-btn.active {
+  background: #6a82fb !important;
+  color: #fff !important;
+}
+
+body.dark-mode .tab-btn:hover:not(.active) {
+  background: rgba(106,130,251,0.2) !important;
+}
+
+body.dark-mode .tab-content {
+  background: #232946 !important;
+  color: #f4f4f4 !important;
+}
+
+body.dark-mode .back-link {
+  color: #6a82fb !important;
+}
+
+body.dark-mode .back-link:hover {
+  color: #fc5c7d !important;
+}
+
+body.dark-mode .search-input {
+  background: #1a1a2e !important;
+  color: #fff !important;
+  border-color: #3a3a4a !important;
+}
+
+body.dark-mode .search-input:focus {
+  border-color: #6a82fb !important;
+}
+
+/* Override any inline styles that might cause visibility issues */
+body.dark-mode [style*="color: #232946"] {
+  color: #fff !important;
+}
+
+body.dark-mode [style*="color: #666"] {
+  color: #b8c5d6 !important;
+}
+
+body.dark-mode [style*="color: #999"] {
+  color: #b8c5d6 !important;
+}
+
+body.dark-mode [style*="color: #1e293b"] {
+  color: #fff !important;
+}
+
+body.dark-mode [style*="color: #2563eb"] {
+  color: #6a82fb !important;
+}
+
+body.dark-mode [style*="color: #475569"] {
+  color: #b8c5d6 !important;
+}
+
+body.dark-mode [style*="color: #155724"] {
+  color: #48bb78 !important;
+}
+
+body.dark-mode [style*="color: #721c24"] {
+  color: #fc5c7d !important;
+}
+
+body.dark-mode [style*="color: #856404"] {
+  color: #ffa726 !important;
+}
+
+body.dark-mode [style*="color: #0c5460"] {
+  color: #6a82fb !important;
+}
+
+body.dark-mode [style*="background: #fff"] {
+  background: #232946 !important;
+}
+
+body.dark-mode [style*="background: #f8f9ff"] {
+  background: #2a2a3a !important;
+}
+
+body.dark-mode [style*="background: #f8fafc"] {
+  background: #2a2a3a !important;
+}
+
+body.dark-mode [style*="background: #f4f6fb"] {
+  background: #1a1a2e !important;
+}
+
+body.dark-mode [style*="background: #f0f4ff"] {
+  background: #2a2a3a !important;
+}
+
+body.dark-mode [style*="background: #e8f5e8"] {
+  background: #2a2a3a !important;
+}
+
+body.dark-mode [style*="background: #e8f0ff"] {
+  background: #2a2a3a !important;
+}
+
+body.dark-mode [style*="background: #d4edda"] {
+  background: #48bb78 !important;
+}
+
+body.dark-mode [style*="background: #fff3cd"] {
+  background: #ffa726 !important;
+}
+
+body.dark-mode [style*="background: #f8d7da"] {
+  background: #fc5c7d !important;
+}
+
+body.dark-mode [style*="background: #d1ecf1"] {
+  background: #6a82fb !important;
+}
+
+body.dark-mode [style*="border-color: #e0e7ff"] {
+  border-color: #3a3a4a !important;
+}
+
+body.dark-mode [style*="border-color: #d1d5db"] {
+  border-color: #3a3a4a !important;
+}
+
+body.dark-mode [style*="border-color: #ccc"] {
+  border-color: #3a3a4a !important;
+}
+
+body.dark-mode [style*="border-color: #ffd6d6"] {
+  border-color: #fc5c7d !important;
+}
+
+/* Ensure all text in tables is visible */
+body.dark-mode table {
+  color: #f4f4f4 !important;
+}
+
+body.dark-mode th {
+  background: #2a2a3a !important;
+  color: #fff !important;
+}
+
+body.dark-mode td {
+  background: #232946 !important;
+  color: #f4f4f4 !important;
+}
+
+/* Ensure all form elements are visible */
+body.dark-mode fieldset {
+  border-color: #3a3a4a !important;
+}
+
+body.dark-mode legend {
+  color: #fff !important;
+}
+
+/* Ensure all list items are visible */
+body.dark-mode ul, body.dark-mode ol {
+  color: #f4f4f4 !important;
+}
+
+body.dark-mode li {
+  color: #f4f4f4 !important;
+}
+
+/* Ensure all code elements are visible */
+body.dark-mode code, body.dark-mode pre {
+  background: #1a1a2e !important;
+  color: #f4f4f4 !important;
+  border-color: #3a3a4a !important;
+}
+
+/* Ensure all blockquote elements are visible */
+body.dark-mode blockquote {
+  background: #2a2a3a !important;
+  color: #f4f4f4 !important;
+  border-left-color: #6a82fb !important;
+}
+
+/* Ensure all small text is visible */
+body.dark-mode small {
+  color: #b8c5d6 !important;
+}
+
+/* Ensure all mark/highlight elements are visible */
+body.dark-mode mark {
+  background: #ffa726 !important;
+  color: #fff !important;
+}
+
+/* Ensure all time elements are visible */
+body.dark-mode time {
+  color: #b8c5d6 !important;
+}
+
+/* Ensure all abbr elements are visible */
+body.dark-mode abbr {
+  color: #6a82fb !important;
+}
+
+/* Ensure all cite elements are visible */
+body.dark-mode cite {
+  color: #b8c5d6 !important;
+}
+
+/* Ensure all dfn elements are visible */
+body.dark-mode dfn {
+  color: #6a82fb !important;
+}
+
+/* Ensure all kbd elements are visible */
+body.dark-mode kbd {
+  background: #1a1a2e !important;
+  color: #f4f4f4 !important;
+  border-color: #3a3a4a !important;
+}
+
+/* Ensure all samp elements are visible */
+body.dark-mode samp {
+  background: #1a1a2e !important;
+  color: #f4f4f4 !important;
+}
+
+/* Ensure all var elements are visible */
+body.dark-mode var {
+  color: #fc5c7d !important;
+}
+
+/* Ensure all sub and sup elements are visible */
+body.dark-mode sub, body.dark-mode sup {
+  color: #b8c5d6 !important;
+}
+
+/* Ensure all details and summary elements are visible */
+body.dark-mode details {
+  color: #f4f4f4 !important;
+}
+
+body.dark-mode summary {
+  color: #fff !important;
+}
+
+/* Ensure all meter and progress elements are visible */
+body.dark-mode meter {
+  background: #1a1a2e !important;
+}
+
+body.dark-mode progress {
+  background: #1a1a2e !important;
+}
+
+/* Ensure all dialog elements are visible */
+body.dark-mode dialog {
+  background: #232946 !important;
+  color: #f4f4f4 !important;
+  border-color: #3a3a4a !important;
+}
+
+/* Ensure all figure and figcaption elements are visible */
+body.dark-mode figure {
+  color: #f4f4f4 !important;
+}
+
+body.dark-mode figcaption {
+  color: #b8c5d6 !important;
+}
+
+/* Ensure all article, section, nav, aside, header, footer elements are visible */
+body.dark-mode article, body.dark-mode section, body.dark-mode nav, body.dark-mode aside, body.dark-mode header, body.dark-mode footer {
+  color: #f4f4f4 !important;
+}
+
+/* Ensure all main element is visible */
+body.dark-mode main {
+  color: #f4f4f4 !important;
+}
+
+/* Ensure all address element is visible */
+body.dark-mode address {
+  color: #b8c5d6 !important;
+}
+
+/* Ensure all del and ins elements are visible */
+body.dark-mode del {
+  color: #fc5c7d !important;
+}
+
+body.dark-mode ins {
+  color: #48bb78 !important;
+}
+
+/* Ensure all q element is visible */
+body.dark-mode q {
+  color: #f4f4f4 !important;
+}
+
+body.dark-mode q::before, body.dark-mode q::after {
+  color: #6a82fb !important;
 }

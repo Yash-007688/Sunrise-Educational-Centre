@@ -47,6 +47,107 @@
       body.dark-mode .sub-tab-button.active {
         background: #6a82fb;
       }
+      
+      /* Mobile Responsive Styles */
+      @media (max-width: 768px) {
+        .sub-tabs {
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin: 1rem 0;
+        }
+        
+        .sub-tab-button {
+          padding: 0.5rem 1rem;
+          font-size: 0.85rem;
+          margin: 0 0.2rem;
+        }
+        
+        .resource-card {
+          padding: 1rem;
+          margin: 0.5rem 0;
+        }
+        
+        .resource-card h3 {
+          font-size: 1.1rem;
+        }
+        
+        .resource-card p {
+          font-size: 0.9rem;
+        }
+        
+        .container {
+          padding: 0 1rem;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .sub-tabs {
+          flex-direction: column;
+          gap: 0.3rem;
+        }
+        
+        .sub-tab-button {
+          padding: 0.4rem 0.8rem;
+          font-size: 0.8rem;
+          margin: 0;
+          width: 100%;
+        }
+        
+        .resource-card {
+          padding: 0.8rem;
+        }
+        
+        .resource-card h3 {
+          font-size: 1rem;
+        }
+        
+        .resource-card p {
+          font-size: 0.85rem;
+        }
+        
+        .container {
+          padding: 0 0.5rem;
+        }
+        
+        .hero-content h1 {
+          font-size: 1.8rem;
+        }
+        
+        .hero-content p {
+          font-size: 1rem;
+        }
+      }
+      
+      @media (max-width: 320px) {
+        .sub-tab-button {
+          padding: 0.3rem 0.6rem;
+          font-size: 0.75rem;
+        }
+        
+        .resource-card {
+          padding: 0.6rem;
+        }
+        
+        .resource-card h3 {
+          font-size: 0.9rem;
+        }
+        
+        .resource-card p {
+          font-size: 0.8rem;
+        }
+        
+        .container {
+          padding: 0 0.3rem;
+        }
+        
+        .hero-content h1 {
+          font-size: 1.5rem;
+        }
+        
+        .hero-content p {
+          font-size: 0.9rem;
+        }
+      }
     </style>
   </head>
   <body>
@@ -70,9 +171,9 @@
               <strong style="color:#6a82fb;">Notifications</strong>
               <ul style="list-style:none; padding:0; margin:0;">
                 {% if user_notifications and user_notifications|length > 0 %}
-                {% for id, message, created_at in user_notifications %}
-                <li style="padding:0.5rem 0; border-bottom:1px solid #eee; font-size:0.98rem; color:#232946;">
-                  {{ message }}<br><span style="font-size:0.85rem; color:#888;">{{ created_at[:19].replace('T', ' ') }}</span>
+                {% for id, message, created_at, status, notification_type, scheduled_time in user_notifications %}
+                <li class="notification-item" data-notification-id="{{ id }}" style="padding:0.5rem 0; border-bottom:1px solid #eee; font-size:0.98rem; color:#232946; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='transparent'">
+                  {{ message }}<br><span style="font-size:0.85rem; color:#888;">{{ format_datetime_for_display(created_at) }}</span>
                 </li>
                 {% endfor %}
                 {% else %}
@@ -116,50 +217,74 @@
 
         <!-- Content for each class -->
         <div class="tab-content-wrapper">
-          {% set categories = [
+          {# Use the original hardcoded categories like last night #}
+          {% set template_categories = [
+              ('notes', 'Notes'),
+              ('sample_paper', 'Sample Papers'),
               ('worksheet', 'Worksheets'),
               ('pyq', 'PYQs'),
               ('case-base', 'Case-Base'),
               ('assertion-reasoning', 'Assertion/Reasoning'),
               ('formula', 'Formula')
           ] %}
-          {% for class_id, class_name in all_classes %}
-            {% if class_name not in ['admin', 'teacher'] %}
-              <div id="class-{{ class_id }}" class="class-content">
+          
+          {# Add any categories from database that aren't in the hardcoded list #}
+          {% if categories %}
+            {% for category in categories %}
+              {% set category_exists = false %}
+              {% for cat in template_categories %}
+                {% if cat[0] == category[1] %}
+                  {% set category_exists = true %}
+                {% endif %}
+              {% endfor %}
+              {% if not category_exists %}
+                {% set _ = template_categories.append((category[1], category[1])) %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+          <div id="class-{{ class_id }}" class="class-content">
                 <!-- Category Sub-Tabs -->
                 <div class="sub-tabs">
-                  {% for cat_key, cat_name in categories %}
-                    {% if (cat_key in ['worksheet', 'formula'] and paid_status == 'paid') or (cat_key not in ['worksheet', 'formula']) %}
-                      <button class="sub-tab-button" onclick="showCategory(event, 'class-{{ class_id }}-cat-{{ cat_key }}')">{{ cat_name }}</button>
-                    {% endif %}
+                  {% for cat_key, cat_name in template_categories %}
+                    <button class="sub-tab-button" onclick="showCategory(event, 'class-{{ class_id }}-cat-{{ cat_key }}')">{{ cat_name }}</button>
                   {% endfor %}
                 </div>
 
                 <!-- Resources for each category -->
-                {% for cat_key, cat_name in categories %}
-                  <div id="class-{{ class_id }}-cat-{{ cat_key }}" class="category-content">
-                    <div class="card-grid">
-                      {% set has_resources = false %}
-                      {% for filename, res_class_id, filepath, title, description, category in resources %}
-                        {% if res_class_id == class_id and category == cat_key %}
-                          {% set has_resources = true %}
-                          <div class="card animated-card" style="text-align:left;">
-                            <strong style="font-size:1.1rem;">{{ title }}</strong><br>
-                            {% if description %}<span style="color:#555; font-size:0.98rem;">{{ description }}</span><br>{% endif %}
-                            <span style="color:#888; font-size:0.95rem;">File: {{ filename }}</span><br>
-                            <a href="/uploads/{{ filename }}" target="_blank" class="btn btn-primary" style="margin-top:0.7rem;">Download/View</a>
-                          </div>
+                {% for cat_key, cat_name in template_categories %}
+                  {% if (cat_key in ['worksheet', 'formula'] and paid_status == 'paid') or (cat_key not in ['worksheet', 'formula']) %}
+                    <div id="class-{{ class_id }}-cat-{{ cat_key }}" class="category-content">
+                      <div class="card-grid">
+                        {% set has_resources = false %}
+                        {% for filename, res_class_id, filepath, title, description, category in resources %}
+                          {% if res_class_id == class_id and category == cat_key %}
+                            {% set has_resources = true %}
+                            <div class="card animated-card" style="text-align:left;">
+                              <strong style="font-size:1.1rem;">{{ title }}</strong><br>
+                              {% if description %}<span style="color:#555; font-size:0.98rem;">{{ description }}</span><br>{% endif %}
+                              <span style="color:#888; font-size:0.95rem;">File: {{ filename }}</span><br>
+                              <a href="/uploads/{{ filename }}" target="_blank" class="btn btn-primary" style="margin-top:0.7rem;">Download/View</a>
+                            </div>
+                          {% endif %}
+                        {% endfor %}
+                        {% if not has_resources %}
+                          <div style="color:#888; text-align:center; grid-column: 1 / -1;">No resources available in this category yet.</div>
                         {% endif %}
-                      {% endfor %}
-                      {% if not has_resources %}
-                        <div style="color:#888; text-align:center; grid-column: 1 / -1;">No resources available in this category yet.</div>
-                      {% endif %}
+                      </div>
                     </div>
-                  </div>
+                  {% else %}
+                    <div id="class-{{ class_id }}-cat-{{ cat_key }}" class="category-content">
+                      <div class="card-grid">
+                        <div style="color:#888; text-align:center; grid-column: 1 / -1; padding: 2rem;">
+                          <h3 style="color:#555; margin-bottom: 1rem;">🔒 Premium Content</h3>
+                          <p>This category contains premium content that requires a paid subscription.</p>
+                          <p style="font-size: 0.9rem; margin-top: 1rem;">Contact your administrator to upgrade your account.</p>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
                 {% endfor %}
               </div>
-            {% endif %}
-          {% endfor %}
         </div>
       </section>
       <div style="text-align:center; margin: 1.5rem 0 2rem 0;">
@@ -189,22 +314,7 @@
           firstTab.click();
         }
 
-        const toggleBtn = document.getElementById('darkModeToggle');
-        function setDarkMode(on) {
-          if (on) {
-            document.body.classList.add('dark-mode');
-            localStorage.setItem('darkMode', 'on');
-          } else {
-            document.body.classList.remove('dark-mode');
-            localStorage.setItem('darkMode', 'off');
-          }
-        }
-        toggleBtn.addEventListener('click', () => {
-          setDarkMode(!document.body.classList.contains('dark-mode'));
-        });
-        if (localStorage.getItem('darkMode') === 'on') {
-          document.body.classList.add('dark-mode');
-        }
+
       });
 
       document.addEventListener('DOMContentLoaded', function() {
@@ -220,6 +330,30 @@
         });
         notifDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
       }
+      });
+      
+      // Handle class parameter from URL
+      document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const classParam = urlParams.get('class');
+        
+        if (classParam) {
+          // Find the tab button for this class
+          const targetTab = document.querySelector(`[onclick*="class-${classParam}"]`);
+          if (targetTab) {
+            // Create a mock event and call showClass function
+            const mockEvent = {
+              target: targetTab
+            };
+            showClass(mockEvent, `class-${classParam}`);
+            
+            // Scroll to the resources section
+            const resourcesSection = document.getElementById('resources');
+            if (resourcesSection) {
+              resourcesSection.scrollIntoView({ behavior: 'smooth' });
+            }
+          }
+        }
       });
     </script>
   </body>

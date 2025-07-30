@@ -3,6 +3,7 @@
 <head>
   <title>Host Live Class - {{ topic or 'Live Class' }}</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="script.js"></script>
   <style>
     .host-container { display: flex; max-width: 1400px; margin: 2rem auto; background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(100,100,255,0.10); }
     .video-section { flex: 2; padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%); }
@@ -28,8 +29,8 @@
     .chat-send-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(106,130,251,0.3); }
     .chat-message { margin: 0.3rem 0; padding: 0.4rem 0.7rem; background: #fff; border-radius: 7px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 3px solid #6a82fb; }
     
-    .poll-section { background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%); border-radius:12px; padding:1.2rem; border: 1px solid #ffd6d6; margin-bottom: 1rem; }
-    .poll-input { width: 100%; border-radius:8px; border:1px solid #ffd6d6; padding:0.5rem 0.8rem; background: #fff; margin-bottom: 0.5rem; }
+    .poll-section { background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%); border-radius:12px; padding:1.2rem; border: 1px solid #e0e7ff; margin-bottom: 1rem; }
+    .poll-input { width: 100%; border-radius:8px; border:1px solid #e0e7ff; padding:0.5rem 0.8rem; background: #fff; margin-bottom: 0.5rem; }
     .poll-option { display: flex; align-items: center; margin-bottom: 0.5rem; }
     .poll-option input { margin-right: 0.5rem; }
     .poll-option label { flex: 1; }
@@ -57,28 +58,96 @@
       .control-section { border-left: none; border-top: 1.5px solid #eee; }
       .video-section, .control-section { padding: 1.2rem; }
     }
+    
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background: #1a1a2e;
+      color: #fff;
+    }
+    
+    body.dark-mode .host-container {
+      background: #232946;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.20);
+    }
+    
+    body.dark-mode .video-section {
+      background: linear-gradient(135deg, #232946 0%, #1a1a2e 100%);
+    }
+    
+    body.dark-mode .control-section {
+      background: #232946;
+      border-left-color: #2a2a3a;
+    }
+    
+    body.dark-mode .class-title {
+      color: #fff;
+    }
+    
+    body.dark-mode .class-description {
+      color: #b8c5d6;
+    }
+    
+    body.dark-mode .chat-card,
+    body.dark-mode .poll-section,
+    body.dark-mode .doubts-section,
+    body.dark-mode .host-controls {
+      background: #2a2a3a;
+      border-color: #3a3a4a;
+    }
+    
+    body.dark-mode .chat-input,
+    body.dark-mode .poll-input {
+      background: #1a1a2e;
+      border-color: #3a3a4a;
+      color: #fff;
+    }
+    
+    body.dark-mode .chat-input:focus,
+    body.dark-mode .poll-input:focus {
+      border-color: #6a82fb;
+    }
+    
+    body.dark-mode .chat-message {
+      background: #1a1a2e;
+      border-left-color: #6a82fb;
+    }
+    
+    body.dark-mode .doubt-item {
+      background: #1a1a2e;
+      border-left-color: #48bb78;
+    }
+    
+    body.dark-mode .doubt-user {
+      color: #fff;
+    }
+    
+    body.dark-mode .doubt-text {
+      color: #b8c5d6;
+    }
+    
+    body.dark-mode .tab-btn {
+      color: #b8c5d6;
+    }
+    
+    body.dark-mode .tab-btn.active {
+      color: #6a82fb;
+      border-bottom-color: #6a82fb;
+    }
+    
+    body.dark-mode .tab-container {
+      border-bottom-color: #3a3a4a;
+    }
   </style>
 </head>
 <body>
   <div class="host-container">
-    <div class="video-section">
-      <video class="video-player" controls>
-        <source src="{{ meeting_url }}" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-      <div class="class-info">
-        <h2 class="class-title">{{ topic or 'Live Class' }}</h2>
-        <p class="class-description">{{ description or '' }}</p>
-        <a href="/admin" class="back-link">&larr; Back to Admin Panel</a>
-      </div>
-    </div>
-    
     <div class="control-section">
       <div class="tab-container">
         <button class="tab-btn active" onclick="showTab('chat')">Chat</button>
         <button class="tab-btn" onclick="showTab('polls')">Polls</button>
         <button class="tab-btn" onclick="showTab('doubts')">Doubts</button>
         <button class="tab-btn" onclick="showTab('controls')">Controls</button>
+        <button id="darkModeToggle" class="btn btn-primary" style="min-width:160px; margin-left: auto;">Toggle Dark Mode</button>
       </div>
       
       <!-- Chat Tab -->
@@ -150,9 +219,125 @@
     </div>
   </div>
 
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script>
     // Get class ID from URL
     const classId = window.location.pathname.split('/').pop();
+    const socket = io();
+    const room = 'liveclass_' + classId;
+
+    // Join the room for real-time updates
+    socket.emit('join-room', { room });
+
+    // --- Polls ---
+    function renderPolls(polls) {
+      const pollsContainer = document.getElementById('activePolls');
+      pollsContainer.innerHTML = '';
+      polls.forEach(poll => {
+        const pollDiv = document.createElement('div');
+        pollDiv.className = 'poll-section';
+        pollDiv.innerHTML = `
+          <h4 style="margin-bottom: 0.5rem;">${poll.question}</h4>
+          <div class="poll-options">
+            ${poll.options.map(opt => `<div style='margin:0.3rem 0; padding:0.5rem; background:#fff; border-radius:6px; border:1px solid #ffd6d6;' data-option-id='${opt.id}'>${opt.option_text} <span class='poll-votes' id='poll-votes-${opt.id}'>0</span></div>`).join('')}
+          </div>
+          <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">Live poll</div>
+        `;
+        pollsContainer.appendChild(pollDiv);
+      });
+    }
+
+    // Create poll
+    function getPollOptions() {
+      return Array.from(document.querySelectorAll('#pollOptions input')).map(input => input.value).filter(val => val.trim());
+    }
+    document.getElementById('pollForm').onsubmit = function(e) {
+      e.preventDefault();
+      var question = document.getElementById('pollQuestion').value;
+      var options = getPollOptions();
+      if (question && options.length >= 2) {
+        socket.emit('create_poll', { class_id: classId, question, options, created_by: 'host' });
+        document.getElementById('pollForm').reset();
+        document.getElementById('pollOptions').innerHTML = `
+          <div class="poll-option">
+            <input type="text" placeholder="Option 1" class="poll-input" required />
+          </div>
+          <div class="poll-option">
+            <input type="text" placeholder="Option 2" class="poll-input" required />
+          </div>
+        `;
+      }
+    };
+    function addPollOption() {
+      var container = document.getElementById('pollOptions');
+      var newOption = document.createElement('div');
+      newOption.className = 'poll-option';
+      newOption.innerHTML = '<input type="text" placeholder="Option ' + (container.children.length + 1) + '" class="poll-input" required />';
+      container.appendChild(newOption);
+    }
+
+    // Listen for new polls
+    socket.on('new_poll', poll => {
+      socket.emit('get_polls_and_doubts', { class_id: classId });
+    });
+    // Listen for poll results
+    socket.on('poll_results', data => {
+      if (data && data.results) {
+        data.results.forEach(opt => {
+          const el = document.getElementById('poll-votes-' + opt.option_id);
+          if (el) el.textContent = `(${opt.votes} votes)`;
+        });
+      }
+    });
+
+    // --- Doubts ---
+    function renderDoubts(doubts) {
+      const doubtsList = document.getElementById('doubtsList');
+      doubtsList.innerHTML = '';
+      doubts.forEach(doubt => {
+        const div = document.createElement('div');
+        div.className = 'doubt-item';
+        div.innerHTML = `
+          <div class="doubt-user">${doubt.username}</div>
+          <div class="doubt-text">${doubt.doubt_text}</div>
+          <div class="doubt-actions">
+            ${doubt.status === 'open' ? `<button class="doubt-btn resolve-btn" onclick="resolveDoubt(${doubt.id})">Resolve</button>
+            <button class="doubt-btn ignore-btn" onclick="ignoreDoubt(${doubt.id})">Ignore</button>` : doubt.status === 'resolved' ? '<span style="color: #48bb78; font-weight: 600;">✓ Resolved</span>' : '<span style="color: #a0aec0;">Ignored</span>'}
+          </div>
+        `;
+        doubtsList.appendChild(div);
+      });
+    }
+    function resolveDoubt(doubtId) {
+      socket.emit('resolve_doubt', { doubt_id: doubtId, class_id: classId });
+    }
+    function ignoreDoubt(doubtId) {
+      socket.emit('ignore_doubt', { doubt_id: doubtId, class_id: classId });
+    }
+    socket.on('update_doubts', data => {
+      renderDoubts(data.doubts);
+    });
+
+    // Initial fetch of polls and doubts
+    socket.emit('get_polls_and_doubts', { class_id: classId });
+    socket.on('init_polls_and_doubts', data => {
+      renderPolls(data.polls);
+      renderDoubts(data.doubts);
+    });
+
+    // --- Tab switching ---
+    function showTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabName + '-tab').classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // Load messages on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Auto-refresh messages every 2 seconds for host
+      setInterval(loadMessages, 2000);
+    });
 
     // Load existing messages
     function loadMessages() {
@@ -196,96 +381,10 @@
       .catch(error => console.error('Error sending message:', error));
     };
 
-    // Load messages on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      loadMessages();
-      // Auto-refresh messages every 2 seconds for host
-      setInterval(loadMessages, 2000);
+    // Clean up when page is unloaded
+    window.addEventListener('beforeunload', () => {
+      // No specific cleanup for WebRTC host as it's not running
     });
-
-    // Tab switching
-    function showTab(tabName) {
-      // Hide all tab contents
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      
-      // Show selected tab
-      document.getElementById(tabName + '-tab').classList.add('active');
-      event.target.classList.add('active');
-    }
-
-    // Poll functionality
-    function addPollOption() {
-      var container = document.getElementById('pollOptions');
-      var newOption = document.createElement('div');
-      newOption.className = 'poll-option';
-      newOption.innerHTML = '<input type="text" placeholder="Option ' + (container.children.length + 1) + '" class="poll-input" required />';
-      container.appendChild(newOption);
-    }
-
-    document.getElementById('pollForm').onsubmit = function(e) {
-      e.preventDefault();
-      var question = document.getElementById('pollQuestion').value;
-      var options = Array.from(document.querySelectorAll('#pollOptions input')).map(input => input.value).filter(val => val.trim());
-      
-      if (question && options.length >= 2) {
-        var pollsContainer = document.getElementById('activePolls');
-        var pollDiv = document.createElement('div');
-        pollDiv.className = 'poll-section';
-        pollDiv.innerHTML = `
-          <h4 style="margin-bottom: 0.5rem;">${question}</h4>
-          ${options.map(option => `<div style="margin: 0.3rem 0; padding: 0.5rem; background: #fff; border-radius: 6px; border: 1px solid #ffd6d6;">${option}</div>`).join('')}
-          <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">Poll created successfully!</div>
-        `;
-        pollsContainer.appendChild(pollDiv);
-        
-        // Reset form
-        document.getElementById('pollForm').reset();
-        document.getElementById('pollOptions').innerHTML = `
-          <div class="poll-option">
-            <input type="text" placeholder="Option 1" class="poll-input" required />
-          </div>
-          <div class="poll-option">
-            <input type="text" placeholder="Option 2" class="poll-input" required />
-          </div>
-        `;
-      }
-    };
-
-    // Doubt functionality
-    function addDoubt(user, text) {
-      var doubtsContainer = document.getElementById('doubtsList');
-      var doubtDiv = document.createElement('div');
-      doubtDiv.className = 'doubt-item';
-      doubtDiv.innerHTML = `
-        <div class="doubt-user">${user}</div>
-        <div class="doubt-text">${text}</div>
-        <div class="doubt-actions">
-          <button class="doubt-btn resolve-btn" onclick="resolveDoubt(this)">Resolve</button>
-          <button class="doubt-btn ignore-btn" onclick="ignoreDoubt(this)">Ignore</button>
-        </div>
-      `;
-      doubtsContainer.appendChild(doubtDiv);
-    }
-
-    function resolveDoubt(btn) {
-      btn.parentElement.parentElement.style.background = '#f0fff4';
-      btn.parentElement.innerHTML = '<span style="color: #48bb78; font-weight: 600;">✓ Resolved</span>';
-    }
-
-    function ignoreDoubt(btn) {
-      btn.parentElement.parentElement.style.opacity = '0.5';
-      btn.parentElement.innerHTML = '<span style="color: #a0aec0;">Ignored</span>';
-    }
-
-    // Simulate some activity
-    setTimeout(() => {
-      addDoubt('Student A', 'Can you explain the quadratic formula again?');
-    }, 2000);
-
-    setTimeout(() => {
-      addDoubt('Student B', 'What is the difference between mean and median?');
-    }, 4000);
   </script>
 </body>
 </html> 

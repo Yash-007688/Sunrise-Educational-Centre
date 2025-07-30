@@ -143,6 +143,109 @@
       font-size: 0.98rem;
       margin-top: 0.7rem;
     }
+    
+    /* Status and Action Button Styles */
+    .status-approved {
+      color: #059669;
+      background: #d1fae5;
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .status-disapproved {
+      color: #dc2626;
+      background: #fee2e2;
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .status-pending {
+      color: #d97706;
+      background: #fef3c7;
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .btn-approve {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-approve:hover:not(:disabled) {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-1px);
+    }
+    
+    .btn-approve:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-disapprove {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-disapprove:hover:not(:disabled) {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      transform: translateY(-1px);
+    }
+    
+    .btn-disapprove:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-reset {
+      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-reset:hover:not(:disabled) {
+      background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+      transform: translateY(-1px);
+    }
+    
+    .btn-reset:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+    }
     @media (max-width: 700px) {
       .nav-content, .footer-content {
         flex-direction: column;
@@ -170,6 +273,22 @@
   <main class="container main-content">
     <section class="card-section" style="max-width:1100px; margin:0 auto;">
       <h2>All Admissions</h2>
+      
+      <!-- Admission Statistics -->
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+        <div style="background: #d1fae5; color: #059669; padding: 0.8rem 1.2rem; border-radius: 8px; font-weight: 600;">
+          <span style="font-size: 1.2rem;">{{ admissions|selectattr('13', 'equalto', 'approved')|list|length }}</span> Approved
+        </div>
+        <div style="background: #fee2e2; color: #dc2626; padding: 0.8rem 1.2rem; border-radius: 8px; font-weight: 600;">
+          <span style="font-size: 1.2rem;">{{ admissions|selectattr('13', 'equalto', 'disapproved')|list|length }}</span> Disapproved
+        </div>
+        <div style="background: #fef3c7; color: #d97706; padding: 0.8rem 1.2rem; border-radius: 8px; font-weight: 600;">
+          <span style="font-size: 1.2rem;">{{ admissions|selectattr('13', 'equalto', 'pending')|list|length }}</span> Pending
+        </div>
+        <div style="background: #e0e7ff; color: #2563eb; padding: 0.8rem 1.2rem; border-radius: 8px; font-weight: 600;">
+          <span style="font-size: 1.2rem;">{{ admissions|length }}</span> Total
+        </div>
+      </div>
       <div style="overflow-x:auto;">
         <table class="admissions-table">
           <thead>
@@ -197,33 +316,38 @@
             <tr>
               <td>{{ adm[0] }}</td>
               <td>{{ adm[1] }}</td>
-              <td>{{ adm[13] }}</td>
               <td>{{ adm[2] }}</td>
-              <td>{{ adm[9] }}</td>
               <td>{{ adm[3] }}</td>
               <td>{{ adm[4] }}</td>
-              <td>{{ adm[10] }}</td>
-              <td>{{ adm[11] }}</td>
-              <td>{{ adm[12] }}</td>
               <td>{{ adm[5] }}</td>
               <td>{{ adm[6] }}</td>
+              <td>{{ adm[7] }}</td>
+              <td>{{ adm[8] }}</td>
+              <td>{{ adm[9] }}</td>
+              <td>{{ adm[10] }}</td>
+              <td>{{ adm[11] }}</td>
               <td>
-                {% if adm[7] %}
-                  <img src="/uploads/admission_photos/{{ adm[7] }}" alt="Photo" style="width:48px; height:48px; object-fit:cover; border-radius:8px;">
+                {% if adm[12] %}
+                  <img src="/uploads/admission_photos/{{ adm[12] }}" alt="Photo" style="width:48px; height:48px; object-fit:cover; border-radius:8px;">
                 {% else %}-{% endif %}
               </td>
               <td>
-                <span style="font-weight:600; text-transform:capitalize;">{{ adm[13] }}</span>
+                <span class="status-{{ adm[13] }}">{{ adm[13].title() }}</span>
               </td>
               <td>
+                <div class="action-buttons">
                 <form method="POST" action="/admin/admissions/approve/{{ adm[0] }}" style="display:inline;">
-                  <button type="submit" class="btn btn-primary" {% if adm[13] == 'approved' %}disabled{% endif %}>Approve</button>
+                    <button type="submit" class="btn-approve" {% if adm[13] == 'approved' %}disabled{% endif %}>Approve</button>
+                  </form>
+                  <form method="POST" action="/admin/admissions/disapprove/{{ adm[0] }}" style="display:inline;">
+                    <button type="submit" class="btn-disapprove" {% if adm[13] == 'disapproved' %}disabled{% endif %}>Disapprove</button>
                 </form>
-                <form method="POST" action="/admin/admissions/disapprove/{{ adm[0] }}" style="display:inline; margin-left:0.5rem;">
-                  <button type="submit" class="btn btn-primary" style="background:#fc5c7d; color:#fff;" {% if adm[13] == 'disapproved' %}disabled{% endif %}>Disapprove</button>
+                  <form method="POST" action="/admin/admissions/reset/{{ adm[0] }}" style="display:inline;">
+                    <button type="submit" class="btn-reset" {% if adm[13] == 'pending' %}disabled{% endif %}>Reset</button>
                 </form>
+                </div>
               </td>
-              <td>{{ adm[8] }}</td>
+              <td>{{ adm[14] }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -244,5 +368,44 @@
       <div class="footer-copy">&copy; 2024 Sunrise Education Centre</div>
     </div>
   </footer>
+  
+  <script>
+    // Add confirmation dialogs for action buttons
+    document.addEventListener('DOMContentLoaded', function() {
+      const approveButtons = document.querySelectorAll('.btn-approve');
+      const disapproveButtons = document.querySelectorAll('.btn-disapprove');
+      const resetButtons = document.querySelectorAll('.btn-reset');
+      
+      approveButtons.forEach(button => {
+        if (!button.disabled) {
+          button.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to approve this admission?')) {
+              e.preventDefault();
+            }
+          });
+        }
+      });
+      
+      disapproveButtons.forEach(button => {
+        if (!button.disabled) {
+          button.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to disapprove this admission?')) {
+              e.preventDefault();
+            }
+          });
+        }
+      });
+      
+      resetButtons.forEach(button => {
+        if (!button.disabled) {
+          button.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to reset this admission to pending?')) {
+              e.preventDefault();
+            }
+          });
+        }
+      });
+    });
+  </script>
 </body>
 </html> 

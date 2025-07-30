@@ -14,46 +14,12 @@
           <img src="attached_assets/image_1750584670920.png" alt="Logo">
         </div>
         <ul class="nav-links">
-          <li class="mega-dropdown" id="programsDropdown">
-            <a href="#programs" id="programsLink">Programs</a>
-            <div class="mega-menu" id="programsMenu">
-              <div class="mega-menu-content">
-                <div class="mega-menu-left">
-                  <div class="mega-category">
-                    <div class="cat-title">Mathematics (Class 9-12)</div>
-                    <div class="cat-desc">Core, Standard, Applied</div>
-                  </div>
-                  <div class="mega-category">
-                    <div class="cat-title">Physics (Class 11-12)</div>
-                    <div class="cat-desc">Concepts, Numericals, Boards & JEE</div>
-                  </div>
-                  <div class="mega-category">
-                    <div class="cat-title">Chemistry (Class 11-12)</div>
-                    <div class="cat-desc">Physical, Organic, Inorganic</div>
-                  </div>
-                  <div class="mega-category">
-                    <div class="cat-title">Foundation (Class 8-10)</div>
-                    <div class="cat-desc">Olympiad, NTSE, Basics</div>
-                  </div>
-                  <div class="mega-category">
-                    <div class="cat-title">Olympiad/NTSE</div>
-                    <div class="cat-desc">Maths, Science, NTSE</div>
-                  </div>
-                </div>
-                <div class="mega-menu-right">
-                  <div class="mega-featured"><span class="mega-icon">9️⃣</span> Class 9</div>
-                  <div class="mega-featured"><span class="mega-icon">🔟</span> Class 10</div>
-                  <div class="mega-featured"><span class="mega-icon">1️⃣1️⃣</span> Class 11</div>
-                  <div class="mega-featured"><span class="mega-icon">1️⃣2️⃣</span> Class 12</div>
-                  <div class="mega-featured"><span class="mega-icon">🏅</span> Olympiad</div>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li><a href="#about-us">About</a></li>
-          <li><a href="/online-class">Live Class</a></li>
-          <li><a href="/study-resources">Study Resources</a></li>
-          <li><a href="/forum">Forum</a></li>
+
+                  <li><a href="#about-us">About</a></li>
+        <li><a href="/online-class">Live Class</a></li>
+        <li><a href="/study-resources">Study Resources</a></li>
+        <li><a href="/forum">Forum</a></li>
+        <li><a href="/profile">Profile</a></li>
           <!-- Notification Bell (rebuilt, now before login/logout) -->
           <li id="notifBellContainer" style="position:relative; z-index:9999;">
             <button id="notifBell" style="background:none; border:none; cursor:pointer; position:relative; z-index:10000; padding:0;">
@@ -66,10 +32,10 @@
               <strong style="color:#6a82fb; font-size:1.15rem;">Notifications</strong>
               <ul style="list-style:none; padding:0; margin:0; max-height:320px; overflow-y:auto;">
                 {% if user_notifications and user_notifications|length > 0 %}
-                  {% for id, message, created_at in user_notifications %}
-                  <li style="padding:0.9rem 1.2rem; border-bottom:1px solid #eee; font-size:1.05rem; color:#232946; background:#f8fafc; border-radius:10px; margin-bottom:0.7rem;">
+                  {% for id, message, created_at, status, notification_type, scheduled_time in user_notifications %}
+                  <li class="notification-item" data-notification-id="{{ id }}" style="padding:0.9rem 1.2rem; border-bottom:1px solid #eee; font-size:1.05rem; color:#232946; background:#f8fafc; border-radius:10px; margin-bottom:0.7rem; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#f8fafc'">
                     <strong>{{ message }}</strong><br>
-                    <span style="font-size:0.92rem; color:#888;">{{ created_at[:19].replace('T', ' ') }}</span>
+                    <span style="font-size:0.92rem; color:#888;">{{ format_datetime_for_display(created_at) }}</span>
                   </li>
                   {% endfor %}
                 {% else %}
@@ -101,20 +67,132 @@
         </div>
       </div>
     </header>
+    
+    <!-- Student Achievements Section -->
+    <section style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); padding: 3rem 0; margin: 2rem 0;">
+      <div class="container">
+        <h2 style="text-align: center; color: #232946; font-size: 2.5rem; margin-bottom: 2rem;">🏆 Wall of Fame</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+          <!-- 2024-2025 Achievements -->
+          <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 8px 32px rgba(0,0,0,0.1); text-align: center;">
+            <h3 style="color: #232946; margin-bottom: 1rem;">2024-2025 (X - CBSE)</h3>
+            <img src="student_achievements/2024_2025_achievements.jpeg" alt="2024-2025 Student Achievements" style="width: 100%; max-width: 400px; height: auto; border-radius: 15px; margin-bottom: 1rem;">
+            <div style="background: rgba(255,107,53,0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1rem;">
+              <h4 style="color: #232946; margin-bottom: 0.5rem;">JIYA MENGHANI</h4>
+              <div style="font-size: 2rem; font-weight: 700; color: #ff6b35;">100/100</div>
+              <div style="color: #232946;">Standard MATHS (X) - 98%</div>
+              <div style="color: #ff6b35; font-weight: 600; margin-top: 0.5rem;">🏆 City Topper - 4th Rank</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem;">
+              <div style="background: rgba(106,130,251,0.1); padding: 0.8rem; border-radius: 10px;">
+                <div style="font-weight: 700; color: #232946; font-size: 0.85rem;">Divya Thawani</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #6a82fb;">98/100</div>
+                <div style="color: #232946; font-size: 0.8rem;">X-Basic MATHS</div>
+              </div>
+              <div style="background: rgba(106,130,251,0.1); padding: 0.8rem; border-radius: 10px;">
+                <div style="font-weight: 700; color: #232946; font-size: 0.85rem;">Harshita Kewalramani</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #6a82fb;">98/100</div>
+                <div style="color: #232946; font-size: 0.8rem;">X-Basic MATHS</div>
+              </div>
+              <div style="background: rgba(106,130,251,0.1); padding: 0.8rem; border-radius: 10px;">
+                <div style="font-weight: 700; color: #232946; font-size: 0.85rem;">Harshil Ramrakhyani</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #6a82fb;">94/100</div>
+                <div style="color: #232946; font-size: 0.8rem;">X-Standard MATHS</div>
+              </div>
+              <div style="background: rgba(106,130,251,0.1); padding: 0.8rem; border-radius: 10px;">
+                <div style="font-weight: 700; color: #232946; font-size: 0.85rem;">Sakshi Leelani</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #6a82fb;">93/100</div>
+                <div style="color: #232946; font-size: 0.8rem;">X-Standard MATHS</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 2023-2024 Scholars -->
+          <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 8px 32px rgba(0,0,0,0.1); text-align: center;">
+            <h3 style="color: #232946; margin-bottom: 1rem;">2023-2024 Scholars</h3>
+            <img src="student_achievements/2023_2024_scholars.jpeg" alt="2023-2024 Scholars" style="width: 100%; max-width: 400px; height: auto; border-radius: 15px; margin-bottom: 1rem;">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem;">
+              <div style="background: rgba(106,130,251,0.1); padding: 0.8rem; border-radius: 10px;">
+                <div style="font-weight: 700; color: #232946; font-size: 0.85rem;">Divya Thawani</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #6a82fb;">98/100</div>
+                <div style="color: #232946; font-size: 0.8rem;">X-Basic MATHS</div>
+              </div>
+              <div style="background: rgba(106,130,251,0.1); padding: 0.8rem; border-radius: 10px;">
+                <div style="font-weight: 700; color: #232946; font-size: 0.85rem;">Harshita Kewalramani</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #6a82fb;">98/100</div>
+                <div style="color: #232946; font-size: 0.8rem;">X-Basic MATHS</div>
+              </div>
+              <div style="background: rgba(106,130,251,0.1); padding: 0.8rem; border-radius: 10px;">
+                <div style="font-weight: 700; color: #232946; font-size: 0.85rem;">Harshil Ramrakhyani</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #6a82fb;">94/100</div>
+                <div style="color: #232946; font-size: 0.8rem;">X-Standard MATHS</div>
+              </div>
+              <div style="background: rgba(106,130,251,0.1); padding: 0.8rem; border-radius: 10px;">
+                <div style="font-weight: 700; color: #232946; font-size: 0.85rem;">Sakshi Leelani</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #6a82fb;">93/100</div>
+                <div style="color: #232946; font-size: 0.8rem;">X-Standard MATHS</div>
+              </div>
+              <div style="background: rgba(106,130,251,0.1); padding: 0.8rem; border-radius: 10px;">
+                <div style="font-weight: 700; color: #232946; font-size: 0.85rem;">Aarav Sharma</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #6a82fb;">92/100</div>
+                <div style="color: #232946; font-size: 0.8rem;">X-Standard MATHS</div>
+              </div>
+              <div style="background: rgba(106,130,251,0.1); padding: 0.8rem; border-radius: 10px;">
+                <div style="font-weight: 700; color: #232946; font-size: 0.85rem;">Priya Patel</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #6a82fb;">91/100</div>
+                <div style="color: #232946; font-size: 0.8rem;">X-Basic MATHS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Additional Top Performers Section -->
+        <div style="background: rgba(255,255,255,0.9); border-radius: 20px; padding: 2rem; margin-top: 2rem;">
+          <h3 style="text-align: center; color: #232946; font-size: 1.8rem; margin-bottom: 1.5rem;">🌟 Outstanding Performers</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div style="background: linear-gradient(135deg, #ff6b35, #ff8e53); color: white; padding: 1rem; border-radius: 15px; text-align: center;">
+              <div style="font-weight: 700; font-size: 1.1rem;">Riya Verma</div>
+              <div style="font-size: 1.5rem; font-weight: 700;">96/100</div>
+              <div style="font-size: 0.9rem;">X-Standard MATHS</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #6a82fb, #8b9cf6); color: white; padding: 1rem; border-radius: 15px; text-align: center;">
+              <div style="font-weight: 700; font-size: 1.1rem;">Karan Singh</div>
+              <div style="font-size: 1.5rem; font-weight: 700;">95/100</div>
+              <div style="font-size: 0.9rem;">X-Basic MATHS</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #fc5c7d, #ff7a9a); color: white; padding: 1rem; border-radius: 15px; text-align: center;">
+              <div style="font-weight: 700; font-size: 1.1rem;">Ananya Desai</div>
+              <div style="font-size: 1.5rem; font-weight: 700;">94/100</div>
+              <div style="font-size: 0.9rem;">X-Standard MATHS</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 1rem; border-radius: 15px; text-align: center;">
+              <div style="font-weight: 700; font-size: 1.1rem;">Vedant Kumar</div>
+              <div style="font-size: 1.5rem; font-weight: 700;">93/100</div>
+              <div style="font-size: 0.9rem;">X-Basic MATHS</div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+          <a href="#programs" class="btn btn-cta" style="background: #232946; color: #fff;">Join Our Success Story</a>
+        </div>
+      </div>
+    </section>
+    
     <!-- Welcome Section -->
     <section class="card-section" style="text-align:center; margin:2rem 0 2.5rem 0;">
-      <div class="card animated-card" style="max-width:800px; width:100%; margin:0 auto; padding:3rem; background: linear-gradient(135deg, #e3f7fc 0%, #e6f9f3 100%); border-radius:24px; box-shadow:0 8px 32px rgba(106,130,251,0.15);">
-        <h2 style="color:#232946; margin-bottom:1.5rem; font-size:2.5rem; font-weight:700;">Welcome to Sunrise Educational Centre</h2>
-        <p style="color:#232946; font-size:1.2rem; line-height:1.6; margin-bottom:2rem; opacity:0.9;">Empowering students from Class 9 to 12 with expert coaching, personalized attention, and a proven track record of success. Join our vibrant learning community and unlock your full potential!</p>
-        <a href="#programs" class="btn btn-primary" style="background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%); color:#fff; padding:1rem 2.5rem; border-radius:12px; font-weight:600; font-size:1.1rem; text-decoration:none; display:inline-block; transition:all 0.3s ease; box-shadow:0 4px 16px rgba(106,130,251,0.3);">Get Started</a>
+      <div class="card animated-card" style="max-width:800px; width:100%; margin:0 auto; padding:3rem; background: linear-gradient(135deg, #e3f7fc 0%, #e6f9f3 100%); border-radius:24px; box-shadow:0 8px 32px rgba(106,130,251,0.15);" id="welcome-card">
+        <h2 style="color:#232946; margin-bottom:1.5rem; font-size:2.5rem; font-weight:700;" id="welcome-title">Welcome to Sunrise Educational Centre</h2>
+        <p style="color:#232946; font-size:1.2rem; line-height:1.6; margin-bottom:2rem; opacity:0.9;" id="welcome-text">Empowering students from Class 9 to 12 with expert coaching, personalized attention, and a proven track record of success. Join our vibrant learning community and unlock your full potential!</p>
+        <a href="/admission" class="btn btn-primary" style="background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%); color:#fff; padding:1rem 2.5rem; border-radius:12px; font-weight:600; font-size:1.1rem; text-decoration:none; display:inline-block; transition:all 0.3s ease; box-shadow:0 4px 16px rgba(106,130,251,0.3);">Get Started</a>
       </div>
     </section>
     <!-- Our Location Section -->
     <section id="our-location" style="margin:3rem 0 2.5rem 0; text-align:center;">
-      <h2 style="color:#6a82fb; font-size:2.1rem; margin-bottom:1.2rem;">Our Location</h2>
-      <p style="font-size:1.1rem; color:#232946; margin-bottom:1.5rem;">Sunrise Educational Centre,<br>123 Main Street, City Name, State, 123456</p>
+      <h2 style="color:#6a82fb; font-size:2.1rem; margin-bottom:1.2rem;" id="location-title">Our Location</h2>
+      <p style="font-size:1.1rem; color:#232946; margin-bottom:1.5rem;" id="location-address">Sunrise Educational Centre,<br>Deepmala Pagarani Sanskar Higher Secondary Public School<br>Bhopal, Madhya Pradesh, India</p>
       <div style="display:flex; justify-content:center;">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.9999999999995!2d75.8577!3d26.9124!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDU0JzQ0LjciTiA3NcKwNTEnMjcuOCJF!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin" width="400" height="250" style="border:0; border-radius:16px; box-shadow:0 4px 24px rgba(106,130,251,0.13);" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.9999999999995!2d77.3410842!3d23.2669386!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x397c6799dde01897%3A0x2869125b79dfad80!2sDeepmala%20Pagarani%20Sanskar%20Higher%20Secondary%20Public%20School!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin" width="400" height="250" style="border:0; border-radius:16px; box-shadow:0 4px 24px rgba(106,130,251,0.13);" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" id="location-map"></iframe>
       </div>
     </section>
     <!-- Subjects We Offer section (restored to top) -->
@@ -125,31 +203,31 @@
             <div style="flex:1 1 260px; min-width:220px; background:#e6f9f3; border-radius:18px; padding:1.5rem;">
               <h3 style="color:#14213d; margin-bottom:1.2rem; text-align:center;">Foundation</h3>
               <div style="display:flex; flex-direction:column; gap:1rem; align-items:center;">
-                <a href="/class/9" class="subject-btn btn" style="background:#ffe082; color:#232946; width:100%; max-width:220px; border-radius:14px; font-weight:600; border:2px solid #ffe082;">
+                <button onclick="redirectToClass('9')" class="subject-btn btn" style="background:#ffe082; color:#232946; width:100%; max-width:220px; border-radius:14px; font-weight:600; border:2px solid #ffe082; cursor:pointer;">
                   Class 9: Core Mathematics
                   <div style='font-size:0.98rem; font-weight:400; color:#232946;'>4:00 PM – 5:00 PM</div>
-                </a>
-                <a href="/class/10-standard" class="subject-btn btn" style="background:#b2f0e6; color:#232946; width:100%; max-width:220px; border-radius:14px; font-weight:600; border:2px solid #b2f0e6;">
+                </button>
+                <button onclick="redirectToClass('2')" class="subject-btn btn" style="background:#b2f0e6; color:#232946; width:100%; max-width:220px; border-radius:14px; font-weight:600; border:2px solid #b2f0e6; cursor:pointer;">
                   Class 10: Standard Mathematics
                   <div style='font-size:0.98rem; font-weight:400; color:#232946;'>5:00 PM – 6:00 PM</div>
-                </a>
-                <a href="/class/10-basic" class="subject-btn btn" style="background:#ffd6e0; color:#232946; width:100%; max-width:220px; border-radius:14px; font-weight:600; border:2px solid #ffd6e0;">
+                </button>
+                <button onclick="redirectToClass('3')" class="subject-btn btn" style="background:#ffd6e0; color:#232946; width:100%; max-width:220px; border-radius:14px; font-weight:600; border:2px solid #ffd6e0; cursor:pointer;">
                   Class 10: Basic Mathematics
                   <div style='font-size:0.98rem; font-weight:400; color:#232946;'>7:00 PM – 8:00 PM</div>
-                </a>
+                </button>
             </div>
             </div>
             <div style="flex:1 1 260px; min-width:220px; background:#e3f7fc; border-radius:18px; padding:1.5rem;">
               <h3 style="color:#14213d; margin-bottom:1.2rem; text-align:center;">JEE Level</h3>
               <div style="display:flex; flex-direction:column; gap:1rem; align-items:center;">
-                <a href="/class/11" class="subject-btn btn" style="background:#d1c4e9; color:#232946; width:100%; max-width:220px; border-radius:14px; font-weight:600; border:2px solid #d1c4e9;">
+                <button onclick="redirectToClass('4')" class="subject-btn btn" style="background:#d1c4e9; color:#232946; width:100%; max-width:220px; border-radius:14px; font-weight:600; border:2px solid #d1c4e9; cursor:pointer;">
                   Class 11: Applied Mathematics
                   <div style='font-size:0.98rem; font-weight:400; color:#232946;'>6:00 PM – 7:00 PM</div>
-                </a>
-                <a href="/class/12" class="subject-btn btn" style="background:#ffcdd2; color:#232946; width:100%; max-width:220px; border-radius:14px; font-weight:600; border:2px solid #ffcdd2;">
+                </button>
+                <button onclick="redirectToClass('6')" class="subject-btn btn" style="background:#ffcdd2; color:#232946; width:100%; max-width:220px; border-radius:14px; font-weight:600; border:2px solid #ffcdd2; cursor:pointer;">
                   Class 12: Core Mathematics
                   <div style='font-size:0.98rem; font-weight:400; color:#232946;'>8:00 PM – 9:00 PM</div>
-                </a>
+                </button>
             </div>
             </div>
           </div>
@@ -309,14 +387,7 @@
     <main class="container main-content">
       <!-- Topper Student Review Card -->
       <!-- (Removed old Wall of Fame/Topper section; only new slider remains) -->
-      <!-- Enroll Now Card -->
-      <div class="card-section" style="display:flex; justify-content:center;">
-        <div class="card animated-card enroll-card" style="max-width:420px; width:100%; margin:0 auto;">
-          <h2>Ready to Join Sunrise?</h2>
-          <p>Start your learning journey with us. Fill out our quick admission form and get started today!</p>
-          <a href="admission.html" class="btn btn-primary">Enroll Now</a>
-        </div>
-      </div>
+
       <section id="about-teacher" class="card-section" style="text-align:center;">
         <div style="background:#fff8e1; border-radius:32px; box-shadow:0 4px 32px rgba(100,200,100,0.10); padding:3.5rem 2.5rem 3rem 2.5rem; max-width:800px; margin:0 auto; min-height:350px; color:#14213d; position:relative; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:2.5rem;">
           <div style="flex:1 1 320px; min-width:260px;">
@@ -367,6 +438,76 @@
           </div>
         </div>
       </section>
+      
+      <!-- YouTube Section with Big Container -->
+      <section id="youtube-section" style="margin: 4rem 0; padding: 3rem 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container">
+          <div style="text-align: center; margin-bottom: 3rem;">
+            <h2 style="color: white; font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">📺 Latest Educational Content</h2>
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">Watch our latest educational videos, tutorials, and live sessions. Subscribe to our YouTube channel for regular updates!</p>
+          </div>
+          
+          <!-- Big YouTube Video Container -->
+          <div style="max-width: 1000px; margin: 0 auto; background: rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 2rem; backdrop-filter: blur(10px);">
+            <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%; border-radius: 15px; overflow: hidden; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);">
+              <iframe 
+                id="mainVideoPlayer"
+                src="https://www.youtube.com/embed/Lq-5Gz7Mrl4?rel=0&modestbranding=1" 
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 15px;"
+                title="Sunrise Education Centre - Demo Video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+            
+            <!-- Video Info -->
+            <div style="margin-top: 1.5rem; text-align: center;">
+              <h3 id="videoTitle" style="color: white; font-size: 1.5rem; margin-bottom: 0.5rem;">Mathematics Class 10 CHAPTER 8 TRIGONOMETRY</h3>
+              <p id="videoDescription" style="color: rgba(255, 255, 255, 0.8); font-size: 1rem; margin-bottom: 1rem;">Complete explanation of Trigonometry with examples and practice questions</p>
+              
+              <!-- Video Controls -->
+              <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <button onclick="window.open('https://www.youtube.com/@MohitNariyani', '_blank')" 
+                        style="background: #ff0000; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-size: 1.2rem;">▶️</span> Subscribe to Channel
+                </button>
+                <button onclick="loadNextVideo()" 
+                        style="background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid rgba(255, 255, 255, 0.3); padding: 0.8rem 1.5rem; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                  🔄 Next Video
+                </button>
+                <button onclick="showVideoPlaylist()" 
+                        style="background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid rgba(255, 255, 255, 0.3); padding: 0.8rem 1.5rem; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                  📋 View Playlist
+                </button>
+              </div>
+            </div>
+          </div>
+          
+
+          
+          <!-- Channel Stats -->
+          <div style="margin-top: 3rem; text-align: center;">
+            <div style="display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;">
+              <div style="color: white; text-align: center;">
+                <div style="font-size: 2rem; font-weight: 700;">500+</div>
+                <div style="font-size: 1rem; opacity: 0.8;">Videos</div>
+              </div>
+              <div style="color: white; text-align: center;">
+                <div style="font-size: 2rem; font-weight: 700;">10K+</div>
+                <div style="font-size: 1rem; opacity: 0.8;">Subscribers</div>
+              </div>
+              <div style="color: white; text-align: center;">
+                <div style="font-size: 2rem; font-weight: 700;">1M+</div>
+                <div style="font-size: 1rem; opacity: 0.8;">Views</div>
+              </div>
+              <div style="color: white; text-align: center;">
+                <div style="font-size: 2rem; font-weight: 700;">24/7</div>
+                <div style="font-size: 1rem; opacity: 0.8;">Learning</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
       <div style="text-align:center; margin: 1.5rem 0 2rem 0;">
         <button id="darkModeToggle" class="btn btn-primary" style="min-width:160px;">Toggle Dark Mode</button>
       </div>
@@ -390,65 +531,7 @@
           background: #232946 !important;
           box-shadow: 0 4px 32px rgba(35,41,70,0.25) !important;
         }
-        .mega-dropdown { position: relative; }
-        .mega-menu {
-          display: none;
-          position: absolute;
-          left: 0;
-          top: 2.5rem;
-          width: 600px;
-          background: #fff;
-          box-shadow: 0 4px 24px rgba(100,100,255,0.13);
-          border-radius: 16px;
-          z-index: 1000;
-          padding: 1.5rem 2rem;
-          animation: fadeIn 0.2s;
-        }
-        .mega-menu-content {
-          display: flex;
-          gap: 2.5rem;
-        }
-        .mega-menu-left {
-          flex: 2;
-          display: flex;
-          flex-direction: column;
-          gap: 1.2rem;
-        }
-        .mega-category .cat-title {
-          font-weight: 700;
-          font-size: 1.08rem;
-          color: #232946;
-        }
-        .mega-category .cat-desc {
-          font-size: 0.98rem;
-          color: #888;
-        }
-        .mega-menu-right {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 1.1rem;
-          justify-content: center;
-        }
-        .mega-featured {
-          background: #f8fafc;
-          border-radius: 12px;
-          padding: 1rem 1.2rem;
-          font-size: 1.08rem;
-          font-weight: 600;
-          color: #232946;
-          display: flex;
-          align-items: center;
-          gap: 0.7rem;
-          box-shadow: 0 2px 8px rgba(100,100,255,0.07);
-        }
-        .mega-icon {
-          font-size: 1.4rem;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
+
         .contact-grid {
           display: flex;
           gap: 2.5rem;
@@ -630,28 +713,158 @@
           window.addEventListener('resize', function() {
             notifDropdown.style.display = 'none';
           });
+          
+          // Handle notification clicks to mark as seen
+          document.addEventListener('click', function(e) {
+            if (e.target.closest('.notification-item')) {
+              const notificationItem = e.target.closest('.notification-item');
+              const notificationId = notificationItem.getAttribute('data-notification-id');
+              
+              // Mark notification as seen
+              fetch('/mark-notification-seen', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  notification_id: notificationId
+                })
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.status === 'success') {
+                  // Fade out the notification
+                  notificationItem.style.opacity = '0.5';
+                  notificationItem.style.background = '#e8f0ff';
+                  
+                  // Remove notification after a short delay
+                  setTimeout(() => {
+                    notificationItem.remove();
+                    
+                    // Check if no notifications left
+                    const remainingNotifications = document.querySelectorAll('.notification-item');
+                    if (remainingNotifications.length === 0) {
+                      const noNotificationsLi = document.createElement('li');
+                      noNotificationsLi.style.cssText = 'padding:1.1rem 1.2rem; color:#888; text-align:center; background:#f8fafc; border-radius:10px;';
+                      noNotificationsLi.textContent = 'No new notifications.';
+                      notifDropdown.querySelector('ul').appendChild(noNotificationsLi);
+                    }
+                  }, 500);
+                }
+              })
+              .catch(error => {
+                console.error('Error marking notification as seen:', error);
+              });
+            }
+          });
         }
       });
     </script>
+    <script src="script.js"></script>
+    
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const toggleBtn = document.getElementById('darkModeToggle');
-        if (!toggleBtn) return;
-        function setDarkMode(on) {
-          if (on) {
-            document.body.classList.add('dark-mode');
-            localStorage.setItem('darkMode', 'on');
-          } else {
-            document.body.classList.remove('dark-mode');
-            localStorage.setItem('darkMode', 'off');
-          }
+      // Function to redirect to specific class tab on study resources page
+      function redirectToClass(classId) {
+        // Check if user is logged in by looking for username in the page
+        const username = document.querySelector('a[href="/logout"]');
+        
+        if (username) {
+          // User is logged in, redirect to study resources with specific class tab
+          const studyResourcesUrl = `/study-resources?class=${classId}`;
+          window.location.href = studyResourcesUrl;
+        } else {
+          // User is not logged in, redirect to login page
+          window.location.href = '/auth';
         }
-        toggleBtn.addEventListener('click', () => {
-          setDarkMode(!document.body.classList.contains('dark-mode'));
+      }
+      
+      // YouTube Video Functions
+      let currentVideoIndex = 0;
+      const videoPlaylist = [
+        {
+          id: 'Lq-5Gz7Mrl4',
+          title: 'Mathematics Class 10 CHAPTER 8 TRIGONOMETRY',
+          description: 'Complete explanation of Trigonometry with examples and practice questions'
+        },
+        {
+          id: 'Lq-5Gz7Mrl4',
+          title: 'Mathematics Class 10 - Chapter 1',
+          description: 'Complete explanation of Real Numbers with examples and practice questions'
+        },
+        {
+          id: 'Lq-5Gz7Mrl4',
+          title: 'Class 11 Physics - Motion in a Plane',
+          description: 'Complete concept explanation with numerical examples'
+        },
+        {
+          id: 'Lq-5Gz7Mrl4',
+          title: 'Class 12 Chemistry - Organic Chemistry',
+          description: 'Hydrocarbons complete chapter with reactions'
+        }
+      ];
+      
+      function loadVideo(videoId, title = '', description = '') {
+        const iframe = document.getElementById('mainVideoPlayer');
+        const videoTitle = document.getElementById('videoTitle');
+        const videoDescription = document.getElementById('videoDescription');
+        
+        // Update video source
+        iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
+        
+        // Update video info
+        if (title) videoTitle.textContent = title;
+        if (description) videoDescription.textContent = description;
+        
+        // Smooth scroll to video section
+        document.getElementById('youtube-section').scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'center'
         });
-        if (localStorage.getItem('darkMode') === 'on') {
-          document.body.classList.add('dark-mode');
+      }
+      
+      function loadNextVideo() {
+        currentVideoIndex = (currentVideoIndex + 1) % videoPlaylist.length;
+        const video = videoPlaylist[currentVideoIndex];
+        loadVideo(video.id, video.title, video.description);
+      }
+      
+      function showVideoPlaylist() {
+        // Create a modal or alert with playlist
+        const playlistText = videoPlaylist.map((video, index) => 
+          `${index + 1}. ${video.title}`
+        ).join('\n');
+        
+        alert('📋 Video Playlist:\n\n' + playlistText + '\n\nClick on any video card to play!');
+      }
+      
+      // Auto-play next video after current one ends
+      function setupVideoEndListener() {
+        const iframe = document.getElementById('mainVideoPlayer');
+        if (iframe) {
+          iframe.addEventListener('load', function() {
+            // YouTube iframe doesn't support direct event listeners
+            // This is a placeholder for future implementation
+          });
         }
+      }
+      
+      // Initialize YouTube section
+      document.addEventListener('DOMContentLoaded', function() {
+        setupVideoEndListener();
+        
+        // Add hover effects to video cards
+        const videoCards = document.querySelectorAll('[onclick*="loadVideo"]');
+        videoCards.forEach(card => {
+          card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+            this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.2)';
+          });
+          
+          card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = 'none';
+          });
+        });
       });
     </script>
     <style>
@@ -698,6 +911,66 @@
       }
       body.dark-mode .query-card h2, body.dark-mode .query-card h3 {
         color: #aabfff;
+      }
+      
+      /* Dark mode styles for welcome section */
+      body.dark-mode #welcome-card {
+        background: linear-gradient(135deg, #2a3a5a 0%, #1e2a3a 100%) !important;
+        box-shadow: 0 8px 32px rgba(106,130,251,0.25) !important;
+      }
+      
+      body.dark-mode #welcome-title {
+        color: #f4f4f4 !important;
+      }
+      
+      body.dark-mode #welcome-text {
+        color: #e0e0e0 !important;
+        opacity: 0.9 !important;
+      }
+      
+      /* Dark mode styles for Our Location section */
+      body.dark-mode #location-title {
+        color: #aabfff !important;
+      }
+      
+      body.dark-mode #location-address {
+        color: #e0e0e0 !important;
+      }
+      
+      body.dark-mode #location-map {
+        box-shadow: 0 4px 24px rgba(106,130,251,0.25) !important;
+      }
+      
+      /* Subject button styles */
+      .subject-btn {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .subject-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      }
+      
+      .subject-btn:active {
+        transform: translateY(0);
+      }
+      
+      /* Add a subtle glow effect on hover */
+      .subject-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+      }
+      
+      .subject-btn:hover::before {
+        left: 100%;
       }
     </style>
   </body>

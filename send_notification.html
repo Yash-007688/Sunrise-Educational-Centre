@@ -155,16 +155,45 @@
       <form method="POST" action="/send-notification" class="login-form">
         <div class="form-group">
           <label for="message">Notification Message *</label>
-          <textarea id="message" name="message" required placeholder="Type your notification..."></textarea>
+          <textarea id="message" name="message" required placeholder="Type your notification..." maxlength="500" rows="4"></textarea>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+            <small style="color: #666;">Maximum 500 characters</small>
+            <small id="charCount" style="color: #6a82fb; font-weight: 500;">0/500</small>
+          </div>
         </div>
         <div class="form-group">
           <label for="class_id">Target Class *</label>
           <select id="class_id" name="class_id" required>
             <option value="">Select Class</option>
-            {% for id, name in all_classes %}
-              <option value="{{ id }}">{{ name|title }}</option>
-            {% endfor %}
+            <optgroup label="Class 9">
+              <option value="1">Class 9</option>
+            </optgroup>
+            <optgroup label="Class 10">
+              <option value="2">Class 10 Standard</option>
+              <option value="3">Class 10 Basic</option>
+            </optgroup>
+            <optgroup label="Class 11">
+              <option value="4">Class 11 Applied</option>
+              <option value="5">Class 11 Core</option>
+            </optgroup>
+            <optgroup label="Class 12">
+              <option value="6">Class 12 Applied</option>
+              <option value="7">Class 12 Core</option>
+            </optgroup>
+            <optgroup label="Staff">
+              <option value="8">Admin</option>
+              <option value="9">Teacher</option>
+            </optgroup>
           </select>
+        </div>
+        <div class="form-group">
+          <label for="target_paid_status">Target Users *</label>
+          <select id="target_paid_status" name="target_paid_status" required>
+            <option value="all">All Users (Paid & Unpaid)</option>
+            <option value="paid">Paid Users Only</option>
+            <option value="not paid">Unpaid Users Only</option>
+          </select>
+          <small style="color: #666;">Choose which users should receive this notification</small>
         </div>
         <div class="form-group">
           <label for="schedule_date">Schedule Notification (Optional)</label>
@@ -182,21 +211,31 @@
             <tr style="background:#f3f6fa;">
               <th style="padding:0.7rem 1rem; text-align:left;">Message</th>
               <th style="padding:0.7rem 1rem; text-align:left;">Class</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Scheduled At</th>
-              <th style="padding:0.7rem 1rem; text-align:left;">Sent At</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Target Users</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Created At</th>
               <th style="padding:0.7rem 1rem; text-align:left;">Actions</th>
             </tr>
           </thead>
           <tbody>
             {% for n in notifications %}
             <tr style="border-bottom:1px solid #eee;">
-              <td style="padding:0.7rem 1rem;">{{ n.message }}</td>
-              <td style="padding:0.7rem 1rem;">{{ n.class_name }}</td>
-              <td style="padding:0.7rem 1rem;">{{ n.scheduled_at or '-' }}</td>
-              <td style="padding:0.7rem 1rem;">{{ n.sent_at or '-' }}</td>
+              <td style="padding:0.7rem 1rem; max-width:300px; word-wrap:break-word;">{{ n[1] }}</td>
+              <td style="padding:0.7rem 1rem;">{{ n[2] or 'All Classes' }}</td>
               <td style="padding:0.7rem 1rem;">
-                <form method="POST" action="/delete-notification/{{ n.id }}" style="display:inline;" onsubmit="return confirm('Delete this notification?');">
-                  <button type="submit" class="btn btn-secondary">Delete</button>
+                {% if n[4] == 'all' %}
+                  <span style="background:#e3f2fd; color:#1976d2; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.85rem;">All Users</span>
+                {% elif n[4] == 'paid' %}
+                  <span style="background:#e8f5e8; color:#2e7d32; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.85rem;">Paid Only</span>
+                {% elif n[4] == 'not paid' %}
+                  <span style="background:#fff3e0; color:#f57c00; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.85rem;">Unpaid Only</span>
+                {% else %}
+                  <span style="background:#f3e5f5; color:#7b1fa2; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.85rem;">{{ n[4]|title }}</span>
+                {% endif %}
+              </td>
+              <td style="padding:0.7rem 1rem;">{{ n[3][:19].replace('T', ' ') if n[3] else '-' }}</td>
+              <td style="padding:0.7rem 1rem;">
+                <form method="POST" action="/admin/delete-notification/{{ n[0] }}" style="display:inline;" onsubmit="return confirm('Delete this notification?');">
+                  <button type="submit" class="btn btn-secondary" style="padding:0.3rem 0.8rem; font-size:0.9rem;">Delete</button>
                 </form>
               </td>
             </tr>
@@ -206,5 +245,79 @@
       </div>
     </div>
   </main>
+  
+  <script>
+    // Character counter for message
+    const messageTextarea = document.getElementById('message');
+    const charCount = document.getElementById('charCount');
+    
+    if (messageTextarea && charCount) {
+      messageTextarea.addEventListener('input', function() {
+        const currentLength = this.value.length;
+        const maxLength = this.maxLength;
+        charCount.textContent = `${currentLength}/${maxLength}`;
+        
+        // Change color when approaching limit
+        if (currentLength > maxLength * 0.9) {
+          charCount.style.color = '#fc5c7d';
+        } else if (currentLength > maxLength * 0.7) {
+          charCount.style.color = '#f6ad55';
+        } else {
+          charCount.style.color = '#6a82fb';
+        }
+      });
+    }
+    
+    // Form validation
+    const form = document.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        const message = document.getElementById('message').value.trim();
+        const classId = document.getElementById('class_id').value;
+        const targetPaidStatus = document.getElementById('target_paid_status').value;
+        
+        if (!message) {
+          e.preventDefault();
+          alert('Please enter a notification message.');
+          return false;
+        }
+        
+        if (!classId) {
+          e.preventDefault();
+          alert('Please select a target class.');
+          return false;
+        }
+        
+        if (!targetPaidStatus) {
+          e.preventDefault();
+          alert('Please select target users.');
+          return false;
+        }
+        
+        // Show confirmation for scheduling
+        if (e.submitter && e.submitter.name === 'schedule') {
+          const scheduleDate = document.getElementById('schedule_date').value;
+          if (!scheduleDate) {
+            e.preventDefault();
+            alert('Please select a schedule date and time.');
+            return false;
+          }
+          
+          if (!confirm('Are you sure you want to schedule this notification?')) {
+            e.preventDefault();
+            return false;
+          }
+        }
+      });
+    }
+    
+    // Auto-resize textarea
+    if (messageTextarea) {
+      messageTextarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+      });
+    }
+  </script>
 </body>
 </html> 
