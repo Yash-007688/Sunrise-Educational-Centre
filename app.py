@@ -1317,9 +1317,9 @@ def study_resources():
         class_name = "Guest"
         paid_status = None
         
-        if not is_guest:
+        if not is_guest and user_id:
             try:
-                user = get_user_by_id(user_id) if user_id else None
+                user = get_user_by_id(user_id)
                 # user tuple: (id, username, class_id, paid, class_name, banned, mobile_no, email_address)
                 class_id = user[2] if user and len(user) > 2 else None
                 class_name = user[4] if user and len(user) > 4 else role
@@ -1884,8 +1884,15 @@ def auth():
                     next_page = request.args.get('next') or request.form.get('next')
                     if user_role in ['admin', 'teacher']:
                         return redirect(url_for('admin_panel'))
-                    if next_page == 'study-resources':
+                    elif next_page == 'study_resources':
                         return redirect(url_for('study_resources'))
+                    elif next_page:
+                        # Try to redirect to the requested page
+                        try:
+                            return redirect(url_for(next_page))
+                        except:
+                            # If the endpoint doesn't exist, fallback to home
+                            return redirect(url_for('home'))
                     # Fallback
                     return redirect(url_for('home'))
                 else:
@@ -1893,8 +1900,11 @@ def auth():
                     all_classes = get_all_classes()
                     return render_template('auth.html', error=error, all_classes=all_classes)
         error = 'Wrong credentials. Contact the institute.'
+    
+    # Handle GET requests - check for next parameter
+    next_page = request.args.get('next')
     all_classes = get_all_classes()
-    return render_template('auth.html', error=error, all_classes=all_classes)
+    return render_template('auth.html', error=error, all_classes=all_classes, next=next_page)
 # Placeholder Google OAuth start (UI only)
 @app.route('/auth/google')
 def auth_google_start():
@@ -5804,7 +5814,7 @@ def before_request_handler():
     else:
         # Allow auth-related endpoints and unauthenticated public pages
         if (endpoint not in allowed_routes and not endpoint.startswith('auth_') and not endpoint.startswith('google_')) and not session.get('user_id'):
-            return redirect(url_for('auth'))
+            return redirect(url_for('auth', next=request.endpoint))
     
     # 2. Session validation and activity update
     user_id = session.get('user_id')
