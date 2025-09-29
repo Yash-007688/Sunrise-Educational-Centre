@@ -24,6 +24,7 @@
             <li><a href="/study-resources">Study Resources</a></li>
             <li><a href="/forum">Forum</a></li>
             <li><a href="/admission">Admission</a></li>
+            <li><a href="/notifications">Notifications</a></li>
         </ul>
     </nav>
     </div>
@@ -31,11 +32,14 @@
     <section class="card-section black-glass" style="max-width:900px; margin: 2rem auto; padding: 1.5rem;">
         <div style="text-align:center; margin-bottom: 1rem;">
             <h2 style="margin:0 0 .5rem 0;">Your Notifications</h2>
-            <div style="display:flex; gap:.5rem; justify-content:center; flex-wrap:wrap;">
+            <div style="display:flex; gap:.5rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem;">
                 <span class="uiverse-stat-chip">🔔 Unread: {{ unread_count or 0 }}</span>
                 <span class="uiverse-stat-chip">📅 Today: {{ today_count or 0 }}</span>
-                <span class="uiverse-stat-chip">📦 Total: {{ notifications|length if notifications else 0 }}</span>
+                <span class="uiverse-stat-chip">📦 Total: {{ total_count or 0 }}</span>
             </div>
+            {% if unread_count and unread_count > 0 %}
+                <button class="uiverse-gradient-btn" onclick="markAllAsRead()" style="margin-bottom:1rem;">✅ Mark All as Read</button>
+            {% endif %}
         </div>
         {% if notifications and notifications|length > 0 %}
             <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.8rem;">
@@ -44,15 +48,26 @@
                     {% set message = n[1] %}
                     {% set created_at = n[2] %}
                     {% set notification_type = n[4] if n|length > 4 else 'general' %}
-                    <li class="notification-item uiverse-card" data-notification-id="{{ id }}" data-type="notification" style="padding:1rem; border-radius:12px;">
+                    {% set item_type = n[6] if n|length > 6 else 'general' %}
+                    {% set sender_name = n[7] if n|length > 7 else None %}
+                    
+                    <li class="notification-item uiverse-card" data-notification-id="{{ id }}" data-type="{{ item_type }}" style="padding:1rem; border-radius:12px; border-left: 4px solid {% if item_type == 'personal_chat' %}#fc5c7d{% elif item_type == 'mention' %}#ff6b6b{% elif item_type == 'personal' %}#4ecdc4{% else %}#6a82fb{% endif %};">
                         <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem; flex-wrap:wrap;">
-                            <span class="uiverse-badge">{{ notification_type|title }}</span>
+                            <span class="uiverse-badge" style="background: {% if item_type == 'personal_chat' %}#fc5c7d{% elif item_type == 'mention' %}#ff6b6b{% elif item_type == 'personal' %}#4ecdc4{% else %}#6a82fb{% endif %};">
+                                {% if item_type == 'personal_chat' %}💬 Personal Chat
+                                {% elif item_type == 'mention' %}📢 Mention
+                                {% elif item_type == 'personal' %}👤 Personal
+                                {% else %}📢 General{% endif %}
+                            </span>
+                            {% if sender_name %}
+                                <span class="uiverse-stat-chip" style="background: rgba(255,255,255,0.1);">@{{ sender_name }}</span>
+                            {% endif %}
                             <span class="uiverse-stat-chip">🕒 {{ created_at }}</span>
                         </div>
-                        <div style="word-wrap: break-word; color:#fff;">{{ message }}</div>
+                        <div style="word-wrap: break-word; color:#fff; margin-bottom:0.5rem;">{{ message }}</div>
                         <div style="margin-top:0.6rem; display:flex; gap:.5rem; flex-wrap:wrap;">
-                            <button class="uiverse-gradient-btn" onclick="markNotificationAsSeen('{{ id }}')">✅ Mark as seen</button>
-                            <button class="btn btn-secondary" onclick="deleteNotification('{{ id }}')">🗑️ Delete</button>
+                            <button class="uiverse-gradient-btn" onclick="markNotificationAsSeen('{{ id }}', '{{ item_type }}')">✅ Mark as seen</button>
+                            <button class="btn btn-secondary" onclick="deleteNotification('{{ id }}', '{{ item_type }}')">🗑️ Delete</button>
                         </div>
                     </li>
                 {% endfor %}

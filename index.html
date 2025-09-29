@@ -951,55 +951,12 @@
             <!-- Search Button -->
             <li><button class="search-btn" onclick="openSearch()">Search</button></li>
             
-            <!-- Notification Button -->
-            <li style="position:relative;">
-                <button id="notifBell" class="notification-bell" title="Notifications">
-                    🔔
-                    <span class="notification-badge" id="notificationCount" style="display:none; align-items:center; justify-content:center;">0</span>
-                </button>
-                <div id="notifDropdown" style="display:none;">
-                    <strong style="color:#6a82fb;">Notifications</strong>
-                    <ul style="list-style:none; padding:0; margin:0;"></ul>
-                </div>
-            </li>
             
             <!-- Theme toggle removed; use footer slider -->
         </ul>
         </nav>
     </div>
 
-    <!-- Notification Panel -->
-    <div id="notification-panel" class="notification-panel black-glass" style="display: none; position: fixed; top: 100px; right: 20px; width: 350px; max-height: 500px; overflow-y: auto; z-index: 999; border-radius: 16px; padding: 1rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.2);">
-            <h3 style="margin: 0; font-size: 1.2rem;">🔔 Notifications</h3>
-            <button onclick="toggleNotifications()" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 0.2rem;">✕</button>
-        </div>
-        <div class="notification-list">
-            <div class="notification-item" style="padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;">
-                <div style="font-weight: 600; margin-bottom: 0.3rem;">📚 New Study Material</div>
-                <div style="font-size: 0.9rem; opacity: 0.8;">Class 10 Mathematics notes uploaded</div>
-                <div style="font-size: 0.8rem; opacity: 0.6; margin-top: 0.3rem;">2 minutes ago</div>
-            </div>
-            <div class="notification-item" style="padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;">
-                <div style="font-weight: 600; margin-bottom: 0.3rem;">🎥 Live Class Reminder</div>
-                <div style="font-size: 0.9rem; opacity: 0.8;">Class 12 JEE Mathematics in 30 minutes</div>
-                <div style="font-size: 0.8rem; opacity: 0.6; margin-top: 0.3rem;">5 minutes ago</div>
-            </div>
-            <div class="notification-item" style="padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;">
-                <div style="font-weight: 600; margin-bottom: 0.3rem;">📝 Admission Update</div>
-                <div style="font-size: 0.9rem; opacity: 0.8;">Your admission status has been updated</div>
-                <div style="font-size: 0.8rem; opacity: 0.6; margin-top: 0.3rem;">1 hour ago</div>
-            </div>
-            <div class="notification-item" style="padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;">
-                <div style="font-weight: 600; margin-bottom: 0.3rem;">📋 New Batch Starting</div>
-                <div style="font-size: 0.9rem; opacity: 0.8;">Class 9 Foundation batch starting next week</div>
-                <div style="font-size: 0.8rem; opacity: 0.6; margin-top: 0.3rem;">2 hours ago</div>
-            </div>
-        </div>
-        <div style="text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2);">
-            <button onclick="window.location.href='/notifications'" class="btn btn-primary" style="width: 100%;">View All Notifications</button>
-        </div>
-    </div>
 
     <!-- Enhanced Hero Section with Floating Particles -->
     <section class="hero-section hero-modern">

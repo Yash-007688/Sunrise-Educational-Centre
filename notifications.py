@@ -78,10 +78,10 @@ def ensure_notification_tables():
         )''')
         
         conn.commit()
-        print("✅ Notification tables ensured successfully")
+        print("Notification tables ensured successfully")
         
     except Exception as e:
-        print(f"❌ Error ensuring notification tables: {e}")
+        print(f"Error ensuring notification tables: {e}")
     finally:
         conn.close()
 
@@ -114,11 +114,11 @@ def add_general_notification(message: str, class_id: Optional[int] = None,
         
         notification_id = c.lastrowid
         conn.commit()
-        print(f"✅ Added general notification: {message[:50]}...")
+        print(f"Added general notification: {message[:50]}...")
         return notification_id
         
     except Exception as e:
-        print(f"❌ Error adding general notification: {e}")
+        print(f"Error adding general notification: {e}")
         return None
     finally:
         conn.close()
@@ -152,11 +152,11 @@ def add_personal_notification(message: str, user_id: int,
         
         notification_id = c.lastrowid
         conn.commit()
-        print(f"✅ Added personal notification for user {user_id}: {message[:50]}...")
+        print(f"Added personal notification for user {user_id}: {message[:50]}...")
         return notification_id
         
     except Exception as e:
-        print(f"❌ Error adding personal notification: {e}")
+        print(f"Error adding personal notification: {e}")
         return None
     finally:
         conn.close()
@@ -196,6 +196,92 @@ def add_mention_notification(mentioned_user_id: int, sender_id: int,
     except Exception as e:
         print(f"❌ Error adding mention notification: {e}")
         return None
+    finally:
+        conn.close()
+
+def get_all_notifications_for_user(user_id: int) -> List[Tuple]:
+    """
+    Get all notifications for a specific user (both read and unread)
+    
+    Args:
+        user_id: User ID
+    
+    Returns:
+        List of notification tuples
+    """
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    
+    try:
+        # Get user info
+        c.execute('SELECT class_id, paid FROM users WHERE id = ?', (user_id,))
+        result = c.fetchone()
+        if not result:
+            return []
+        
+        class_id, user_paid_status = result
+        all_notifications = []
+        
+        # 1. Get general notifications for user's class (both read and unread)
+        c.execute('''
+            SELECT n.id, n.message, n.created_at, n.status, n.notification_type, 
+                   n.scheduled_time, 'general' as item_type, NULL as sender_name
+            FROM notifications n
+            WHERE n.class_id = ?
+            AND (n.target_paid_status = 'all' OR n.target_paid_status = ?)
+            AND n.status IN ('active', 'scheduled')
+        ''', (class_id, user_paid_status))
+        general_notifications = c.fetchall()
+        all_notifications.extend(general_notifications)
+        
+        # 2. Get personal notifications for this specific user (both read and unread)
+        c.execute('''
+            SELECT un.id, un.message, un.created_at, 'active' as status, 
+                   un.notification_type, un.created_at as scheduled_time, 
+                   'personal' as item_type, u.username as sender_name
+            FROM user_notifications un
+            LEFT JOIN users u ON un.sender_id = u.id
+            WHERE un.user_id = ?
+        ''', (user_id,))
+        personal_notifications = c.fetchall()
+        all_notifications.extend(personal_notifications)
+        
+        # 3. Get mention notifications for this specific user (both read and unread)
+        c.execute('''
+            SELECT mn.id, 
+                   CASE 
+                       WHEN u.username IS NOT NULL THEN 'There is a mention message for you by @' || u.username || '.'
+                       ELSE 'You were mentioned in a forum message.'
+                   END as message,
+                   mn.created_at, 'active' as status, 'forum_mention' as notification_type,
+                   mn.created_at as scheduled_time, 'mention' as item_type, u.username as sender_name
+            FROM mention_notifications mn
+            LEFT JOIN users u ON mn.sender_id = u.id
+            WHERE mn.mentioned_user_id = ?
+        ''', (user_id,))
+        mention_notifications = c.fetchall()
+        all_notifications.extend(mention_notifications)
+        
+        # 4. Get personal chat messages (both read and unread)
+        c.execute('''
+            SELECT pc.id, pc.message, pc.created_at, 'active' as status, 
+                   'personal_chat' as notification_type, pc.created_at as scheduled_time,
+                   'personal_chat' as item_type, u.username as sender_name
+            FROM personal_chats pc
+            JOIN users u ON pc.sender_id = u.id
+            WHERE pc.receiver_id = ?
+        ''', (user_id,))
+        personal_messages = c.fetchall()
+        all_notifications.extend(personal_messages)
+        
+        # Sort by creation time (newest first)
+        all_notifications.sort(key=lambda x: x[2], reverse=True)
+        
+        return all_notifications
+        
+    except Exception as e:
+        print(f"❌ Error getting all notifications for user {user_id}: {e}")
+        return []
     finally:
         conn.close()
 
@@ -331,10 +417,10 @@ def mark_notification_as_read(user_id: int, notification_id: int, notification_t
             ''', (notification_id, user_id))
         
         conn.commit()
-        print(f"✅ Marked {notification_type} notification {notification_id} as read for user {user_id}")
+        print(f"Marked {notification_type} notification {notification_id} as read for user {user_id}")
         
     except Exception as e:
-        print(f"❌ Error marking notification as read: {e}")
+        print(f"Error marking notification as read: {e}")
     finally:
         conn.close()
 
@@ -378,10 +464,10 @@ def delete_notification(notification_id: int, notification_type: str = 'general'
             c.execute('DELETE FROM mention_notifications WHERE id = ?', (notification_id,))
         
         conn.commit()
-        print(f"✅ Deleted {notification_type} notification {notification_id}")
+        print(f"Deleted {notification_type} notification {notification_id}")
         
     except Exception as e:
-        print(f"❌ Error deleting notification: {e}")
+        print(f"Error deleting notification: {e}")
     finally:
         conn.close()
 

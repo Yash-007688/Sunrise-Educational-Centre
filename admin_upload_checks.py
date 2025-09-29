@@ -11,6 +11,7 @@ import json
 import os
 import sqlite3
 from contextlib import contextmanager
+from typing import Union
 
 from app import app
 
@@ -27,7 +28,7 @@ def admin_client():
     yield client
 
 
-def pick_any_class_id(db_path: str = 'users.db') -> int | None:
+def pick_any_class_id(db_path: str = 'users.db') -> Union[int, None]:
     try:
         conn = sqlite3.connect(db_path)
         cur = conn.cursor()

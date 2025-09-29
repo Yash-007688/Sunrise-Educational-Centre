@@ -119,12 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <a href="/logout" class="dropdown-item" id="logoutLink" style="display:none;">Logout</a>
               </div>
             </li>
-            <li style="position:relative;">
-              <button id="notifBell" class="notification-bell" title="Notifications">🔔
-                <span id="notificationCount" class="notification-badge" style="display:none;"></span>
-              </button>
-              <div id="notifDropdown" style="display:none;"><strong style="color:#6a82fb;">Notifications</strong><ul style="list-style:none; padding:0; margin:0;"></ul></div>
-            </li>
           </ul>`;
         document.body.insertBefore(nav, document.body.firstChild);
       }
@@ -670,6 +664,90 @@ function markNotificationAsSeen(notificationId, notificationType = 'notification
                 
                 // Update notification count
                 updateNotificationCount();
+                
+                // If on notifications page, refresh the page to show updated counts
+                if (window.location.pathname === '/notifications') {
+                    window.location.reload();
+                }
+            }
+        } else {
+            console.error('Failed to mark notification as seen:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error marking notification as seen:', error);
+    });
+}
+
+// Delete notification
+function deleteNotification(notificationId, notificationType = 'general') {
+    if (!confirm('Are you sure you want to delete this notification?')) {
+        return;
+    }
+    
+    fetch(`/api/delete-notification/${notificationId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            type: notificationType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove the notification item from the page
+            const notificationItem = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            if (notificationItem) {
+                notificationItem.remove();
+                
+                // Update notification count
+                updateNotificationCount();
+                
+                // If on notifications page, refresh the page to show updated counts
+                if (window.location.pathname === '/notifications') {
+                    window.location.reload();
+                }
+            }
+        } else {
+            console.error('Failed to delete notification:', data.error);
+            alert('Failed to delete notification. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting notification:', error);
+        alert('Error deleting notification. Please try again.');
+    });
+}
+
+// Mark all notifications as read
+function markAllAsRead() {
+    if (!confirm('Are you sure you want to mark all notifications as read?')) {
+        return;
+    }
+    
+    fetch('/api/mark-all-notifications-read', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Refresh the page to show updated counts
+            window.location.reload();
+        } else {
+            console.error('Failed to mark all notifications as read:', data.error);
+            alert('Failed to mark all notifications as read. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error marking all notifications as read:', error);
+        alert('Error marking all notifications as read. Please try again.');
+    });
+}
                 
                 // Check if no more notifications
                 const remainingNotifications = document.querySelectorAll('.notification-item');

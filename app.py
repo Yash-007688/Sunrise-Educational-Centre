@@ -1,4 +1,5 @@
 from flask import Flask, render_template, send_from_directory, request, redirect, url_for, session, flash, jsonify, send_file
+from typing import Union
 import json
 import threading
 import time
@@ -472,56 +473,29 @@ def init_admission_access_table():
         print(f"Error initializing admission access table: {e}")
 
 def create_user_session(user_id, session_id, ip_address, user_agent):
-    """Create a new session for a user, invalidating any existing sessions"""
+    """Create or replace a session atomically to avoid race failures."""
     conn = None
     try:
         conn = sqlite3.connect(DATABASE, timeout=30.0)
         conn.execute('PRAGMA journal_mode=WAL')
         conn.execute('PRAGMA busy_timeout=30000')
         c = conn.cursor()
-        
-        # First, invalidate any existing sessions for this user
-        c.execute('DELETE FROM active_sessions WHERE user_id = ?', (user_id,))
-        
-        # Create new session
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        # Use UPSERT on UNIQUE(user_id)
         c.execute('''
             INSERT INTO active_sessions (user_id, session_id, ip_address, user_agent, created_at, last_activity)
             VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET
+                session_id=excluded.session_id,
+                ip_address=excluded.ip_address,
+                user_agent=excluded.user_agent,
+                last_activity=excluded.last_activity
         ''', (user_id, session_id, ip_address, user_agent, now, now))
-        
         conn.commit()
         return True
     except sqlite3.OperationalError as e:
-        if "database is locked" in str(e).lower():
-            print(f"Session creation database locked, retrying once: {e}")
-            # Try one more time after a short delay
-            import time
-            time.sleep(0.1)
-            try:
-                if conn:
-                    conn.close()
-                conn = sqlite3.connect(DATABASE, timeout=30.0)
-                conn.execute('PRAGMA journal_mode=WAL')
-                conn.execute('PRAGMA busy_timeout=30000')
-                c = conn.cursor()
-                
-                c.execute('DELETE FROM active_sessions WHERE user_id = ?', (user_id,))
-                now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                c.execute('''
-                    INSERT INTO active_sessions (user_id, session_id, ip_address, user_agent, created_at, last_activity)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                ''', (user_id, session_id, ip_address, user_agent, now, now))
-                
-                conn.commit()
-                print("Session creation retry successful")
-                return True
-            except Exception as retry_e:
-                print(f"Session creation retry failed: {retry_e}")
-                return False
-        else:
-            print(f"Session creation operational error: {e}")
-            return False
+        print(f"Session creation operational error: {e}")
+        return False
     except Exception as e:
         print(f"Error creating user session: {e}")
         return False
@@ -1271,11 +1245,36 @@ def scholars_page():
 def notifications_page():
     if 'user_id' not in session:
         return redirect(url_for('auth'))
+    
+    user_id = session['user_id']
     try:
-        notifications = get_unread_notifications_for_user(session['user_id'])
-    except Exception:
+        notifications = get_unread_notifications_for_user(user_id)
+        
+        # Calculate counts
+        unread_count = len(notifications)
+        
+        # Count today's notifications
+        from datetime import datetime
+        today = datetime.now().strftime('%Y-%m-%d')
+        today_count = sum(1 for n in notifications if n[2].startswith(today))
+        
+        # Get total notifications (including read ones)
+        from notifications import get_all_notifications_for_user
+        all_notifications = get_all_notifications_for_user(user_id)
+        total_count = len(all_notifications)
+        
+    except Exception as e:
+        print(f"Error loading notifications: {e}")
         notifications = []
-    return render_template('notifications.html', notifications=notifications)
+        unread_count = 0
+        today_count = 0
+        total_count = 0
+    
+    return render_template('notifications.html', 
+                         notifications=notifications,
+                         unread_count=unread_count,
+                         today_count=today_count,
+                         total_count=total_count)
 
 @app.route('/api/live-classes/status')
 def api_live_classes_status():
@@ -7076,6 +7075,63 @@ def api_get_user_notifications():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+# API route for deleting notifications
+@app.route('/api/delete-notification/<int:notification_id>', methods=['POST'])
+def api_delete_notification(notification_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    data = request.get_json() or {}
+    notification_type = data.get('type', 'general')
+    user_id = session['user_id']
+    
+    try:
+        # Import the delete function from notifications module
+        from notifications import delete_notification as delete_notification_func
+        
+        # Delete the notification
+        delete_notification_func(notification_id, notification_type)
+        
+        return jsonify({'success': True, 'message': 'Notification deleted successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# API route for marking all notifications as read
+@app.route('/api/mark-all-notifications-read', methods=['POST'])
+def api_mark_all_notifications_read():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    user_id = session['user_id']
+    
+    try:
+        # Import the mark function from notifications module
+        from notifications import mark_notification_as_read
+        
+        # Get all unread notifications for the user
+        notifications = get_unread_notifications_for_user(user_id)
+        
+        # Mark each notification as read
+        for notification in notifications:
+            notification_id = notification[0]
+            item_type = notification[6] if len(notification) > 6 else 'general'
+            
+            # Map item_type to notification_type for the mark function
+            if item_type == 'personal_chat':
+                notification_type = 'personal_chat'
+            elif item_type == 'mention':
+                notification_type = 'mention'
+            elif item_type == 'personal':
+                notification_type = 'personal'
+            else:
+                notification_type = 'general'
+            
+            mark_notification_as_read(user_id, notification_id, notification_type)
+        
+        return jsonify({'success': True, 'message': f'Marked {len(notifications)} notifications as read'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @socketio.on('chat_status_change')
 def handle_chat_status_change(data):
     """Handle chat status changes (lock/unlock, public/private)"""
@@ -7299,7 +7355,7 @@ def handle_get_benchmark_sections(data):
 _PREVIEW_PATH_CACHE = {}
 
 
-def resolve_uploaded_file_path(filename: str) -> str | None:
+def resolve_uploaded_file_path(filename: str) -> Union[str, None]:
     """Resolve a filename to an absolute path inside UPLOAD_FOLDER or its subfolders.
     Results are cached to avoid repeated os.walk scans.
     """
