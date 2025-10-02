@@ -671,27 +671,27 @@
                                     </div>
                                     <div class="class-info-section" style="display:flex;flex-direction:column;gap:0.5rem;">
                                         <h3 style="background: linear-gradient(135deg, #ffa726 0%, #ff6b35 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin:0;">{{ c[4] or 'Upcoming Class' }}</h3>
-                                        {% if c|length > 12 %}
-                                        <div class="class-info">
-                                            {% set subj = c[13] %}
-                                            {% if subj %}<strong>📚 Subject:</strong> {{ subj|capitalize }}<br>{% endif %}
-                                            {% if c[14] %}<strong>👨‍🏫 Teacher:</strong> {{ c[14] }}<br>{% endif %}
-                                            {% if c[9] %}<strong>🎯 Target:</strong> Class {{ c[9] }}{% if c[9] in ['11','12'] and c[10] %} ({{ c[10]|capitalize }}){% endif %}{% endif %}
-                                        </div>
-                                        {% endif %}
-                                        <div class="class-code">
-                                            <strong>🔑 Class Code:</strong> {{ c[1] }}
-                                        </div>
-                                        {% if c[5] %}
-                                        <div class="class-info">{{ c[5] }}</div>
-                                        {% endif %}
-                                        {% if c[8] %}
-                                        <div class="class-info"><strong>📅 Scheduled:</strong> {{ c[8] }}</div>
-                                        {% endif %}
+                                    {% if c|length > 12 %}
+                                    <div class="class-info">
+                                        {% set subj = c[13] %}
+                                        {% if subj %}<strong>📚 Subject:</strong> {{ subj|capitalize }}<br>{% endif %}
+                                        {% if c[14] %}<strong>👨‍🏫 Teacher:</strong> {{ c[14] }}<br>{% endif %}
+                                        {% if c[9] %}<strong>🎯 Target:</strong> Class {{ c[9] }}{% if c[9] in ['11','12'] and c[10] %} ({{ c[10]|capitalize }}){% endif %}{% endif %}
+                                    </div>
+                                    {% endif %}
+                                    <div class="class-code">
+                                        <strong>🔑 Class Code:</strong> {{ c[1] }}
+                                    </div>
+                                    {% if c[5] %}
+                                    <div class="class-info">{{ c[5] }}</div>
+                                    {% endif %}
+                                    {% if c[8] %}
+                                    <div class="class-info"><strong>📅 Scheduled:</strong> {{ c[8] }}</div>
+                                    {% endif %}
                                         <button class="btn-modern btn-glass" style="width: 100%; margin-top: 0.5rem; cursor: not-allowed; opacity: 0.6;" disabled>
-                                            <span style="margin-right: 0.5rem;">⏳</span>
-                                            Pending
-                                        </button>
+                                        <span style="margin-right: 0.5rem;">⏳</span>
+                                        Pending
+                                    </button>
                                     </div>
                                 </div>
                             {% endfor %}

@@ -47,9 +47,22 @@
       
       .batch-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
         gap: 1.5rem;
         margin-top: 1.5rem;
+      }
+      
+      /* Responsive grid for smaller screens */
+      @media (max-width: 1200px) {
+        .batch-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      
+      @media (max-width: 900px) {
+        .batch-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
       }
       
       .batch-card {
@@ -291,8 +304,31 @@
       .course-tab { padding:10px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; font-weight:700; cursor:pointer; }
       .course-tab.active { background: linear-gradient(135deg, #6a82fb 0%, #5a6fd8 100%); border-color:#6a82fb; box-shadow:0 8px 24px rgba(106,130,251,0.3); }
 
-      /* Match Online Class card look */
-      .course-list { display:flex; flex-direction:column; gap:16px; }
+      /* Match Online Class card look - Use grid layout for 4 cards per row */
+      .course-list { 
+        display: grid; 
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 1.5rem; 
+      }
+      
+      /* Responsive grid for course-list */
+      @media (max-width: 1200px) {
+        .course-list {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      
+      @media (max-width: 900px) {
+        .course-list {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      
+      @media (max-width: 768px) {
+        .course-list {
+          grid-template-columns: 1fr;
+        }
+      }
       .class-card { background: rgba(5, 6, 10, 0.72); border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 20px; padding: 1.2rem; box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6); }
       .class-card h3 { font-size: 1.2rem; font-weight: 700; margin: 0 0 0.6rem 0; background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
       .class-info { color: rgba(255,255,255,0.85); margin-bottom: 0.6rem; }
@@ -359,13 +395,20 @@
             <h1 style="margin:0; font-size:1.8rem; font-weight:800; letter-spacing:-0.02em; color:#8fa3ff;">Batches</h1>
             <p style="margin:4px 0 0; color:rgba(255,255,255,0.8);">Choose a batch that matches your class and schedule. Limited seats available.</p>
           </div>
-          <div style="display:flex; gap:8px; align-items:center;">
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
             <button class="tab-btn active" data-filter-all style="white-space:nowrap;">All</button>
             <button class="tab-btn" data-filter-class="9">Class 9</button>
             <button class="tab-btn" data-filter-class="10">Class 10</button>
             <button class="tab-btn" data-filter-class="11">Class 11</button>
             <button class="tab-btn" data-filter-class="12">Class 12</button>
           </div>
+        </div>
+        <!-- Applied/Core buttons for Class 11 & 12 (initially hidden) -->
+        <div id="streamButtons" style="display:none; margin-top:10px; gap:8px; align-items:center; flex-wrap:wrap;">
+          <span style="color:rgba(255,255,255,0.7); font-size:0.9rem; margin-right:8px;">Stream:</span>
+          <button class="tab-btn active" data-filter-stream="all">All Streams</button>
+          <button class="tab-btn" data-filter-stream="applied">Applied</button>
+          <button class="tab-btn" data-filter-stream="core">Core</button>
         </div>
         <div style="display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap;">
           <button class="tab-btn{% if is_logged_in %} active{% endif %}" id="btnMyBatches" style="white-space:nowrap;">My Batches</button>
@@ -385,7 +428,7 @@
         <div id="paid-section" class="batch-grid" style="margin-top:0.8rem;">
           {% if paid_cards and paid_cards|length > 0 %}
             {% for card in paid_cards %}
-            <div class="batch-card black-glass" data-class-name="{{ card.class_name }}" data-class-id="{{ card.class_id }}">
+            <div class="batch-card black-glass" data-class-name="{{ card.class_name }}" data-class-id="{{ card.class_id }}" data-stream="{{ card.stream or 'general' }}">
               <div class="batch-image">
                 <img src="{{ card.image }}" alt="{{ card.batch_name }}" />
               </div>
@@ -427,7 +470,7 @@
         <div id="free-section" class="batch-grid" style="display:none; margin-top:0.8rem;">
           {% if free_cards and free_cards|length > 0 %}
             {% for card in free_cards %}
-            <div class="batch-card black-glass" data-class-name="{{ card.class_name }}" data-class-id="{{ card.class_id }}">
+            <div class="batch-card black-glass" data-class-name="{{ card.class_name }}" data-class-id="{{ card.class_id }}" data-stream="{{ card.stream or 'general' }}">
               <div class="batch-image">
                 <img src="{{ card.image }}" alt="{{ card.batch_name }}" />
               </div>
@@ -482,7 +525,7 @@
               {% set free = (group.list | selectattr('paid_status','equalto','free') | list) %}
               {% if paid %}
               {% set pb = paid[0] %}
-              <div class="class-card" data-paid="true">
+              <div class="class-card" data-paid="true" data-stream="{{ pb.stream or 'general' }}">
                 <h3>{{ pb.batch_name }} (Paid)</h3>
                 <div class="class-info">📚 {{ pb.class_name }} • 🔖 {{ pb.status|title }}</div>
                 <div class="class-code">🗓️ {{ pb.start_on or '-' }} → {{ pb.end_on or '-' }}</div>
@@ -493,7 +536,7 @@
               {% endif %}
               {% if free %}
               {% set fb = free[0] %}
-              <div class="class-card" data-paid="false">
+              <div class="class-card" data-paid="false" data-stream="{{ fb.stream or 'general' }}">
                 <h3>{{ fb.batch_name }} (Free)</h3>
                 <div class="class-info">📚 {{ fb.class_name }} • 🔖 {{ fb.status|title }}</div>
                 <div class="class-code">🗓️ {{ fb.start_on or '-' }} → {{ fb.end_on or '-' }}</div>
@@ -505,7 +548,7 @@
               {% else %}
               {% set sample = group.list[0] %}
               <!-- fallback rendering from all_cards (unchanged) -->
-              <div class="class-card" data-paid="true">
+              <div class="class-card" data-paid="true" data-stream="{{ sample.stream or 'general' }}">
                 <h3>{{ sample.batch_name }} (Paid)</h3>
                 <div class="class-info">📚 {{ sample.class_name }}</div>
                 <div class="class-code">🗓️ {{ sample.start_date }} → {{ sample.end_date }}</div>
@@ -513,7 +556,7 @@
                   <a class="class-btn" href="/admission?class_id={{ sample.class_id }}">View Content</a>
                 </div>
               </div>
-              <div class="class-card" data-paid="false">
+              <div class="class-card" data-paid="false" data-stream="{{ sample.stream or 'general' }}">
                 <h3>{{ sample.batch_name }} (Free)</h3>
                 <div class="class-info">📚 {{ sample.class_name }}</div>
                 <div class="class-code">🗓️ {{ sample.start_date }} → {{ sample.end_date }}</div>
@@ -537,15 +580,15 @@
           <button class="tab-btn" data-price-filter="paid">Paid</button>
           <button class="tab-btn" data-price-filter="free">Unpaid</button>
         </div>
-        <div style="display:flex; flex-direction:column; gap:0.8rem;">
+        <div class="batch-grid">
           {% for card in all_cards %}
-          <div class="batch-card" style="display:flex; gap:0.8rem;" data-class-name="{{ card.class_name }}" data-class-id="{{ card.class_id }}">
-            <div class="batch-image" style="flex:0 0 180px; height:120px;">
+          <div class="batch-card black-glass" data-class-name="{{ card.class_name }}" data-class-id="{{ card.class_id }}">
+            <div class="batch-image">
               <img src="{{ card.image }}" alt="{{ card.batch_name }}" />
             </div>
-            <div class="batch-info" style="flex:1;">
-              <h3 style="margin-top:0;">{{ card.batch_name }}</h3>
-              <div class="batch-meta" style="grid-template-columns:repeat(4, auto); gap:0.8rem;">
+            <div class="batch-info">
+              <h3>{{ card.batch_name }}</h3>
+              <div class="batch-meta">
                 <div><strong>Class</strong>: {{ card.class_name }}</div>
                 <div><strong>ID</strong>: {{ card.class_id }}</div>
                 <div><strong>Start</strong>: {{ card.start_date }}</div>
@@ -567,7 +610,7 @@
       </section>
       </div>
       {% endif %}
-      {% if is_logged_in %}
+      {% if is_logged_in and role not in ['admin', 'teacher'] %}
       <section class="card animated-card black-glass" style="padding: 1.2rem 1rem;">
         <h1 style="margin: 0.2rem 0 0.8rem 0;">My Batch</h1>
         <p style="margin: 0; color: #6b7280;">Welcome{% if username %}, {{ username }}{% endif %}. Your class: <strong>{{ role }}</strong> (ID: {{ class_id }})</p>
@@ -629,37 +672,79 @@
           });
         }
 
-        // Header class filters
+        // Header class filters with stream support
         const headerFilterAll = document.querySelector('[data-filter-all]');
         const headerClassFilters = document.querySelectorAll('[data-filter-class]');
+        const streamButtons = document.getElementById('streamButtons');
+        const streamFilterButtons = document.querySelectorAll('[data-filter-stream]');
         const allCards = document.querySelectorAll('.batch-card');
-        function applyClassFilter(className) {
+        let currentClass = '';
+        let currentStream = 'all';
+        
+        function applyFilters() {
           allCards.forEach(card => {
             const cname = (card.getAttribute('data-class-name') || '').toLowerCase();
             const cid = (card.getAttribute('data-class-id') || '').toString();
-            if (!className) {
-              card.style.display = '';
-            } else {
-              if (cname.includes(className) || cid === className) {
-                card.style.display = '';
-              } else {
-                card.style.display = 'none';
+            const stream = (card.getAttribute('data-stream') || '').toLowerCase();
+            
+            let showCard = true;
+            
+            // Class filter
+            if (currentClass && currentClass !== 'all') {
+              if (!cname.includes(currentClass) && cid !== currentClass) {
+                showCard = false;
               }
             }
+            
+            // Stream filter (only for Class 11 & 12)
+            if ((currentClass === '11' || currentClass === '12') && currentStream !== 'all') {
+              if (stream !== currentStream) {
+                showCard = false;
+              }
+            }
+            
+            card.style.display = showCard ? '' : 'none';
           });
         }
+        
         if (headerFilterAll) {
           headerFilterAll.addEventListener('click', function() {
-            document.querySelectorAll('header .tab-btn').forEach(b=>b.classList.remove('active'));
+            document.querySelectorAll('header .tab-btn[data-filter-class], header .tab-btn[data-filter-all]').forEach(b=>b.classList.remove('active'));
             this.classList.add('active');
-            applyClassFilter('');
+            currentClass = '';
+            streamButtons.style.display = 'none';
+            applyFilters();
           });
         }
+        
         headerClassFilters.forEach(btn => {
           btn.addEventListener('click', function() {
-            document.querySelectorAll('header .tab-btn').forEach(b=>b.classList.remove('active'));
+            document.querySelectorAll('header .tab-btn[data-filter-class], header .tab-btn[data-filter-all]').forEach(b=>b.classList.remove('active'));
             this.classList.add('active');
-            applyClassFilter(this.getAttribute('data-filter-class'));
+            currentClass = this.getAttribute('data-filter-class');
+            
+            // Show stream buttons only for Class 11 & 12
+            if (currentClass === '11' || currentClass === '12') {
+              streamButtons.style.display = 'flex';
+              currentStream = 'all';
+              document.querySelectorAll('[data-filter-stream]').forEach(b=>b.classList.remove('active'));
+              document.querySelector('[data-filter-stream="all"]').classList.add('active');
+            } else {
+              streamButtons.style.display = 'none';
+              currentStream = 'all';
+            }
+            
+            applyFilters();
+          });
+        });
+        
+        // Stream filter buttons
+        streamFilterButtons.forEach(btn => {
+          btn.addEventListener('click', function() {
+            streamFilterButtons.forEach(b=>b.classList.remove('active'));
+            this.classList.add('active');
+            currentStream = this.getAttribute('data-filter-stream');
+            applyFilters();
           });
         });
 

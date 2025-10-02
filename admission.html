@@ -619,7 +619,6 @@
             <li><a href="/auth" class="btn-primary">Login</a></li>
             {% endif %}
             
-            <li><button class="search-btn" onclick="openSearch()">🔍</button></li>
             <!-- Theme toggle removed; use footer slider -->
         </ul>
     </nav>
@@ -933,17 +932,6 @@
         });
     </script>
 
-    <!-- Search Modal -->
-    <div id="searchModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
-        <div class="modal-content black-glass" style="margin: 10% auto; padding: 2rem; border-radius: 20px; width: 90%; max-width: 600px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="color: white; margin: 0;">🔍 Search</h2>
-                <button onclick="closeSearch()" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">✕</button>
-            </div>
-            <input type="text" id="searchInput" placeholder="Search courses, resources, or topics..." style="width: 100%; padding: 15px; border: none; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem; margin-bottom: 1rem;">
-            <div id="searchResults" style="max-height: 300px; overflow-y: auto;"></div>
-        </div>
-    </div>
 
     <!-- Notification Panel -->
     <div id="notification-panel" class="notification-panel black-glass" style="display: none; position: fixed; top: 100px; right: 20px; width: 350px; max-height: 500px; overflow-y: auto; z-index: 999; border-radius: 16px; padding: 1rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);">

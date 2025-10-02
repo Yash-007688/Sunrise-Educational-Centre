@@ -494,8 +494,8 @@ def create_user_session(user_id, session_id, ip_address, user_agent):
         conn.commit()
         return True
     except sqlite3.OperationalError as e:
-        print(f"Session creation operational error: {e}")
-        return False
+            print(f"Session creation operational error: {e}")
+            return False
     except Exception as e:
         print(f"Error creating user session: {e}")
         return False
