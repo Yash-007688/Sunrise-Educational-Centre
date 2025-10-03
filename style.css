@@ -3035,29 +3035,63 @@ body.dark-mode div[style*="background: linear-gradient(135deg, #e3f7fc 0%, #e6f9
   border-color: #444a6d !important;
 }
 
-/* ===== Ensure hero CTA buttons are visible on dark hero ===== */
+/* ===== Hero CTA buttons respond to theme ===== */
 .hero-buttons .uiverse-btn {
   display: inline-flex !important;
   align-items: center !important;
   gap: 10px !important;
-  color: #fff !important;
+  padding: 0.9rem 1.6rem !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12) !important;
+  transition: transform 0.2s ease, box-shadow 0.25s ease, background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease !important;
 }
-.hero-buttons .uiverse-primary {
-  background: linear-gradient(135deg, #6a82fb 0%, #5a6fd8 50%, #6a82fb 100%) !important;
-  border: 1px solid rgba(106,130,251,0.5) !important;
+
+.hero-buttons .uiverse-btn::before {
+  background: linear-gradient(120deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0)) !important;
 }
-.hero-buttons .uiverse-outline {
-  background: rgba(255,255,255,0.12) !important;
-  border: 1px solid rgba(255,255,255,0.35) !important;
+
+.hero-buttons .uiverse-btn:hover {
+  transform: translateY(-3px) !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.18) !important;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18) !important;
 }
-.hero-buttons .uiverse-glow {
-  background: linear-gradient(135deg, #ff6b35 0%, #fc5c7d 100%) !important;
-  border: 1px solid rgba(252,92,125,0.45) !important;
-  box-shadow: 0 12px 40px rgba(252,92,125,0.35), 0 8px 24px rgba(255,107,53,0.25) !important;
+
+.hero-buttons .uiverse-btn:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.35) !important;
+  outline-offset: 2px !important;
 }
+
+body.dark-mode .hero-buttons .uiverse-btn {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(148, 163, 184, 0.35) !important;
+  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.55) !important;
+}
+
+body.dark-mode .hero-buttons .uiverse-btn::before {
+  background: linear-gradient(120deg, rgba(248, 250, 252, 0.18), rgba(248, 250, 252, 0)) !important;
+}
+
+body.dark-mode .hero-buttons .uiverse-btn:hover {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: rgba(148, 163, 184, 0.45) !important;
+  box-shadow: 0 24px 54px rgba(15, 23, 42, 0.65) !important;
+}
+
+.hero-buttons .uiverse-primary,
+.hero-buttons .uiverse-outline,
+.hero-buttons .uiverse-glow,
 .hero-buttons .uiverse-glass {
-  background: rgba(255,255,255,0.12) !important;
-  border: 1px solid rgba(255,255,255,0.35) !important;
+  background: inherit !important;
+  color: inherit !important;
+  border-color: inherit !important;
+  box-shadow: inherit !important;
 }
 
 /* Subjects We Offer buttons */
