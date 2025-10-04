@@ -129,6 +129,19 @@
     border-color: rgba(255,255,255,0.4);
 }
 
+/* Ensure action buttons (e.g., Browse Topics) are visible in navbar */
+.floating-navbar .uiverse-btn {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    padding: 8px 14px;
+    border-radius: 12px;
+}
+
+.floating-navbar .uiverse-btn:hover {
+    background: rgba(255, 255, 255, 0.22) !important;
+}
+
 /* Search Button Styles */
 .search-btn {
     background: rgba(255,255,255,0.1);
