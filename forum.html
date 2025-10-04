@@ -410,6 +410,12 @@
                 max-height: 60vh;
             }
         }
+
+        /* Fit hero panel: full-bleed and no extra spacing */
+        .hero-section.hero-modern {
+            padding: 0 !important;
+            min-height: 100vh; /* ensure viewport fit */
+        }
     </style>
 </head>
 <body class="forum-page" data-user-role="{{ role|default('') }}">
