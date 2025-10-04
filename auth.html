@@ -596,6 +596,10 @@
                     <span style="margin-right: 0.5rem;">✨</span>
                     Create Account
                 </button>
+
+                <div class="form-divider">or</div>
+
+                <div id="googleButtonSignup" class="google-button-container"></div>
             </form>
             <!-- Form Toggle -->
             <div class="form-toggle">
@@ -665,7 +669,7 @@
                 
                 const btnOpts = { 
                     type: 'standard', 
-                    theme: 'filled_blue', 
+                    theme: 'outline', 
                     size: 'large', 
                     text: 'continue_with', 
                     shape: 'pill', 
@@ -677,6 +681,15 @@
                 if (loginBtn) {
                     google.accounts.id.renderButton(loginBtn, btnOpts);
                     window.__gis_btn_rendered = true;
+                }
+
+                const signupBtn = document.getElementById('googleButtonSignup');
+                if (signupBtn) {
+                    google.accounts.id.renderButton(signupBtn, btnOpts);
+                    // Ensure signup also posts to Google callback
+                    signupBtn.addEventListener('click', function(ev){
+                        // No-op; the Google SDK handles popup and callback
+                    });
                 }
             } catch (e) {
                 console.log('Google Sign-In initialization error:', e);
