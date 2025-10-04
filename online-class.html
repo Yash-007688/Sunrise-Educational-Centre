@@ -740,12 +740,12 @@
                                     <div class="class-info"><strong>📅 Completed:</strong> {{ c[8] }}</div>
                                     {% endif %}
                                     {% if c[3] %}
-                                            <a href="{{ c[3] }}" class="btn-modern btn-primary-modern" style="width: 100%; margin-top: 0.5rem;" target="_blank">
+                                        <a href="/recording.html?class_id={{ c[0] }}" class="btn-modern btn-primary-modern" style="width: 100%; margin-top: 0.5rem;">
                                             <span style="margin-right: 0.5rem;">📹</span>
                                             View Recording
                                         </a>
                                     {% else %}
-                                            <button class="btn-modern btn-glass" style="width: 100%; margin-top: 0.5rem; cursor: not-allowed; opacity: 0.6;" disabled>
+                                        <button class="btn-modern btn-glass" style="width: 100%; margin-top: 0.5rem; cursor: not-allowed; opacity: 0.6;" disabled>
                                             <span style="margin-right: 0.5rem;">❌</span>
                                             No Recording
                                         </button>

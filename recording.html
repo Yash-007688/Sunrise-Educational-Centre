@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Class Recording - Sunrise Educational Centre</title>
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="uiverse-components.css">
+    <link rel="stylesheet" href="modern-components.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      body.recording-page { background: #ffffff; font-family: 'Inter', sans-serif; }
+      body.dark-mode.recording-page { background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e, #0f3460, #533483); background-size: 400% 400%; animation: gradientShift 15s ease infinite; color: white; }
+      .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+      .card { background: rgba(5,6,10,0.72); border: 1px solid rgba(255,255,255,0.22); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(18px) saturate(110%); box-shadow: 0 12px 48px rgba(0,0,0,0.6); }
+      .title { font-size: 1.8rem; font-weight: 800; margin: 0 0 1rem; background: linear-gradient(135deg, #fff 0%, #e0e7ff 50%, #c7d2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+      .meta { color: rgba(255,255,255,0.8); margin-bottom: 1rem; }
+      .recordings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+      .rec-item { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 1rem; }
+      .rec-title { font-weight: 700; margin-bottom: .5rem; }
+      .rec-meta { font-size: .9rem; color: rgba(255,255,255,0.8); margin-bottom: .75rem; }
+      .btn-row { display: flex; gap: .5rem; flex-wrap: wrap; }
+      .btn { display: inline-block; padding: .6rem 1rem; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; }
+      .btn-primary { background: linear-gradient(135deg, #6a82fb 0%, #5a6fd8 100%); color: #fff; }
+      .btn-glass { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+      .empty { text-align: center; padding: 2rem; color: rgba(255,255,255,0.8); }
+      video { width: 100%; border-radius: 10px; background: #000; }
+      @media (max-width: 768px) { .recordings { grid-template-columns: 1fr; } .container { padding: 1rem; } }
+      @keyframes gradientShift { 0%,100%{background-position:0% 50%}50%{background-position:100% 50%} }
+    </style>
+  </head>
+  <body class="recording-page">
+    <div class="container">
+      <a href="/online-class" class="btn btn-glass" style="margin-bottom: 1rem;">← Back to Live Classes</a>
+      <div class="card">
+        <h1 class="title">Class Recordings</h1>
+        <div id="classMeta" class="meta"></div>
+        <div id="playerContainer" style="margin-bottom: 1rem;" class="hidden">
+          <video id="videoPlayer" controls></video>
+        </div>
+        <div id="recordings" class="recordings"></div>
+        <div id="emptyState" class="empty hidden">No recordings available for this class yet.</div>
+      </div>
+    </div>
+
+    <script src="/attached_assets/theme.js"></script>
+    <script>
+      function qs(name) { const p = new URLSearchParams(window.location.search); return p.get(name); }
+      function formatSize(bytes){ if(!bytes) return 'Unknown'; const u=['B','KB','MB','GB']; let i=0; while(bytes>=1024&&i<u.length-1){bytes/=1024;i++;} return bytes.toFixed(1)+' '+u[i]; }
+      function formatDuration(sec){ if(!sec) return 'Unknown'; const m=Math.floor(sec/60), s=sec%60; return m+':' + String(s).padStart(2,'0'); }
+
+      async function loadRecordings() {
+        const classId = qs('class_id');
+        if (!classId) { document.getElementById('emptyState').classList.remove('hidden'); return; }
+        document.getElementById('classMeta').textContent = 'Class ID: ' + classId;
+        try {
+          const res = await fetch('/api/recordings/' + encodeURIComponent(classId));
+          const data = await res.json();
+          if (!data || !Array.isArray(data.recordings) || data.recordings.length === 0) {
+            document.getElementById('emptyState').classList.remove('hidden');
+            return;
+          }
+          renderList(data.recordings);
+        } catch (e) {
+          document.getElementById('emptyState').textContent = 'Failed to load recordings.';
+          document.getElementById('emptyState').classList.remove('hidden');
+        }
+      }
+
+      function renderList(list) {
+        const container = document.getElementById('recordings');
+        container.innerHTML = '';
+        list.forEach(rec => {
+          const item = document.createElement('div');
+          item.className = 'rec-item';
+          item.innerHTML = `
+            <div class="rec-title">${rec.recording_name || 'Recording #' + rec.id}</div>
+            <div class="rec-meta">Status: ${rec.status || 'unknown'} | Duration: ${formatDuration(rec.duration)} | Size: ${formatSize(rec.file_size)}</div>
+            <div class="btn-row">
+              ${rec.status === 'completed' ? `<button class="btn btn-primary" data-file="${rec.file_path}" onclick="playRecording(this)">Play</button>` : ''}
+              ${rec.status === 'completed' ? `<a class="btn btn-glass" href="/download-recording/${rec.id}">Download</a>` : '<span style="opacity:.7;">Processing...</span>'}
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      }
+
+      function playRecording(btn) {
+        const filePath = btn.getAttribute('data-file');
+        if (!filePath) return;
+        const player = document.getElementById('videoPlayer');
+        const wrap = document.getElementById('playerContainer');
+        player.src = filePath;
+        wrap.classList.remove('hidden');
+        player.play();
+        window.scrollTo({ top: wrap.offsetTop - 80, behavior: 'smooth' });
+      }
+
+      document.addEventListener('DOMContentLoaded', loadRecordings);
+    </script>
+  </body>
+</html>
