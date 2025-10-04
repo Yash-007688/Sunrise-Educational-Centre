@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Class Recordings - Sunrise Educational Centre</title>
+  <link rel="icon" type="image/png" href="/favicon.ico">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="modern-components.css">
+  <link rel="stylesheet" href="enhanced-aesthetic.css">
+  <link rel="stylesheet" href="floating-navbar.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .page-title { font-size: clamp(1.8rem, 3.5vw, 2.4rem); font-weight: 800; margin: 1rem 0; background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .recordings-card { background: rgba(5,6,10,0.72); border: 1px solid rgba(255,255,255,0.22); border-radius: 16px; padding: 1.25rem; color: #fff; backdrop-filter: blur(18px) saturate(110%); box-shadow: 0 12px 48px rgba(0,0,0,0.6); }
+    .recording-item { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; margin-bottom: 0.75rem; background: rgba(255,255,255,0.06); }
+    .recording-meta { color: rgba(255,255,255,0.85); font-size: 0.95rem; }
+    .muted { color: rgba(255,255,255,0.65); font-size: 0.85rem; }
+    .btn { padding: 0.6rem 1rem; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; }
+    .btn-primary { background: linear-gradient(135deg, #6a82fb 0%, #5a6fd8 100%); color: #fff; }
+    .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+    .status-chip { padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; }
+    .chip-recording { background: rgba(220,53,69,0.15); color: #ff6b6b; border: 1px solid rgba(220,53,69,0.35); }
+    .chip-completed { background: rgba(40,167,69,0.15); color: #28a745; border: 1px solid rgba(40,167,69,0.35); }
+    .empty { text-align: center; padding: 3rem 1.25rem; color: rgba(255,255,255,0.8); }
+    .empty .icon { font-size: 3rem; margin-bottom: 0.5rem; }
+    .top-actions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+    .back-link { color: #fff; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="floating-navbar-container">
+    <nav class="floating-navbar black-glass">
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/online-class">Live Classes</a></li>
+        <li><a href="/study-resources">Study Resources</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="container">
+    <div class="top-actions">
+      <a class="back-link" href="/online-class">← Back to Online Classes</a>
+      <div id="classTitle" class="page-title">Class Recordings</div>
+    </div>
+
+    <div id="recordingsCard" class="recordings-card">
+      <div id="recordingsList"></div>
+    </div>
+  </div>
+
+  <script>
+    function getClassIdFromPath() {
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      // support /record-class/<id> or /record-class.html?class_id=ID
+      const maybeId = parts[1];
+      const urlId = maybeId && /^\d+$/.test(maybeId) ? maybeId : null;
+      const qs = new URLSearchParams(window.location.search);
+      return urlId || qs.get('class_id');
+    }
+
+    function formatDuration(seconds) {
+      if (!seconds || isNaN(seconds)) return 'Unknown';
+      const s = Number(seconds);
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const r = s % 60;
+      return [h, m, r].map(v => String(v).padStart(2,'0')).join(':');
+    }
+
+    async function loadRecordings() {
+      const classId = getClassIdFromPath();
+      const list = document.getElementById('recordingsList');
+      const title = document.getElementById('classTitle');
+      if (!classId) {
+        list.innerHTML = '<div class="empty"><div class="icon">❌</div><div>Missing class id</div></div>';
+        return;
+      }
+      title.textContent = `Class ${classId} Recordings`;
+      list.innerHTML = '<div class="empty"><div class="icon">🔄</div><div>Loading recordings...</div></div>';
+      try {
+        const res = await fetch(`/api/recordings/${encodeURIComponent(classId)}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed to fetch recordings');
+        const recs = data.recordings || [];
+        if (recs.length === 0) {
+          list.innerHTML = '<div class="empty"><div class="icon">📭</div><div>No recordings found for this class yet</div></div>';
+          return;
+        }
+        list.innerHTML = recs.map(r => {
+          const started = r.started_at ? new Date(r.started_at).toLocaleString() : 'Unknown';
+          const duration = formatDuration(r.duration);
+          const size = r.file_size ? `${(r.file_size/1024/1024).toFixed(1)} MB` : 'Unknown';
+          const statusChip = r.status === 'recording' ? '<span class="status-chip chip-recording">Recording</span>' : '<span class="status-chip chip-completed">Completed</span>';
+          const actions = r.status === 'completed'
+            ? `<a class="btn btn-primary" href="/download-recording/${r.id}">📥 Download</a>`
+            : `<button class="btn btn-secondary" disabled>⏳ Processing</button>`;
+          return `
+            <div class="recording-item">
+              <div>
+                <div class="recording-meta" style="font-weight:600;">${r.recording_name || 'Recording'}</div>
+                <div class="muted">Started: ${started} &nbsp;•&nbsp; Duration: ${duration} &nbsp;•&nbsp; Size: ${size}</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                ${statusChip}
+                ${actions}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        list.innerHTML = `<div class="empty"><div class="icon">⚠️</div><div>Error loading recordings: ${e.message}</div></div>`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadRecordings);
+  </script>
+</body>
+</html>
