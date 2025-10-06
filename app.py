@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory, request, redirect, url_for, session, flash, jsonify, send_file
+from flask import Flask, render_template, render_template_string, send_from_directory, request, redirect, url_for, session, flash, jsonify, send_file
 from typing import Union
 import json
 import threading
@@ -905,6 +905,63 @@ init_db()
 # Initialize study resources tables
 ensure_resource_tables()
 
+# Cached study resources template handling
+_STUDY_RESOURCES_TEMPLATE_CACHE = None
+_STUDY_RESOURCES_TEMPLATE_MTIME = None
+_STUDY_RESOURCES_TEMPLATE_LOCK = threading.Lock()
+
+
+def _load_study_resources_template() -> str:
+    """Load the study resources template with robust encoding handling.
+
+    The HTML file is sometimes saved with UTF-16 encoding, which the default
+    Flask/Jinja loader (UTF-8) cannot decode and results in a redirect loop
+    when visiting the study resources route. We decode the template manually
+    with several fallbacks and also normalize a known Jinja loop issue to
+    prevent template rendering errors.
+    """
+
+    global _STUDY_RESOURCES_TEMPLATE_CACHE, _STUDY_RESOURCES_TEMPLATE_MTIME
+
+    template_path = os.path.join(app.template_folder or '.', 'study-resources.html')
+
+    try:
+        current_mtime = os.path.getmtime(template_path)
+    except OSError:
+        current_mtime = None
+
+    with _STUDY_RESOURCES_TEMPLATE_LOCK:
+        if (
+            _STUDY_RESOURCES_TEMPLATE_CACHE is not None
+            and _STUDY_RESOURCES_TEMPLATE_MTIME == current_mtime
+        ):
+            return _STUDY_RESOURCES_TEMPLATE_CACHE
+
+        try:
+            with open(template_path, 'rb') as template_file:
+                raw_template = template_file.read()
+        except OSError as exc:
+            raise RuntimeError(f"Unable to read study resources template: {exc}") from exc
+
+        decoded_template = None
+        for encoding in ('utf-8', 'utf-8-sig', 'utf-16', 'utf-16-le', 'utf-16-be'):
+            try:
+                decoded_template = raw_template.decode(encoding)
+                break
+            except UnicodeDecodeError:
+                continue
+
+        if decoded_template is None:
+            decoded_template = raw_template.decode('utf-8', errors='ignore')
+
+        decoded_template = decoded_template.replace(
+            '{% for cat_key, cat_name in template_categories %}',
+            '{% for cat_key, cat_name, cat_icon in template_categories %}',
+        )
+
+        _STUDY_RESOURCES_TEMPLATE_CACHE = decoded_template
+        _STUDY_RESOURCES_TEMPLATE_MTIME = current_mtime
+        return decoded_template
 # --- Batches DB Setup ---
 def init_batches_db():
     try:
@@ -1370,9 +1427,11 @@ def study_resources():
             categories = []
             flash('Some categories could not be loaded.', 'warning')
 
+        template_content = _load_study_resources_template()
+
         # Pass all necessary data to template
-        return render_template(
-            'study-resources.html',
+        return render_template_string(
+            template_content,
             resources=resources,
             categories=categories,
             class_name=class_name,
