@@ -954,8 +954,17 @@ def _load_study_resources_template() -> str:
         if decoded_template is None:
             decoded_template = raw_template.decode('utf-8', errors='ignore')
 
+        # Normalize template_categories loop: support both two- and three-variable tuples.
+        # Some older templates may have used two variables; prefer the three-variable form
+        # used by the modern template. Replace the two-variable form if present, but
+        # avoid changing the three-variable form if it's already correct.
         decoded_template = decoded_template.replace(
             '{% for cat_key, cat_name in template_categories %}',
+            '{% for cat_key, cat_name, cat_icon in template_categories %}',
+        )
+        # Also ensure any legacy occurrences using different whitespace are normalized
+        decoded_template = decoded_template.replace(
+            "{%for cat_key, cat_name in template_categories%}",
             '{% for cat_key, cat_name, cat_icon in template_categories %}',
         )
 
@@ -1356,30 +1365,32 @@ def api_live_classes_status():
 @app.route('/study-resources')
 def study_resources():
     try:
+        # Require authentication - user must be logged in
         role = session.get('role')
         username = session.get('username')
         user_id = session.get('user_id')
         
-        # Allow guest access but with limited functionality
-        is_guest = not role
+        if not user_id or not role:
+            flash('Please log in to access study resources.', 'info')
+            return redirect(url_for('auth', next='study_resources'))
         
         # Redirect admin/teacher to their own panel, as this page is for students
         if role in ['admin', 'teacher']:
             flash('Please use the admin panel to manage all resources.', 'info')
             return redirect(url_for('admin_panel'))
 
-        # Determine the user's class from the database (more reliable than mapping role string)
+        # Get user details from database
         class_id = None
-        class_name = "Guest"
+        class_name = "Unknown"
         paid_status = None
         
-        if not is_guest and user_id:
-            try:
-                user = get_user_by_id(user_id)
+        try:
+            user = get_user_by_id(user_id)
+            if user:
                 # user tuple: (id, username, class_id, paid, class_name, banned, mobile_no, email_address)
-                class_id = user[2] if user and len(user) > 2 else None
-                class_name = user[4] if user and len(user) > 4 else role
-                paid_status = user[3] if user and len(user) > 3 else None
+                class_id = user[2] if len(user) > 2 else None
+                class_name = user[4] if len(user) > 4 else role
+                paid_status = user[3] if len(user) > 3 else 'unpaid'
                 
                 if not class_id:
                     # Fallback: attempt to resolve by role name (case-insensitive)
@@ -1393,25 +1404,21 @@ def study_resources():
                 if not class_id:
                     flash('Could not determine your class. Please contact administrator.', 'error')
                     return redirect(url_for('home'))
-            except Exception as e:
-                print(f"Error determining user class: {e}")
-                flash('Error loading class information. Please try again.', 'error')
-                return redirect(url_for('home'))
-        else:
-            # For guests, show a default set of resources (e.g., Class 10 or general resources)
-            try:
-                from auth_handler import get_class_id_by_name
-                class_id = get_class_id_by_name("Class 10")  # Default to Class 10 for guests
-                class_name = "Class 10 (Preview)"
-            except Exception as _:
-                class_id = 2  # Fallback to a common class ID
-                class_name = "Preview Mode"
+            else:
+                flash('User not found. Please log in again.', 'error')
+                return redirect(url_for('auth'))
+                
+        except Exception as e:
+            print(f"Error determining user class: {e}")
+            flash('Error loading user information. Please try again.', 'error')
+            return redirect(url_for('auth'))
         
-        # Fetch resources only for the user's class
+        # Fetch resources for the user's class with proper paid/unpaid filtering
         resources = []
         try:
             if class_id:
-                resources = get_resources_for_class_id(class_id, paid_status)
+                # Get all resources for the class, but filter by paid status in template
+                resources = get_resources_for_class_id(class_id)
         except Exception as e:
             print(f"Error fetching resources: {e}")
             resources = []
@@ -1427,11 +1434,9 @@ def study_resources():
             categories = []
             flash('Some categories could not be loaded.', 'warning')
 
-        template_content = _load_study_resources_template()
-
-        # Pass all necessary data to template
-        return render_template_string(
-            template_content,
+        # Render template with user information
+        return render_template(
+            'study-resources.html',
             resources=resources,
             categories=categories,
             class_name=class_name,
@@ -1439,7 +1444,7 @@ def study_resources():
             paid_status=paid_status,
             username=username,
             role=role,
-            is_guest=is_guest
+            is_guest=False  # No more guest access
         )
         
     except Exception as e:
@@ -5858,7 +5863,7 @@ def before_request_handler():
         'check_admission_status', 'check_admission', 'submit_query', 'get_recent_queries',
         'api_get_categories_for_class', 'api_get_categories_by_class_name', 'index', 'static',
         'countdown_preview', 'api_recent_queries', 'api_queries', 'preview', 'uploads',
-        'forum', 'batch', 'study_resources',
+        'forum', 'batch',
         # Auth/Google flows
         'auth_google_start', 'auth_google_callback', 'google_complete'
     ]
