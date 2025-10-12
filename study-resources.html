@@ -183,13 +183,9 @@
       /* Category Section - Centered */
       .category-section {
         width: 100%;
-        padding: 2rem 2rem 3rem 2rem;
+        padding: 2rem 2rem 2rem 2rem;
         background: rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(10px);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
         margin-top: 0;
       }
 
@@ -220,9 +216,10 @@
       /* Resources Section */
       .resources-section {
         width: 100%;
-        padding: 3rem 2rem 2rem 2rem;
+        padding: 2rem 2rem 2rem 2rem;
         background: rgba(0, 0, 0, 0.1);
         margin-bottom: 0;
+        display: none; /* Hidden by default so footer sits below cards */
       }
 
       .resources-section-header {
@@ -238,6 +235,11 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+      }
+
+      /* Show resources when a category is selected */
+      .resources-section.show {
+        display: block;
       }
 
       /* Category Cards Grid - Centered */
@@ -559,6 +561,15 @@
         z-index: 5;
       }
 
+      /* Subtle divider above footer for nicer separation */
+      .section-divider {
+        height: 1px;
+        width: 100%;
+        max-width: 1200px;
+        margin: 2rem auto 0 auto;
+        background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.25), rgba(255,255,255,0));
+      }
+
       /* Responsive Design */
       @media (max-width: 768px) {
         .hero-section {
@@ -718,6 +729,7 @@
 
       <!-- Category Section -->
       <section class="category-section">
+        <div class="container">
         <div class="category-section-header">
           <h2 class="category-section-title">Choose Your Category</h2>
           <p class="category-section-subtitle">Select a category to explore our comprehensive study materials</p>
@@ -759,10 +771,12 @@
             </div>
           {% endfor %}
       </div>
+      </div>
     </section>
 
       <!-- Resources Section -->
       <section class="resources-section">
+        <div class="container">
         <div class="resources-section-header">
           <h2 class="resources-section-title">Study Materials</h2>
           <p class="section-subtitle">Browse through our collection of educational resources</p>
@@ -835,8 +849,11 @@
             </div>
           </div>
         {% endfor %}
+        </div>
       </section>
     </main>
+
+    <div class="section-divider"></div>
 
     <!-- Enhanced Modern Footer - Below PDF Cards -->
     <footer class="footer-modern" style="margin-top: 0;">
@@ -924,11 +941,11 @@
     <script src="study-resources.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // Show the first category tab by default
-        const firstCategoryTab = document.querySelector('.category-tab');
-        if (firstCategoryTab) {
-          firstCategoryTab.click();
-          }
+        // Ensure resources are hidden until a category is selected
+        const resSection = document.querySelector('.resources-section');
+        if (resSection) {
+          resSection.classList.remove('show');
+        }
       });
     </script>
     <script src="navbar-functions.js"></script>
