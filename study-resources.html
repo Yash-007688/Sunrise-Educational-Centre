@@ -726,6 +726,7 @@
         <!-- Category Cards -->
         <div class="category-cards-grid">
           {% set template_categories = [
+              ('pdfs', '📑', 'PDFs', 'All PDF documents'),
               ('notes', '📚', 'Notes', 'Comprehensive study notes and summaries'),
               ('sample_paper', '📄', 'Sample Papers', 'Practice papers and mock tests'),
               ('worksheet', '📝', 'Worksheets', 'Interactive practice worksheets'),
@@ -776,7 +777,19 @@
               
                 {% for resource in resources %}
                 {% set resource_id, filename, res_class_id, filepath, title, description, category, resource_paid_status, schedule_date, uploaded_by, uploaded_at, download_count, is_active, file_size, file_type, class_name, uploaded_by_name = resource %}
-                  {% if res_class_id == class_id and category == cat_key %}
+                  {% set cat = (category or '')|lower %}
+                  {% set fname = (filename or '')|lower %}
+                  {% set matches = (cat == cat_key)
+                    or (cat_key == 'sample_paper' and ('sample' in cat))
+                    or (cat_key == 'pyq' and ('pyq' in cat or 'previous' in cat))
+                    or (cat_key == 'worksheet' and ('worksheet' in cat))
+                    or (cat_key == 'formula' and ('formula' in cat))
+                    or (cat_key == 'case-base' and ('case' in cat and ('base' in cat or 'based' in cat)))
+                    or (cat_key == 'assertion-reasoning' and ('assertion' in cat or 'reason' in cat))
+                    or (cat_key == 'notes' and ('note' in cat or 'study material' in cat or 'others' in cat or 'imp' in cat))
+                    or (cat_key == 'pdfs' and ('.pdf' in fname))
+                  %}
+                  {% if res_class_id == class_id and matches %}
                     {% set has_resources = true %}
                   
                   {# Check if user has access to this resource #}
