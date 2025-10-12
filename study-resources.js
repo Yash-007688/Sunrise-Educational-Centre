@@ -2,32 +2,15 @@
 
 // Category switching functionality
 function showCategory(event, categoryId) {
-    // Hide all category content
-    document.querySelectorAll('.category-content').forEach(content => {
-        content.classList.remove('active');
-    });
-
     // Deactivate all category cards
     document.querySelectorAll('.category-card').forEach(card => {
         card.classList.remove('active');
     });
 
-    // Show selected category content and activate its card
-    const activeCategoryContent = document.getElementById(categoryId);
-    if (activeCategoryContent) {
-        activeCategoryContent.classList.add('active');
-        
-        // Add smooth scroll to the category content
-        activeCategoryContent.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-        });
-    }
-    
-    // Add active class to clicked card
+    // Highlight clicked card only (do not reveal hidden resources)
     event.currentTarget.classList.add('active');
-    
-    // Add click effect
+
+    // Subtle click effect
     event.currentTarget.style.transform = 'scale(0.95)';
     setTimeout(() => {
         event.currentTarget.style.transform = '';
