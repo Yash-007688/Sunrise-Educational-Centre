@@ -729,11 +729,11 @@
 
       <!-- Category Section -->
       <section class="category-section">
-        <div class="container">
+      <div class="container">
         <div class="category-section-header">
           <h2 class="category-section-title">Choose Your Category</h2>
           <p class="category-section-subtitle">Select a category to explore our comprehensive study materials</p>
-        </div>
+      </div>
         
         <!-- Category Cards -->
         <div class="category-cards-grid">
@@ -770,7 +770,7 @@
               <p class="category-description">{{ cat_description }}</p>
             </div>
           {% endfor %}
-      </div>
+        </div>
       </div>
     </section>
 
@@ -834,7 +834,7 @@
                       {% endif %}
                       <div class="filename">{{ filename }}</div>
                       <a href="/preview/{{ filename }}" class="btn-preview">📖 Preview Document</a>
-                    </div>
+                      </div>
                     {% set has_accessible_resources = true %}
                   {% endif %}
                   {% endif %}
@@ -844,13 +844,13 @@
                 <div class="empty-state">
                   <h3>No resources available yet</h3>
                   <p>We're working on adding content to this category. Check back soon!</p>
-                </div>
+              </div>
               {% endif %}
+              </div>
             </div>
-          </div>
         {% endfor %}
-        </div>
-      </section>
+      </div>
+    </section>
     </main>
 
     <div class="section-divider"></div>
@@ -945,7 +945,7 @@
         const resSection = document.querySelector('.resources-section');
         if (resSection) {
           resSection.classList.remove('show');
-        }
+          }
       });
     </script>
     <script src="navbar-functions.js"></script>

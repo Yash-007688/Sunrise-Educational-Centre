@@ -1407,7 +1407,7 @@ def study_resources():
             else:
                 flash('User not found. Please log in again.', 'error')
                 return redirect(url_for('auth'))
-                
+
         except Exception as e:
             print(f"Error determining user class: {e}")
             flash('Error loading user information. Please try again.', 'error')

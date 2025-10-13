@@ -76,6 +76,33 @@
       .video-section, .info-section { padding: 1.2rem; }
     }
     
+    /* Poll & Doubt buttons - bigger, purple background, theme-aware text */
+    .poll-btn,
+    .doubt-btn {
+      background: #7e57c2 !important; /* purple */
+      color: #111 !important;         /* black text for light theme */
+      border: none !important;
+      padding: 0.85rem 1.2rem !important; /* bigger */
+      font-size: 1rem !important;
+      font-weight: 700 !important;
+      border-radius: 12px !important;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .poll-btn:hover,
+    .doubt-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(126, 87, 194, 0.35);
+    }
+
+    body.dark-mode .poll-btn,
+    body.dark-mode .doubt-btn {
+      background: #7e57c2 !important; /* keep purple */
+      color: #fff !important;          /* white text for dark theme */
+      border: none !important;
+    }
+    
     /* Dark Mode Styles */
     body.dark-mode {
       background: #1a1a2e;
@@ -148,6 +175,33 @@
     body.dark-mode .tab-container {
       border-bottom-color: #3a3a4a;
     }
+    /* Tab buttons styling */
+    .tab-btn {
+      background: #ffffff;
+      border: 1px solid #e0e7ff;
+      border-radius: 10px;
+      padding: 0.5rem 0.8rem;
+      color: #232946;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 10px rgba(100,100,255,0.10);
+      margin: 0 0.25rem 0.5rem 0;
+    }
+    .tab-btn:hover {
+      transform: translateY(-1px);
+      border-color: #c7d2fe;
+      box-shadow: 0 6px 18px rgba(100,100,255,0.18);
+    }
+    .tab-btn.active {
+      color: #6a82fb;
+      border-color: #6a82fb;
+      box-shadow: 0 8px 24px rgba(106,130,251,0.28);
+      background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%);
+    }
     /* Tab content visibility */
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -158,6 +212,12 @@
     .player-controls .volume-slider { width: 140px; }
     .player-controls .speed-select { padding: 0.3rem 0.5rem; border: 1px solid #e0e7ff; border-radius: 6px; background: #fff; color: #232946; }
     body.dark-mode .player-controls .speed-select { background: #232946; border-color: #3a3a4a; color: #fff; }
+    /* Purple progress slider */
+    .progress-slider { -webkit-appearance: none; appearance: none; width: 55%; height: 6px; background: #e0e7ff; border-radius: 999px; outline: none; cursor: pointer; background-image: linear-gradient(#6a82fb,#6a82fb); background-size: 0% 100%; background-repeat: no-repeat; }
+    .progress-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; background: #6a82fb; border-radius: 50%; box-shadow: 0 0 0 2px #ffffff; }
+    .progress-slider::-moz-range-thumb { width: 14px; height: 14px; background: #6a82fb; border: none; border-radius: 50%; }
+    body.dark-mode .progress-slider { background: #3a3a4a; background-image: linear-gradient(#6a82fb,#6a82fb); }
+    body.dark-mode .progress-slider::-webkit-slider-thumb { box-shadow: 0 0 0 2px #232946; }
     
     /* Device Selection Styles for Student View */
     .device-selection { margin-top: 1rem; padding: 1rem; background: rgba(106,130,251,0.03); border-radius: 12px; border: 1px solid #e0e7ff; }
@@ -315,6 +375,10 @@
       color: #b8c5d6;
     }
   </style>
+  <script>
+    // Set username from server-side session into client scope for accurate labeling
+    window.username = {{ (username | tojson) if username is defined else 'null' }} || undefined;
+  </script>
     <link rel="stylesheet" href="floating-navbar.css">
     <link rel="stylesheet" href="uiverse-components.css">
 </head>
@@ -391,8 +455,11 @@
           {% endif %}
         </div>
         <!-- Custom playback controls for content video (non-YouTube) -->
-        <div id="contentControls" class="player-controls" style="display:none;">
+        <div id="contentControls" class="player-controls" style="display:none; flex-wrap: wrap;">
           <button id="playPauseBtn" class="chat-send-btn" style="background:#e8eefc; color:#6a82fb; border:1px solid #e0e7ff;">⏯ Play</button>
+          <span id="currentTime" style="color:#666; min-width:56px; text-align:right;">0:00</span>
+          <input type="range" id="progressSlider" class="progress-slider" min="0" max="100" step="0.1" value="0">
+          <span id="durationTime" style="color:#666; min-width:56px;">0:00</span>
           <span style="color:#666;">Volume</span>
           <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1">
           <span style="color:#666;">Speed</span>
@@ -407,7 +474,7 @@
         </div>
         
         <!-- Live Class Status -->
-        <div id="liveStatus" style="margin-top: 1rem; text-align: center; padding: 1rem; background: rgba(106,130,251,0.05); border-radius: 12px; border: 1px solid #e0e7ff;">
+        <div id="liveStatus" style="display:none; margin-top: 1rem; text-align: center; padding: 1rem; background: rgba(106,130,251,0.05); border-radius: 12px; border: 1px solid #e0e7ff;">
           <span id="liveStatusText" style="color: #6a82fb; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/>
@@ -501,6 +568,22 @@
         <button class="tab-btn" onclick="showTab('benchmark', this)" id="benchmarkTab" style="display: none;">Benchmark</button>
         
       </div>
+      <!-- Description Card -->
+      <div class="desc-card" style="background:#ffffff; border:1px solid #e0e7ff; border-radius:12px; box-shadow:0 6px 24px rgba(100,100,255,0.08); padding:1rem; margin-bottom: 1rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem; color:#6a82fb; font-weight:700; margin-bottom:0.25rem;">
+          <span>📘</span>
+          <span>About this class</span>
+        </div>
+        <div style="color:#232946; font-weight:600;">{{ topic or 'Live Class' }}</div>
+        <div style="color:#666; margin-top:0.25rem;">{{ description or 'Join the session and participate in chat, polls and doubts.' }}</div>
+        {% if subject or teacher_name or target_class %}
+        <div style="margin-top:0.5rem; color:#555; font-size:0.95rem;">
+          {% if subject %}<strong>Subject:</strong> {{ subject|capitalize }}{% endif %}
+          {% if teacher_name %}{% if subject %} • {% endif %}<strong>Teacher:</strong> {{ teacher_name }}{% endif %}
+          {% if target_class %}<br><strong>Target:</strong> Class {{ target_class }}{% if target_class in ['11','12'] and class_stream %} ({{ class_stream|capitalize }}){% endif %}{% endif %}
+        </div>
+        {% endif %}
+      </div>
       <!-- Chat Tab -->
       <div id="chat-tab" class="tab-content active">
         <div class="chat-card">
@@ -513,12 +596,28 @@
           <div id="chatMessages" class="chat-messages">
             <!-- Chat messages will appear here -->
           </div>
-      <form id="chatForm" style="display:flex; gap:0.5rem; align-items:center;">
+          <div id="chatLockedBanner" style="display:none; margin:-0.6rem 0 0.8rem 0; padding:0.6rem 0.8rem; border-radius:8px; background: rgba(252,92,125,0.1); border:1px solid rgba(252,92,125,0.2); color:#fc5c7d; font-weight:500;">🔒 Chat is locked by host</div>
+      <form id="chatForm" style="display:flex; gap:0.5rem; align-items:center; position: relative;">
         <button type="button" id="attachBtn" title="Attach" style="background:#e8eefc; border:1px solid #e0e7ff; color:#6a82fb; padding:0.5rem; border-radius:8px; cursor:pointer;">
           📎
         </button>
+        <button type="button" id="emojiBtn" title="Emoji" style="background:#e8eefc; border:1px solid #e0e7ff; color:#6a82fb; padding:0.5rem; border-radius:8px; cursor:pointer;">😀</button>
         <input type="text" id="chatInput" placeholder="Type a message..." class="chat-input" autocomplete="off" />
         <button type="submit" class="chat-send-btn">Send</button>
+        <div id="emojiPicker" style="display:none; position:absolute; bottom: 110%; left: 60px; background:#fff; border:1px solid #e0e7ff; border-radius:8px; padding:0.4rem; box-shadow:0 6px 24px rgba(100,100,255,0.12); max-width:240px; z-index: 20;">
+          <div style="display:flex; flex-wrap:wrap; gap:6px; max-width: 240px;">
+            <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmoji('😀')">😀</button>
+            <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmoji('😁')">😁</button>
+            <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmoji('😂')">😂</button>
+            <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmoji('😊')">😊</button>
+            <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmoji('😎')">😎</button>
+            <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmoji('👍')">👍</button>
+            <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmoji('🙏')">🙏</button>
+            <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmoji('🎉')">🎉</button>
+            <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmoji('✅')">✅</button>
+            <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmoji('❓')">❓</button>
+          </div>
+        </div>
       </form>
       <div id="quickReplies" style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem;">
         <button type="button" class="chat-send-btn" style="background:#e8eefc; color:#6a82fb; border:1px solid #e0e7ff;" onclick="insertQuick('👍')">👍</button>
@@ -551,8 +650,8 @@
           </form>
           <div id="doubtsList">
             <!-- Doubts will appear here -->
-            <div class="doubt-item" style="background: #fff; border-radius: 8px; padding: 0.8rem; margin-bottom: 0.5rem; border-left: 3px solid #48bb78;">
-              <div class="doubt-user">You</div>
+            <div class="doubt-item" style="background: #f9fbff; border:1px solid #e0e7ff; border-radius: 8px; padding: 0.8rem; margin-bottom: 0.5rem; border-left: 3px solid #48bb78;">
+              <div class="doubt-user">{{ username or 'You' }}</div>
               <div class="doubt-text">(Sample) How to solve quadratic equations?</div>
             </div>
           </div>
@@ -1491,7 +1590,7 @@ function renderDoubts(doubts) {
   doubts.forEach(doubt => {
     const div = document.createElement('div');
     div.className = 'doubt-item';
-    div.style = 'background: #fff; border-radius: 8px; padding: 0.8rem; margin-bottom: 0.5rem; border-left: 3px solid #48bb78;';
+    div.style = 'background: #f9fbff; border:1px solid #e0e7ff; border-radius: 8px; padding: 0.8rem; margin-bottom: 0.5rem; border-left: 3px solid #48bb78;';
     div.innerHTML = `<div class="doubt-user">${doubt.username}</div><div class="doubt-text">${doubt.doubt_text}</div>` +
       (doubt.status === 'resolved' ? '<div style="color:#48bb78;font-weight:600;">✓ Resolved</div>' : doubt.status === 'ignored' ? '<div style="color:#a0aec0;">Ignored</div>' : '');
     doubtsList.appendChild(div);
@@ -1543,6 +1642,36 @@ function sendChatMessage() {
   }
 }
 
+// Emoji UI handlers
+document.addEventListener('DOMContentLoaded', function() {
+  const emojiBtn = document.getElementById('emojiBtn');
+  const emojiPicker = document.getElementById('emojiPicker');
+  if (emojiBtn && emojiPicker) {
+    emojiBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      emojiPicker.style.display = (emojiPicker.style.display === 'none' || !emojiPicker.style.display) ? 'block' : 'none';
+    });
+    document.addEventListener('click', function(e) {
+      if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) {
+        emojiPicker.style.display = 'none';
+      }
+    });
+  }
+});
+
+function insertEmoji(char) {
+  const input = document.getElementById('chatInput');
+  if (!input) return;
+  const start = input.selectionStart || input.value.length;
+  const end = input.selectionEnd || input.value.length;
+  const before = input.value.substring(0, start);
+  const after = input.value.substring(end);
+  input.value = before + char + after;
+  const newPos = start + char.length;
+  input.focus();
+  if (input.setSelectionRange) input.setSelectionRange(newPos, newPos);
+}
+
 function renderChatMessage(messageData) {
   const chatMessages = document.getElementById('chatMessages');
   const messageDiv = document.createElement('div');
@@ -1551,7 +1680,7 @@ function renderChatMessage(messageData) {
   
   const timestamp = new Date(messageData.created_at).toLocaleTimeString();
   const isHost = messageData.username === 'Host';
-  const isOwnMessage = messageData.username === getUsername();
+  const isOwnMessage = (messageData.user_id && messageData.user_id === getUserId()) || (messageData.username && messageData.username === getUsername());
   const usernameColor = isHost ? '#fc5c7d' : (isOwnMessage ? '#48bb78' : '#6a82fb');
   const messageStyle = isHost ? 'border-left-color: #fc5c7d;' : (isOwnMessage ? 'border-left-color: #48bb78;' : 'border-left-color: #6a82fb;');
   
@@ -1593,11 +1722,7 @@ function renderChatMessage(messageData) {
 // Enhanced chat event listeners
 socket.on('new_chat_message', (messageData) => {
   console.log('Received new chat message:', messageData);
-  
-  // Don't render if it's our own message
-  if (messageData.username !== getUsername()) {
-    renderChatMessage(messageData);
-  }
+  renderChatMessage(messageData);
 });
 
 socket.on('chat_messages_history', (data) => {
@@ -1671,6 +1796,7 @@ function updateChatStatus(status, message) {
   const statusText = document.getElementById('chatStatusText');
   const chatForm = document.getElementById('chatForm');
   const chatInput = document.getElementById('chatInput');
+  const chatLockedBanner = document.getElementById('chatLockedBanner');
   
   // Remove all status classes
   statusText.classList.remove('locked', 'private', 'public');
@@ -1681,6 +1807,7 @@ function updateChatStatus(status, message) {
     chatForm.style.opacity = '0.5';
     chatInput.disabled = true;
     chatInput.placeholder = 'Chat is locked by host';
+    if (chatLockedBanner) chatLockedBanner.style.display = 'block';
     
     // Show notification
     showNotification(message, 'warning');
@@ -1690,6 +1817,7 @@ function updateChatStatus(status, message) {
     chatForm.style.opacity = '0.5';
     chatInput.disabled = true;
     chatInput.placeholder = 'Chat is private - only host can see messages';
+    if (chatLockedBanner) chatLockedBanner.style.display = 'none';
     
     // Show notification
     showNotification(message, 'info');
@@ -1699,6 +1827,7 @@ function updateChatStatus(status, message) {
     chatForm.style.opacity = '1';
     chatInput.disabled = false;
     chatInput.placeholder = 'Type a message...';
+    if (chatLockedBanner) chatLockedBanner.style.display = 'none';
     
     // Show notification
     showNotification(message, 'success');
@@ -1708,6 +1837,7 @@ function updateChatStatus(status, message) {
     chatForm.style.opacity = '1';
     chatInput.disabled = false;
     chatInput.placeholder = 'Type a message...';
+    if (chatLockedBanner) chatLockedBanner.style.display = 'none';
     
     // Show notification
     showNotification(message, 'success');
@@ -1982,6 +2112,9 @@ function setupStudentContentControls() {
   const videoEl = document.querySelector('#contentVideo video');
   const controls = document.getElementById('contentControls');
   const playPauseBtn = document.getElementById('playPauseBtn');
+  const progress = document.getElementById('progressSlider');
+  const currentTimeEl = document.getElementById('currentTime');
+  const durationTimeEl = document.getElementById('durationTime');
   const volumeSlider = document.getElementById('volumeSlider');
   const speedSelect = document.getElementById('speedSelect');
   if (!videoEl) {
@@ -1993,6 +2126,19 @@ function setupStudentContentControls() {
   volumeSlider.value = typeof videoEl.volume === 'number' ? videoEl.volume : 1;
   speedSelect.value = String(videoEl.playbackRate || 1);
   playPauseBtn.textContent = videoEl.paused ? '⏯ Play' : '⏸ Pause';
+  const fmt = (s) => {
+    const m = Math.floor(s / 60);
+    const ss = Math.floor(s % 60).toString().padStart(2, '0');
+    return `${m}:${ss}`;
+  };
+  const updateProgressUi = () => {
+    if (!videoEl.duration || !progress) return;
+    const percent = (videoEl.currentTime / videoEl.duration) * 100;
+    progress.value = String(percent);
+    progress.style.backgroundSize = percent + '% 100%';
+    currentTimeEl.textContent = fmt(videoEl.currentTime || 0);
+    durationTimeEl.textContent = fmt(videoEl.duration || 0);
+  };
   // Handlers
   playPauseBtn.onclick = () => {
     if (videoEl.paused) { videoEl.play(); playPauseBtn.textContent = '⏸ Pause'; }
@@ -2003,6 +2149,21 @@ function setupStudentContentControls() {
   // Update button text on native play/pause
   videoEl.addEventListener('play', () => playPauseBtn.textContent = '⏸ Pause');
   videoEl.addEventListener('pause', () => playPauseBtn.textContent = '⏯ Play');
+  // Time/progress updates
+  videoEl.addEventListener('loadedmetadata', updateProgressUi);
+  videoEl.addEventListener('timeupdate', updateProgressUi);
+  if (progress) {
+    progress.addEventListener('input', (e) => {
+      if (!videoEl.duration) return;
+      const percent = parseFloat(e.target.value);
+      progress.style.backgroundSize = percent + '% 100%';
+    });
+    progress.addEventListener('change', (e) => {
+      if (!videoEl.duration) return;
+      const percent = parseFloat(e.target.value);
+      videoEl.currentTime = (percent / 100) * videoEl.duration;
+    });
+  }
 }
 
 // Fullscreen functionality

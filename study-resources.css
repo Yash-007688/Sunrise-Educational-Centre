@@ -1,5 +1,5 @@
 
-/* Study Resources Page Styles - Forum-Inspired Design */
+/* Study Resources Page Styles - Fixed Layout Structure */
 
 /* Glassy Black and Transparent Theme */
 body {
@@ -8,16 +8,60 @@ body {
               linear-gradient(135deg, #0d0f16 0%, #10131d 50%, #0b0e15 100%);
   color: #ffffff;
   font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-/* Forum-style shell container */
+/* Main Layout Structure */
 .study-resources-shell {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero Section - Fixed Positioning */
+.hero-section {
+  position: relative;
+  width: 100%;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  margin-bottom: 2rem;
+}
+
+.hero-content {
+  text-align: center;
+  z-index: 11;
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.hero-title-modern {
+  font-size: 3.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle-modern {
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
 }
 
 /* Glassmorphic Container */
@@ -105,7 +149,7 @@ body {
   border: 1px solid rgba(106, 130, 251, 0.4);
 }
 
-/* Enhanced Vertical Slider with Modern Aesthetic */
+/* Enhanced Vertical Slider with Modern Aesthetic - Fixed Positioning */
 .vertical-slider {
   position: fixed !important;
   top: 0 !important;
@@ -460,12 +504,23 @@ body.slider-open::before {
   text-align: center;
 }
 
+/* Category Selector Section - Fixed Positioning */
+.category-selector-section {
+  position: relative;
+  z-index: 5;
+  margin: 2rem 0;
+  padding: 0 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* Glassmorphic Tabs */
 .class-tabs {
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
-  padding: 1rem;
+  padding: 1.5rem;
   background: rgba(12, 14, 22, 0.55);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -473,6 +528,7 @@ body.slider-open::before {
   border: 1px solid rgba(255, 255, 255, 0.08);
   justify-content: center;
   flex-wrap: wrap;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .tab-button {
@@ -566,12 +622,24 @@ body.slider-open::before {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* PDF Cards Section - Fixed Positioning */
+.pdf-cards-section {
+  position: relative;
+  z-index: 4;
+  margin: 2rem 0;
+  padding: 0 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* Forum-style resource grid */
 .resource-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.2rem;
-  margin-top: 1.25rem;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  padding: 1rem 0;
 }
 
 /* Forum-style resource cards */
@@ -962,8 +1030,18 @@ body.slider-open::before {
     padding: 1rem;
   }
   
-  .page-header h1 {
-    font-size: 2rem;
+  .hero-title-modern {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle-modern {
+    font-size: 1.1rem;
+  }
+  
+  .category-selector-section,
+  .pdf-cards-section,
+  .forum-section {
+    padding: 0 1rem;
   }
   
   .class-tabs {
@@ -997,6 +1075,11 @@ body.slider-open::before {
   
   .resource-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .card-grid-modern {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 
@@ -1087,6 +1170,39 @@ html {
   font-weight: 500;
   margin-bottom: 0.5rem;
   border: 1px solid rgba(106, 130, 251, 0.3);
+}
+
+/* Forum Section - Fixed Positioning */
+.forum-section {
+  position: relative;
+  z-index: 3;
+  margin: 3rem 0;
+  padding: 0 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.forum-section h2 {
+  color: #6a82fb;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.forum-content {
+  background: rgba(15, 18, 28, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2rem;
+  box-shadow: 0 12px 42px rgba(0, 0, 0, 0.35);
 }
 
 /* Forum-style empty state */

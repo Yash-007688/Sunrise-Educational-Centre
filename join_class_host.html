@@ -20,6 +20,33 @@
     .tab-btn.active { color: #6a82fb; border-bottom: 2px solid #6a82fb; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+    /* Tab buttons styling */
+    .tab-btn {
+      background: #ffffff;
+      border: 1px solid #e0e7ff;
+      border-radius: 10px;
+      padding: 0.45rem 0.8rem;
+      color: #232946;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 10px rgba(100,100,255,0.10);
+      margin: 0 0.25rem 0.5rem 0;
+    }
+    .tab-btn:hover {
+      transform: translateY(-1px);
+      border-color: #c7d2fe;
+      box-shadow: 0 6px 18px rgba(100,100,255,0.18);
+    }
+    .tab-btn.active {
+      color: #6a82fb;
+      border-color: #6a82fb;
+      box-shadow: 0 8px 24px rgba(106,130,251,0.28);
+      background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%);
+    }
     
     .chat-card { background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%); border-radius:12px; box-shadow: 0 4px 16px rgba(100,100,255,0.08); padding:1.2rem; border: 1px solid #e0e7ff; margin-bottom: 1rem; }
     .chat-messages { max-height: 200px; overflow-y:auto; margin-bottom:0.7rem; border-bottom:1px solid #e0e7ff; padding-bottom:0.5rem; font-size:0.95rem; }
@@ -98,17 +125,34 @@
     .poll-option { display: flex; align-items: center; margin-bottom: 0.5rem; }
     .poll-option input { margin-right: 0.5rem; }
     .poll-option label { flex: 1; }
-    .poll-btn { border-radius:8px; background: linear-gradient(135deg, #fc5c7d 0%, #e74c3c 100%); border: none; color: #fff; padding: 0.5rem 1rem; cursor: pointer; transition: all 0.2s; }
-    .poll-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(252,92,125,0.3); }
+    /* Poll & Doubt buttons - bigger, purple background, theme-aware text */
+    .poll-btn,
+    .doubt-btn {
+      background: #7e57c2 !important; /* purple */
+      color: #111 !important;         /* black text for light theme */
+      border: none !important;
+      padding: 0.85rem 1.2rem !important; /* bigger */
+      font-size: 1rem !important;
+      font-weight: 700 !important;
+      border-radius: 12px !important;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .poll-btn:hover,
+    .doubt-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(126, 87, 194, 0.35); }
     
     .doubts-section { background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%); border-radius:12px; padding:1.2rem; border: 1px solid #c6f6d5; margin-bottom: 1rem; }
     .doubt-item { background: #fff; border-radius: 8px; padding: 0.8rem; margin-bottom: 0.5rem; border-left: 3px solid #48bb78; }
     .doubt-user { font-weight: 600; color: #2d3748; font-size: 0.9rem; }
     .doubt-text { color: #4a5568; margin-top: 0.3rem; }
     .doubt-actions { margin-top: 0.5rem; }
-    .doubt-btn { border-radius: 6px; border: none; padding: 0.3rem 0.6rem; font-size: 0.8rem; cursor: pointer; margin-right: 0.3rem; }
-    .resolve-btn { background: #48bb78; color: #fff; }
-    .ignore-btn { background: #e2e8f0; color: #4a5568; }
+    .doubt-btn { margin-right: 0.3rem; }
+    .resolve-btn { background: #48bb78 !important; color: #fff !important; }
+    .ignore-btn { background: #e2e8f0 !important; color: #4a5568 !important; }
+
+    /* Dark theme overrides */
+    body.dark-mode .poll-btn,
+    body.dark-mode .doubt-btn { background: #7e57c2 !important; color: #fff !important; border: none !important; }
     
     .host-controls { background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%); border-radius:12px; padding:1.2rem; border: 1px solid #81e6d9; margin-bottom: 1rem; }
     .control-btn { width: 100%; border-radius:8px; border: none; padding: 0.8rem; margin-bottom: 0.5rem; cursor: pointer; font-weight: 500; transition: all 0.2s; }
@@ -335,8 +379,11 @@
           {% endif %}
         </div>
         <!-- Custom playback controls for content video (non-YouTube) -->
-        <div id="hostContentControls" class="player-controls" style="display:none;">
+        <div id="hostContentControls" class="player-controls" style="display:none; flex-wrap: wrap;">
           <button id="hostPlayPauseBtn" class="chat-send-btn" style="background:#e8eefc; color:#6a82fb; border:1px solid #e0e7ff;">⏯ Play</button>
+          <span id="hostCurrentTime" style="color:#666; min-width:56px; text-align:right;">0:00</span>
+          <input type="range" id="hostProgressSlider" class="progress-slider" min="0" max="100" step="0.1" value="0">
+          <span id="hostDurationTime" style="color:#666; min-width:56px;">0:00</span>
           <span style="color:#666;">Volume</span>
           <input type="range" id="hostVolumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1">
           <span style="color:#666;">Speed</span>
@@ -429,6 +476,22 @@
         <button class="tab-btn" onclick="showTab('controls')">Controls</button>
         
       </div>
+      <!-- Description Card -->
+      <div class="desc-card" style="background:#ffffff; border:1px solid #e0e7ff; border-radius:12px; box-shadow:0 6px 24px rgba(100,100,255,0.08); padding:1rem; margin-bottom: 1rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem; color:#6a82fb; font-weight:700; margin-bottom:0.25rem;">
+          <span>📘</span>
+          <span>About this class</span>
+        </div>
+        <div style="color:#232946; font-weight:600;">{{ topic or 'Live Class' }}</div>
+        <div style="color:#666; margin-top:0.25rem;">{{ description or 'Manage your class: stream camera, run polls, and review doubts.' }}</div>
+        {% if subject or teacher_name or target_class %}
+        <div style="margin-top:0.5rem; color:#555; font-size:0.95rem;">
+          {% if subject %}<strong>Subject:</strong> {{ subject|capitalize }}{% endif %}
+          {% if teacher_name %}{% if subject %} • {% endif %}<strong>Teacher:</strong> {{ teacher_name }}{% endif %}
+          {% if target_class %}<br><strong>Target:</strong> Class {{ target_class }}{% if target_class in ['11','12'] and class_stream %} ({{ class_stream|capitalize }}){% endif %}{% endif %}
+        </div>
+        {% endif %}
+      </div>
       
       <!-- Chat Tab -->
       <div id="chat-tab" class="tab-content active">
@@ -469,10 +532,25 @@
           <div id="chatMessages" class="chat-messages">
             <!-- Chat messages will appear here -->
           </div>
-          <form id="chatForm" style="display:flex; gap:0.5rem; align-items:center;">
+          <form id="chatForm" style="display:flex; gap:0.5rem; align-items:center; position: relative;">
             <button type="button" id="attachBtnHost" title="Attach" style="background:#e8eefc; border:1px solid #e0e7ff; color:#6a82fb; padding:0.5rem; border-radius:8px; cursor:pointer;">📎</button>
+            <button type="button" id="emojiBtnHost" title="Emoji" style="background:#e8eefc; border:1px solid #e0e7ff; color:#6a82fb; padding:0.5rem; border-radius:8px; cursor:pointer;">😀</button>
             <input type="text" id="chatInput" placeholder="Type a message..." class="chat-input" autocomplete="off" />
             <button type="submit" class="chat-send-btn">Send</button>
+            <div id="emojiPickerHost" style="display:none; position:absolute; bottom: 110%; left: 60px; background:#fff; border:1px solid #e0e7ff; border-radius:8px; padding:0.4rem; box-shadow:0 6px 24px rgba(100,100,255,0.12); max-width:240px; z-index: 20;">
+              <div style="display:flex; flex-wrap:wrap; gap:6px; max-width: 240px;">
+                <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmojiHost('😀')">😀</button>
+                <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmojiHost('😁')">😁</button>
+                <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmojiHost('😂')">😂</button>
+                <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmojiHost('😊')">😊</button>
+                <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmojiHost('😎')">😎</button>
+                <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmojiHost('👍')">👍</button>
+                <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmojiHost('🙏')">🙏</button>
+                <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmojiHost('🎉')">🎉</button>
+                <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmojiHost('✅')">✅</button>
+                <button type="button" class="chat-send-btn" style="background:#f8f9ff; color:#232946; border:1px solid #e0e7ff; padding:6px 8px;" onclick="insertEmojiHost('❓')">❓</button>
+              </div>
+            </div>
           </form>
           <div id="quickRepliesHost" style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem;">
             <button type="button" class="chat-send-btn" style="background:#e8eefc; color:#6a82fb; border:1px solid #e0e7ff;" onclick="insertQuickHost('👍')">👍</button>
@@ -599,6 +677,35 @@
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script>
+// Emoji UI handlers (host)
+document.addEventListener('DOMContentLoaded', function() {
+  const emojiBtnHost = document.getElementById('emojiBtnHost');
+  const emojiPickerHost = document.getElementById('emojiPickerHost');
+  if (emojiBtnHost && emojiPickerHost) {
+    emojiBtnHost.addEventListener('click', function(e) {
+      e.preventDefault();
+      emojiPickerHost.style.display = (emojiPickerHost.style.display === 'none' || !emojiPickerHost.style.display) ? 'block' : 'none';
+    });
+    document.addEventListener('click', function(e) {
+      if (!emojiPickerHost.contains(e.target) && e.target !== emojiBtnHost) {
+        emojiPickerHost.style.display = 'none';
+      }
+    });
+  }
+});
+
+function insertEmojiHost(char) {
+  const input = document.getElementById('chatInput');
+  if (!input) return;
+  const start = input.selectionStart || input.value.length;
+  const end = input.selectionEnd || input.value.length;
+  const before = input.value.substring(0, start);
+  const after = input.value.substring(end);
+  input.value = before + char + after;
+  const newPos = start + char.length;
+  input.focus();
+  if (input.setSelectionRange) input.setSelectionRange(newPos, newPos);
+}
     // Get class ID from URL
     const classId = window.location.pathname.split('/').pop();
     
@@ -1922,6 +2029,9 @@
       const videoEl = document.querySelector('#contentVideo video');
       const controls = document.getElementById('hostContentControls');
       const playPauseBtn = document.getElementById('hostPlayPauseBtn');
+      const progress = document.getElementById('hostProgressSlider');
+      const currentTimeEl = document.getElementById('hostCurrentTime');
+      const durationTimeEl = document.getElementById('hostDurationTime');
       const volumeSlider = document.getElementById('hostVolumeSlider');
       const speedSelect = document.getElementById('hostSpeedSelect');
       if (!videoEl) {
@@ -1932,6 +2042,15 @@
       volumeSlider.value = typeof videoEl.volume === 'number' ? videoEl.volume : 1;
       speedSelect.value = String(videoEl.playbackRate || 1);
       playPauseBtn.textContent = videoEl.paused ? '⏯ Play' : '⏸ Pause';
+      const fmt = (s) => { const m = Math.floor(s/60); const ss = Math.floor(s%60).toString().padStart(2,'0'); return `${m}:${ss}`; };
+      const updateProgressUi = () => {
+        if (!videoEl.duration || !progress) return;
+        const percent = (videoEl.currentTime / videoEl.duration) * 100;
+        progress.value = String(percent);
+        progress.style.backgroundSize = percent + '% 100%';
+        currentTimeEl.textContent = fmt(videoEl.currentTime || 0);
+        durationTimeEl.textContent = fmt(videoEl.duration || 0);
+      };
       playPauseBtn.onclick = () => {
         if (videoEl.paused) { videoEl.play(); playPauseBtn.textContent = '⏸ Pause'; }
         else { videoEl.pause(); playPauseBtn.textContent = '⏯ Play'; }
@@ -1940,6 +2059,20 @@
       speedSelect.onchange = (e) => { videoEl.playbackRate = parseFloat(e.target.value); };
       videoEl.addEventListener('play', () => playPauseBtn.textContent = '⏸ Pause');
       videoEl.addEventListener('pause', () => playPauseBtn.textContent = '⏯ Play');
+      videoEl.addEventListener('loadedmetadata', updateProgressUi);
+      videoEl.addEventListener('timeupdate', updateProgressUi);
+      if (progress) {
+        progress.addEventListener('input', (e) => {
+          if (!videoEl.duration) return;
+          const percent = parseFloat(e.target.value);
+          progress.style.backgroundSize = percent + '% 100%';
+        });
+        progress.addEventListener('change', (e) => {
+          if (!videoEl.duration) return;
+          const percent = parseFloat(e.target.value);
+          videoEl.currentTime = (percent / 100) * videoEl.duration;
+        });
+      }
     }
 
     // Enhanced start recording function

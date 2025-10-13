@@ -458,6 +458,7 @@
                   {% else %}
                   <a class="btn btn-primary" href="/admission?class_id={{ card.class_id }}">Enroll Now</a>
                   {% endif %}
+                  <a class="btn" href="/batch/{{ card.class_id }}">See more</a>
                   <a class="btn" href="/study-resources?class_id={{ card.class_id }}">Resources</a>
                 </div>
               </div>
@@ -490,6 +491,7 @@
                 </div>
                 <div class="batch-actions">
                   <a class="btn btn-secondary" href="/batch/{{ card.class_id }}">Explore</a>
+                  <a class="btn" href="/batch/{{ card.class_id }}">See more</a>
                   <a class="btn btn-primary" href="/admission?class_id={{ card.class_id }}">Enroll</a>
                 </div>
               </div>
@@ -602,6 +604,7 @@
               </div>
               <div class="batch-actions">
                 <a class="btn btn-primary" href="/admission?class_id={{ card.class_id }}">Enroll Now</a>
+                <a class="btn" href="/batch/{{ card.class_id }}">See more</a>
               </div>
             </div>
           </div>
