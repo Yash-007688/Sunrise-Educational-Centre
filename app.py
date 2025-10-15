@@ -1384,8 +1384,8 @@ def study_resources():
         class_name = "Unknown"
         paid_status = None
         
-            try:
-                user = get_user_by_id(user_id)
+        try:
+            user = get_user_by_id(user_id)
             if user:
                 # user tuple: (id, username, class_id, paid, class_name, banned, mobile_no, email_address)
                 class_id = user[2] if len(user) > 2 else None
@@ -1407,9 +1407,9 @@ def study_resources():
             else:
                 flash('User not found. Please log in again.', 'error')
                 return redirect(url_for('auth'))
-                
-            except Exception as e:
-                print(f"Error determining user class: {e}")
+
+        except Exception as e:
+            print(f"Error determining user class: {e}")
             flash('Error loading user information. Please try again.', 'error')
             return redirect(url_for('auth'))
         
