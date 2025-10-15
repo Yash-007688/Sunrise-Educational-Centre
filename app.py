@@ -1384,8 +1384,8 @@ def study_resources():
         class_name = "Unknown"
         paid_status = None
         
-        try:
-            user = get_user_by_id(user_id)
+            try:
+                user = get_user_by_id(user_id)
             if user:
                 # user tuple: (id, username, class_id, paid, class_name, banned, mobile_no, email_address)
                 class_id = user[2] if len(user) > 2 else None
@@ -1407,9 +1407,9 @@ def study_resources():
             else:
                 flash('User not found. Please log in again.', 'error')
                 return redirect(url_for('auth'))
-
-        except Exception as e:
-            print(f"Error determining user class: {e}")
+                
+            except Exception as e:
+                print(f"Error determining user class: {e}")
             flash('Error loading user information. Please try again.', 'error')
             return redirect(url_for('auth'))
         
@@ -4088,7 +4088,10 @@ def admission():
     user_id = session.get('user_id')  # This will be None for non-logged in users
     
     if request.method == 'GET':
-        return render_template('admission.html')
+        last_creds = session.pop('last_admission_creds', None)
+        last_student = session.pop('last_admission_student', None)
+        last_status = session.pop('last_admission_status', None)
+        return render_template('admission.html', last_creds=last_creds, last_student=last_student, last_status=last_status)
     
     # Handle POST request (admission form submission)
     print('--- Admission form submitted ---')
@@ -4178,8 +4181,8 @@ def admission():
             # Generate unique admission username (for admission portal access)
             admission_username = generate_admission_username(new_admission_id, request.form['student_name'])
             
-            # Use student's full name as login username (for system login after approval)
-            login_username = request.form['student_name'].strip()
+            # Use normalized student name as login username (lowercase, no spaces)
+            login_username = (request.form['student_name'] or '').strip().lower().replace(' ', '')
             
             # Generate complex password (12 characters for better security)
             access_password = generate_complex_password(12)
@@ -4247,11 +4250,14 @@ def admission():
             'login_username': login_username
         }
         try:
-            return render_template('admission_success.html', student=student, creds=creds)
+            # Show success confirmation inline on admission page
+            session['last_admission_student'] = student
+            session['last_admission_creds'] = creds
+            return redirect(url_for('admission'))
         except Exception as template_error:
-            print(f'Error rendering admission_success.html: {template_error}')
-            flash('Admission submitted successfully! Please check your admission status.', 'success')
-            return redirect(url_for('check_admission'))
+            print(f'Error redirecting to admission success inline: {template_error}')
+            flash('Admission submitted successfully!', 'success')
+            return redirect(url_for('admission'))
     except Exception as e:
         print('Error inserting admission:', e)
         flash(f'Error saving admission: {e}', 'error')
@@ -4259,52 +4265,30 @@ def admission():
 # Public admission check page (no login)
 @app.route('/check-admission', methods=['GET', 'POST'])
 def check_admission():
+    # This route now redirects results back to the admission page to show inline
     if request.method == 'POST':
-        # Handle form submission for checking admission status
         access_username = request.form.get('access_username')
         access_password = request.form.get('access_password')
-        
         if not access_username or not access_password:
             flash('Please provide both username and password', 'error')
-            return render_template('check_admission.html')
+            return redirect(url_for('admission'))
         
-        # Check admission status using credentials
         result = check_admission_by_credentials(access_username, access_password)
-        
         if result:
-            return render_template(
-                'check_admission.html',
-                result=True,
-                status=result.get('status'),
-                paid_status=result.get('paid_status'),
-                details=result.get('details'),
-                access_username=access_username,
-                access_password=access_password
-            )
+            session['last_admission_status'] = {
+                'result': True,
+                'status': result.get('status'),
+                'paid_status': result.get('paid_status'),
+                'details': result.get('details'),
+                'access_username': access_username,
+                'access_password': access_password,
+            }
         else:
             flash('Invalid credentials. Please check your username and password.', 'error')
-            return render_template('check_admission.html', access_username=access_username)
-    
-    # Handle GET request
-    # Prefill with freshly generated credentials if available (single-use display)
-    last_creds = session.pop('last_admission_creds', None)
-    if last_creds:
-        return render_template('check_admission.html', from_submission=True, 
-                             access_username=last_creds.get('admission_username'), 
-                             access_password=last_creds.get('password'))
-    # Show last status result if available (single-use)
-    last_status = session.pop('last_admission_status', None)
-    if last_status:
-        return render_template(
-            'check_admission.html',
-            result=last_status.get('result'),
-            status=last_status.get('status'),
-            paid_status=last_status.get('paid_status'),
-            details=last_status.get('details'),
-            access_username=last_status.get('access_username'),
-            access_password=last_status.get('access_password')
-        )
-    return render_template('check_admission.html')
+        return redirect(url_for('admission'))
+
+    # GET: just bounce to admission where inline UI exists
+    return redirect(url_for('admission'))
 
 @app.route('/live-class-management')
 def live_class_management():

@@ -10,6 +10,24 @@ function showCategory(event, categoryId) {
     // Highlight clicked card only (do not reveal hidden resources)
     event.currentTarget.classList.add('active');
 
+    // Show resources section below the category cards
+    const resSection = document.querySelector('.resources-section');
+    if (resSection) {
+        resSection.classList.add('show');
+    }
+
+    // Switch visible category content to the selected one
+    document.querySelectorAll('.category-content').forEach(sec => sec.classList.remove('active'));
+    const target = document.getElementById(categoryId);
+    if (target) {
+        target.classList.add('active');
+    }
+
+    // Smooth scroll to resources so footer stays below them
+    if (resSection && typeof resSection.scrollIntoView === 'function') {
+        resSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     // Subtle click effect
     event.currentTarget.style.transform = 'scale(0.95)';
     setTimeout(() => {

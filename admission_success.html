@@ -43,15 +43,22 @@
     </div>
 
     <div class="creds">
-      <h3>Admission Portal Credentials (Save These)</h3>
-      <div><strong>Admission ID (Username):</strong> {{ creds.username }}</div>
-      <div><strong>Admission Password:</strong> {{ creds.password }}</div>
-      <div class="note">These credentials are used to check your admission status at any time on the Check Admission page.</div>
+      <h3>Credentials (Save These)</h3>
+      <div style="margin-bottom:0.4rem;"><strong>Admission Portal Username:</strong> <code>{{ creds.admission_username }}</code></div>
+      <div style="margin-bottom:0.6rem;"><strong>Admission Portal Password:</strong> <code>{{ creds.password }}</code></div>
+      <div style="margin-top:0.6rem; color:#334155;">
+        <strong>Student Portal Username:</strong> <code>{{ creds.login_username }}</code> (for login after approval)
+      </div>
+      <div class="note">Use the Admission Portal credentials on the Check Admission page to view your status. After approval, use the Student Portal username to sign in.</div>
     </div>
 
     <div class="actions">
-      <a class="btn" href="/check-admission">Go to Check Admission</a>
-      <a class="btn" style="margin-left:0.6rem; background:#0ea5e9" href="/check-admission-login">Open Admission Status Login</a>
+      <form id="checkNowForm" method="POST" action="/check-admission" style="display:inline-block; margin-right:0.6rem;">
+        <input type="hidden" name="access_username" value="{{ creds.admission_username }}">
+        <input type="hidden" name="access_password" value="{{ creds.password }}">
+        <button type="submit" class="btn">Check Admission Now</button>
+      </form>
+      <a class="btn" style="margin-left:0; background:#0ea5e9" href="/check-admission">Open Check Admission</a>
       <a class="btn" style="margin-left:0.6rem; background:#10b981" href="/">Back to Home</a>
     </div>
   </div>

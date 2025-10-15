@@ -660,10 +660,41 @@
             {% endwith %}
             
             <div class="form-note">
-                <strong>Important:</strong> All fields marked with <span class="required">*</span> are required. Please ensure all information is accurate and up-to-date.
+                <strong>Choose an action:</strong> Use the tabs below.
             </div>
+
+            <div style="display:flex; gap:0.6rem; margin-bottom:1rem; flex-wrap:wrap;">
+                <button type="button" class="tab-btn active admission-tab" id="tabNew">➕ New Admission</button>
+                <button type="button" class="tab-btn admission-tab" id="tabAnother">➕ Add Another</button>
+                <button type="button" class="tab-btn admission-tab" id="tabCheck">🔎 Check Status</button>
+            </div>
+
+            {% if last_student and last_creds %}
+            <div class="creds adm-creds" style="background:#f5f7ff; border:2px dashed #6a82fb; border-radius:12px; padding:1rem; margin-bottom:1rem;">
+                <h3 style="margin:0 0 0.6rem 0; color:#6a82fb;">Admission Submitted Successfully</h3>
+                <div style="margin-bottom:0.4rem; color:#232946; font-weight:600;">{{ last_student.student_name }} ({{ last_student.class }})</div>
+                <div style="margin-bottom:0.4rem;"><strong>Admission Portal Username:</strong> <code>{{ last_creds.admission_username }}</code></div>
+                <div style="margin-bottom:0.6rem;"><strong>Password:</strong> <code>{{ last_creds.password }}</code></div>
+                <form method="POST" action="/check-admission" style="display:inline-block;">
+                    <input type="hidden" name="access_username" value="{{ last_creds.admission_username }}" />
+                    <input type="hidden" name="access_password" value="{{ last_creds.password }}" />
+                    <button class="btn btn-primary" type="submit">Check Status Now</button>
+                </form>
+            </div>
+            {% endif %}
+            {% if last_status %}
+            <div class="creds adm-creds" style="background:#f0fff4; border:1px solid #bbf7d0; border-radius:12px; padding:1rem; margin-bottom:1rem;">
+                <h3 style="margin:0 0 0.6rem 0; color:#16a34a;">Status: {{ last_status.status|upper }}</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+                    <div><strong>Student</strong><div>{{ last_status.details.student_name }}</div></div>
+                    <div><strong>Class</strong><div>{{ last_status.details.class }}</div></div>
+                    <div><strong>School</strong><div>{{ last_status.details.school_name }}</div></div>
+                    <div><strong>Submitted</strong><div>{{ last_status.details.submitted_at }}</div></div>
+                </div>
+            </div>
+            {% endif %}
             
-            <form action="/admission" method="POST" enctype="multipart/form-data">
+            <form id="admissionFormForm" action="/admission" method="POST" enctype="multipart/form-data">
                 <!-- Student Information -->
                 <div class="form-section">
                     <h3 class="section-title">Student Information</h3>
@@ -765,6 +796,22 @@
                 
                 <button type="submit" class="submit-btn">Submit Admission Form</button>
             </form>
+            <form id="checkFormInline" method="POST" action="/check-admission" style="display:none; margin-top:1rem;">
+                <div class="form-section">
+                    <h3 class="section-title">Check Admission Status</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Admission Portal Username <span class="required">*</span></label>
+                            <input type="text" name="access_username" class="form-input" placeholder="e.g., ADM000123">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Admission Portal Password <span class="required">*</span></label>
+                            <input type="password" name="access_password" class="form-input" placeholder="Your password">
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-btn" style="margin-top:0.5rem;">Check Status</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -804,6 +851,19 @@
         // Check admission status on page load
         document.addEventListener('DOMContentLoaded', function() {
             checkAdmissionStatus();
+            // Tabs behavior
+            const tabNew = document.getElementById('tabNew');
+            const tabAnother = document.getElementById('tabAnother');
+            const tabCheck = document.getElementById('tabCheck');
+            const form = document.getElementById('admissionFormForm');
+            const checkForm = document.getElementById('checkFormInline');
+            function setActive(btn) {
+                [tabNew, tabAnother, tabCheck].forEach(b=>b && b.classList.remove('active'));
+                if (btn) btn.classList.add('active');
+            }
+            if (tabNew) tabNew.addEventListener('click', function(){ setActive(tabNew); form.style.display='block'; checkForm.style.display='none'; });
+            if (tabAnother) tabAnother.addEventListener('click', function(){ setActive(tabAnother); form.reset(); form.style.display='block'; checkForm.style.display='none'; });
+            if (tabCheck) tabCheck.addEventListener('click', function(){ setActive(tabCheck); form.style.display='none'; checkForm.style.display='block'; });
         });
         
         // Check admission status
@@ -912,7 +972,7 @@
         });
         
         // Form validation
-        document.querySelector('form').addEventListener('submit', function(e) {
+        document.getElementById('admissionFormForm').addEventListener('submit', function(e) {
             const requiredFields = document.querySelectorAll('[required]');
             let isValid = true;
             
@@ -931,6 +991,12 @@
             }
         });
     </script>
+
+    <style>
+      .admission-tab { background:#fff; border:1px solid #e0e7ff; border-radius:10px; padding:0.5rem 0.8rem; color:#232946; font-weight:700; box-shadow:0 2px 10px rgba(100,100,255,0.10); }
+      .admission-tab.active { color:#6a82fb; border-color:#6a82fb; box-shadow:0 8px 24px rgba(106,130,251,0.28); background:linear-gradient(135deg,#f8f9ff 0%, #eef2ff 100%); }
+      .adm-creds code { background:#1f2937; color:#e5e7eb; padding:0.1rem 0.35rem; border-radius:6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    </style>
 
 
     <!-- Notification Panel -->
