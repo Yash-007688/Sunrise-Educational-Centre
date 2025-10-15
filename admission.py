@@ -124,22 +124,22 @@ def check_admission():
         access_password = request.form.get('access_password')
         if not access_username or not access_password:
             flash('Please provide both username and password', 'error')
-            return render_template('check_admission.html')
+            return render_template('check_admission_login.html')
         result = _check_admission_by_credentials(access_username, access_password)
         if result:
-            return render_template('check_admission.html', result=True,
+            return render_template('check_admission_login.html', result=True,
                                    status=result.get('status'), paid_status=result.get('paid_status'),
                                    details=result.get('details'), access_username=access_username,
                                    access_password=access_password)
         flash('Invalid credentials. Please check your username and password.', 'error')
-        return render_template('check_admission.html', access_username=access_username)
+        return render_template('check_admission_login.html', access_username=access_username)
 
     last_creds = session.pop('last_admission_creds', None)
     if last_creds:
-        return render_template('check_admission.html', from_submission=True,
+        return render_template('check_admission_login.html', from_submission=True,
                                access_username=last_creds.get('admission_username'),
                                access_password=last_creds.get('password'))
-    return render_template('check_admission.html')
+    return render_template('check_admission_login.html')
 
 
 # ========= Admin Endpoints =========
