@@ -45,6 +45,23 @@
         color: #1e293b;
       }
 
+      /* Force black/dark text in light theme for common text nodes */
+      body:not(.dark-mode) .study-resources-page,
+      body:not(.dark-mode) .study-resources-page h1,
+      body:not(.dark-mode) .study-resources-page h2,
+      body:not(.dark-mode) .study-resources-page h3,
+      body:not(.dark-mode) .study-resources-page h4,
+      body:not(.dark-mode) .study-resources-page h5,
+      body:not(.dark-mode) .study-resources-page h6,
+      body:not(.dark-mode) .study-resources-page p,
+      body:not(.dark-mode) .study-resources-page span,
+      body:not(.dark-mode) .study-resources-page div,
+      body:not(.dark-mode) .study-resources-page li,
+      body:not(.dark-mode) .study-resources-page label,
+      body:not(.dark-mode) .study-resources-page a {
+        color: var(--text-color) !important;
+      }
+
       body.dark-mode .study-resources-page {
         background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
         background-size: 400% 400%;

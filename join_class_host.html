@@ -707,7 +707,8 @@ function insertEmojiHost(char) {
   if (input.setSelectionRange) input.setSelectionRange(newPos, newPos);
 }
     // Get class ID from URL
-    const classId = window.location.pathname.split('/').pop();
+    // Get class ID from URL (robust) and keep as string for consistent comparisons
+    const classId = String((window.location.pathname.replace(/\/+$/,'').split('/').pop() || '').match(/\d+/)?.[0] || '');
     
     // Enhanced Socket.IO connection with reconnection
     const socket = io({
@@ -718,6 +719,15 @@ function insertEmojiHost(char) {
       maxReconnectionAttempts: 10,
       forceNew: true
     });
+
+    // Normalize incoming payload class_id to string to avoid strict-equality mismatches
+    if (typeof socket.onAny === 'function') {
+      socket.onAny((event, data) => {
+        if (data && typeof data.class_id !== 'undefined') {
+          data.class_id = String(data.class_id);
+        }
+      });
+    }
     
     const room = 'liveclass_' + classId;
     let isConnected = false;

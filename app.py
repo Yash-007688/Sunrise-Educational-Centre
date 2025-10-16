@@ -1254,6 +1254,136 @@ def inject_global_variables():
         google_client_id=app.config.get('GOOGLE_CLIENT_ID')
     )
 
+# ----------------------------------------------------------------------------
+# Admission credentials security controls
+# ----------------------------------------------------------------------------
+# When True, plain-text admission credential fallback is disabled and only
+# hashed credentials in admission_access are honored.
+DISABLE_PLAIN_ADMISSION_FALLBACK = True
+
+def generate_secure_admission_username(admission_id: int) -> str:
+    """Generate a non-guessable admission username for portal access."""
+    # Example: ADM-8XfKcQ-000123 (random token + zero-padded id suffix)
+    try:
+        token = secrets.token_urlsafe(5).replace('-', '').replace('_', '')
+    except Exception:
+        token = os.urandom(6).hex()
+    return f"ADM-{token}-{int(admission_id):06d}"
+
+# ----------------------------------------------------------------------------
+# Phone-based admission status helpers
+# ----------------------------------------------------------------------------
+def _normalize_phone(raw: str) -> str:
+    s = (raw or '').strip()
+    # Keep digits only
+    digits = ''.join(ch for ch in s if ch.isdigit())
+    # Use last 10 digits if longer (common for +91, +1, etc.)
+    if len(digits) > 10:
+        return digits[-10:]
+    return digits
+
+def _looks_like_phone(value: str) -> bool:
+    v = (value or '').strip()
+    if not v:
+        return False
+    digits = ''.join(ch for ch in v if ch.isdigit())
+    return 10 <= len(digits) <= 13
+
+def check_admission_by_phone(student_phone: str):
+    """Find admission by phone and return status/details like credential check."""
+    phone_norm = _normalize_phone(student_phone)
+    if not phone_norm:
+        return None
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    try:
+        # Find most recent admission id for this phone
+        c.execute('''
+            SELECT id, student_name, class, school_name, status, submitted_at, student_phone
+            FROM admissions
+            WHERE student_phone LIKE ?
+            ORDER BY submitted_at DESC
+            LIMIT 25
+        ''', (f"%{phone_norm[-6:]}%",))
+        rows = c.fetchall()
+        admission_id = None
+        chosen_row = None
+        for row in rows:
+            # row: (id, student_name, class, school_name, status, submitted_at, student_phone)
+            if _normalize_phone(row[6]) == phone_norm:
+                admission_id = row[0]
+                chosen_row = row
+                break
+        if not admission_id:
+            conn.close()
+            return None
+
+        # If still in admissions (pending/in-review), return that
+        if chosen_row:
+            status = chosen_row[4]
+            result = {
+                'status': status,
+                'paid_status': 'unpaid',
+                'details': {
+                    'student_name': chosen_row[1],
+                    'class': chosen_row[2],
+                    'school_name': chosen_row[3],
+                    'submitted_at': chosen_row[5]
+                }
+            }
+        else:
+            result = None
+
+        # Check approved
+        c.execute('''
+            SELECT student_name, class, school_name, approved_at
+            FROM approved_admissions
+            WHERE original_admission_id = ?
+        ''', (admission_id,))
+        apr = c.fetchone()
+        if apr:
+            conn.close()
+            return {
+                'status': 'approved',
+                'paid_status': 'unpaid',
+                'details': {
+                    'student_name': apr[0],
+                    'class': apr[1],
+                    'school_name': apr[2],
+                    'submitted_at': apr[3]
+                }
+            }
+
+        # Check disapproved
+        c.execute('''
+            SELECT student_name, class, school_name, disapproved_at
+            FROM disapproved_admissions
+            WHERE original_admission_id = ?
+        ''', (admission_id,))
+        dis = c.fetchone()
+        if dis:
+            conn.close()
+            return {
+                'status': 'disapproved',
+                'paid_status': 'unpaid',
+                'details': {
+                    'student_name': dis[0],
+                    'class': dis[1],
+                    'school_name': dis[2],
+                    'submitted_at': dis[3]
+                }
+            }
+
+        conn.close()
+        return result
+    except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        print(f"Error checking admission by phone: {e}")
+        return None
+
 # Route for the main page
 @app.route('/')
 def home():
@@ -3971,41 +4101,63 @@ def check_admission_by_credentials(access_username, access_password):
     Check admission status using access credentials
     Returns admission details if found, None otherwise
     """
+    # Normalize incoming inputs (trim whitespace)
+    safe_username = (access_username or '').strip()
+    safe_password = (access_password or '').strip()
+
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     
     try:
         # Try hashed credentials first (stored in admission_access)
-        c.execute('SELECT admission_id, access_password FROM admission_access WHERE access_username = ?', (access_username,))
+        # Make username check case-insensitive to avoid mismatch
+        try:
+            c.execute('SELECT admission_id, access_password FROM admission_access WHERE access_username = ? COLLATE NOCASE', (safe_username,))
+        except Exception:
+            # Fallback without explicit COLLATE if older SQLite
+            c.execute('SELECT admission_id, access_password FROM admission_access WHERE lower(access_username) = lower(?)', (safe_username,))
         row = c.fetchone()
         admission_id = None
         if row:
             possible_adm_id, hashed_pw = row
             try:
-                if check_password_hash(hashed_pw, access_password):
+                if check_password_hash(hashed_pw, safe_password):
                     admission_id = possible_adm_id
             except Exception:
                 admission_id = None
         
-        # Fallback to plain-text credentials table if needed
-        if not admission_id:
-            # Fallback for legacy/plain password storage
+        # Fallback to plain-text credentials table if needed (only if not disabled)
+        if not admission_id and not DISABLE_PLAIN_ADMISSION_FALLBACK:
             try:
                 c.execute('''
                     SELECT admission_id 
                     FROM admission_access_plain 
-                    WHERE access_username = ? AND access_password_plain = ?
-                ''', (access_username, access_password))
+                    WHERE access_username = ? COLLATE NOCASE AND access_password_plain = ?
+                ''', (safe_username, safe_password))
                 plain = c.fetchone()
             except sqlite3.OperationalError:
                 c.execute('''
                     SELECT admission_id 
                     FROM admission_access_plain 
-                    WHERE access_username = ? AND plain_password = ?
-                ''', (access_username, access_password))
+                    WHERE access_username = ? COLLATE NOCASE AND plain_password = ?
+                ''', (safe_username, safe_password))
                 plain = c.fetchone()
             if plain:
                 admission_id = plain[0]
+
+        # Additional fallback: some users may try login_username instead of access_username
+        if not admission_id and not DISABLE_PLAIN_ADMISSION_FALLBACK:
+            try:
+                c.execute('''
+                    SELECT admission_id 
+                    FROM admission_access_plain 
+                    WHERE login_username = ? COLLATE NOCASE AND access_password_plain = ?
+                ''', (safe_username, safe_password))
+                alt = c.fetchone()
+                if alt:
+                    admission_id = alt[0]
+            except Exception:
+                pass
         
         if not admission_id:
             conn.close()
@@ -4178,8 +4330,8 @@ def admission():
         # Generate admission portal credentials immediately
         new_admission_id = c.lastrowid
         try:
-            # Generate unique admission username (for admission portal access)
-            admission_username = generate_admission_username(new_admission_id, request.form['student_name'])
+            # Generate secure admission username (non-guessable)
+            admission_username = generate_secure_admission_username(new_admission_id)
             
             # Use normalized student name as login username (lowercase, no spaces)
             login_username = (request.form['student_name'] or '').strip().lower().replace(' ', '')
@@ -4192,17 +4344,18 @@ def admission():
             c.execute('''INSERT OR IGNORE INTO admission_access (admission_id, access_username, access_password)
                          VALUES (?, ?, ?)''', (new_admission_id, admission_username, hashed_pw))
             
-            # Also store plain password for admin viewing
+            # Optionally store plain password for admin viewing only if fallback enabled
             c.execute('''CREATE TABLE IF NOT EXISTS admission_access_plain (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 admission_id INTEGER NOT NULL UNIQUE,
                 access_username TEXT UNIQUE,
-                access_password_plain TEXT NOT NULL,
+                access_password_plain TEXT,
                 login_username TEXT,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )''')
-            c.execute('''INSERT OR REPLACE INTO admission_access_plain (admission_id, access_username, access_password_plain, login_username)
-                         VALUES (?, ?, ?, ?)''', (new_admission_id, admission_username, access_password, login_username))
+            if not DISABLE_PLAIN_ADMISSION_FALLBACK:
+                c.execute('''INSERT OR REPLACE INTO admission_access_plain (admission_id, access_username, access_password_plain, login_username)
+                             VALUES (?, ?, ?, ?)''', (new_admission_id, admission_username, access_password, login_username))
             
             # Store credentials temporarily in session to display once (not persisted)
             session['last_admission_creds'] = {
@@ -4227,7 +4380,7 @@ def admission():
         conn.close()
         
         # Add success message
-        flash('Admission submitted successfully! Please save your credentials.', 'success')
+        flash('Admission submitted successfully! You can check status using your phone number.', 'success')
         
         # Build student summary and render success page
         student = {
@@ -4267,13 +4420,22 @@ def admission():
 def check_admission():
     # This route now redirects results back to the admission page to show inline
     if request.method == 'POST':
-        access_username = request.form.get('access_username')
-        access_password = request.form.get('access_password')
-        if not access_username or not access_password:
-            flash('Please provide both username and password', 'error')
+        access_username = (request.form.get('access_username') or '').strip()
+        access_password = (request.form.get('access_password') or '').strip()
+        if not access_username and not access_password:
+            flash('Please provide username/password or phone number', 'error')
             return redirect(url_for('admission'))
-        
-        result = check_admission_by_credentials(access_username, access_password)
+
+        # If user typed a phone number in the username field, support phone-based check
+        result = None
+        if _looks_like_phone(access_username) and not access_password:
+            result = check_admission_by_phone(access_username)
+        else:
+            # Fall back to credential-based verification
+            if not access_username or not access_password:
+                flash('Please provide both username and password', 'error')
+                return redirect(url_for('admission'))
+            result = check_admission_by_credentials(access_username, access_password)
         if result:
             session['last_admission_status'] = {
                 'result': True,
@@ -6195,7 +6357,7 @@ def api_check_admission_credentials():
             return jsonify({'valid': False, 'error': 'Missing credentials'}), 400
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
-        c.execute('SELECT access_password FROM admission_access WHERE access_username=?',
+        c.execute('SELECT access_password FROM admission_access WHERE access_username=? COLLATE NOCASE',
                   (access_username,))
         row = c.fetchone()
         conn.close()
@@ -6295,7 +6457,7 @@ def check_admission_login():
         print(f"DEBUG: Connecting to database to check credentials")
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
-        c.execute('SELECT admission_id, access_password FROM admission_access WHERE access_username=?',
+        c.execute('SELECT admission_id, access_password FROM admission_access WHERE access_username=? COLLATE NOCASE',
                   (access_username,))
         row = c.fetchone()
         

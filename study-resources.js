@@ -114,7 +114,8 @@ function searchResources() {
 
 // Smooth animations for category tabs
 function animateCategoryTabs() {
-    const categoryTabs = document.querySelectorAll('.category-tab');
+    // Match actual category cards used in the page
+    const categoryTabs = document.querySelectorAll('.category-card');
     
     categoryTabs.forEach((tab, index) => {
         // Add staggered animation
@@ -163,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Show the first category tab by default
-    const firstCategoryTab = document.querySelector('.category-tab');
+    const firstCategoryTab = document.querySelector('.category-card');
     if (firstCategoryTab) {
         firstCategoryTab.click();
     }
