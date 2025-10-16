@@ -1,13 +1,17 @@
+/* Global theme-aware text color */
+:root { --text-color: #111827; /* slate-900 */ }
+body.dark-mode { --text-color: #f4f4f4; }
+
 body {
   font-family: 'Inter', Arial, sans-serif;
   background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%);
   margin: 0;
-  color: #222;
+  color: var(--text-color);
 }
 
 body.dark-mode {
   background: linear-gradient(120deg, #232946 0%, #16161a 100%);
-  color: #f4f4f4;
+  color: var(--text-color);
 }
 
 /* Ensure homepage hero black-glass looks right in dark mode */

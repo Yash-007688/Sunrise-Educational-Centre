@@ -17,12 +17,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+      /* CSS Variables for Theme Support */
+      :root {
+        --glass-bg: rgba(255, 255, 255, 0.9);
+        --glass-border: rgba(0, 0, 0, 0.1);
+        --glass-blur: blur(20px);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        --radius-xl: 20px;
+      }
+
+      body.dark-mode {
+        --glass-bg: rgba(5, 6, 10, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.15);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
       /* Study Resources Page - Modern Design System */
       .study-resources-page {
         min-height: 100vh;
         font-family: 'Inter', sans-serif;
         overflow-x: hidden;
         position: relative;
+        /* Light theme background */
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e1 50%, #94a3b8 75%, #64748b 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+        color: #1e293b;
       }
 
       body.dark-mode .study-resources-page {
@@ -45,9 +65,13 @@
 
       .particle {
         position: absolute;
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(106, 130, 251, 0.1);
         border-radius: 50%;
         animation: float 6s ease-in-out infinite;
+      }
+
+      body.dark-mode .particle {
+        background: rgba(255, 255, 255, 0.1);
       }
 
       .particle:nth-child(1) {
@@ -137,18 +161,57 @@
         font-size: clamp(2.5rem, 6vw, 4rem);
         font-weight: 800;
         margin-bottom: 1rem;
-        background: linear-gradient(135deg, #fff 0%, #e0e7ff 50%, #c7d2fe 100%);
+        background: linear-gradient(135deg, #1e293b 0%, #3b82f6 50%, #6366f1 100%);
+        color: transparent;
+        -webkit-background-clip: text;
+        background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         text-shadow: 0 4px 8px rgba(0,0,0,0.3);
       }
 
+      body.dark-mode .hero-title {
+        background: linear-gradient(135deg, #fff 0%, #e0e7ff 50%, #c7d2fe 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 4px 8px rgba(255,255,255,0.1);
+      }
+
       .hero-subtitle {
         font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-        color: rgba(255,255,255,0.9);
+        color: rgba(30, 41, 59, 0.8);
         margin-bottom: 2rem;
         line-height: 1.6;
+      }
+
+      body.dark-mode .hero-subtitle {
+        color: rgba(255,255,255,0.9);
+      }
+
+      /* Glass Card Styling */
+      .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+      }
+
+      body.dark-mode .glass-card {
+        background: rgba(5, 6, 10, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      /* User Status Card Theme Support */
+      body.dark-mode .glass-card .user-class-name {
+        color: #fff !important;
+      }
+
+      body.dark-mode .glass-card .user-class-label {
+        color: rgba(255,255,255,0.7) !important;
       }
 
       .btn-cta {
@@ -217,9 +280,13 @@
       .resources-section {
         width: 100%;
         padding: 2rem 2rem 2rem 2rem;
-        background: rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.1);
         margin-bottom: 0;
-        display: none; /* Hidden by default so footer sits below cards */
+        display: block; /* Show by default */
+      }
+
+      body.dark-mode .resources-section {
+        background: rgba(0, 0, 0, 0.1);
       }
 
       .resources-section-header {
@@ -654,7 +721,7 @@
 
     </style>
   </head>
-  <body class="hero-modern">
+  <body class="study-resources-page">
     <!-- Enhanced Floating Particles Background -->
     <div class="floating-particles">
         <div class="particle"></div>
@@ -703,9 +770,9 @@
     </div>
     <!-- Main Content -->
     <main class="main-content">
-      <!-- Hero Section - Above Category Cards -->
+      <!-- Enhanced Hero Section -->
       <section class="hero-section">
-      <div class="hero-content">
+        <div class="hero-content">
           <h1 class="hero-title">Study Resources</h1>
           <p class="hero-subtitle">Access comprehensive notes, worksheets, practice problems, and solutions designed to help you excel in your studies</p>
         
@@ -715,25 +782,24 @@
             <div style="display: flex; align-items: center; gap: 1rem;">
               <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: white;">{{ class_name[0]|upper if class_name else 'C' }}</div>
               <div style="text-align: left;">
-                <div style="color: #fff; font-size: 1.1rem; font-weight: 600;">{{ class_name|title }}</div>
-                <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Your Class</div>
+                <div class="user-class-name" style="color: #1e293b; font-size: 1.1rem; font-weight: 600;">{{ class_name|title }}</div>
+                <div class="user-class-label" style="color: rgba(30, 41, 59, 0.7); font-size: 0.9rem;">Your Class</div>
               </div>
             </div>
             <div style="padding: 0.75rem 1.5rem; background: {{ 'rgba(0,200,140,0.2)' if paid_status == 'paid' else 'rgba(255,215,0,0.2)' }}; border: 1px solid {{ 'rgba(0,200,140,0.4)' if paid_status == 'paid' else 'rgba(255,215,0,0.4)' }}; border-radius: 25px; color: {{ '#aef9e4' if paid_status == 'paid' else '#ffd700' }}; font-weight: 600;">
-                {{ '🔓 Premium Access - All Resources' if paid_status == 'paid' else '🔒 Basic Access - Free Resources Only' }}
+                {{ '🔓 Premium Access - All Resources (Paid + Free)' if paid_status == 'paid' else '🔒 Basic Access - Free Resources Only' }}
             </div>
           </div>
         </div>
       </div>
     </section>
 
-      <!-- Category Section -->
+      <!-- Enhanced Category Section -->
       <section class="category-section">
-      <div class="container">
         <div class="category-section-header">
           <h2 class="category-section-title">Choose Your Category</h2>
           <p class="category-section-subtitle">Select a category to explore our comprehensive study materials</p>
-      </div>
+        </div>
         
         <!-- Category Cards -->
         <div class="category-cards-grid">
@@ -774,12 +840,21 @@
       </div>
     </section>
 
-      <!-- Resources Section -->
+      <!-- Enhanced Resources Section -->
       <section class="resources-section">
-        <div class="container">
         <div class="resources-section-header">
           <h2 class="resources-section-title">Study Materials</h2>
-          <p class="section-subtitle">Browse through our collection of educational resources</p>
+          <p class="section-subtitle">Browse through our collection of educational resources. Click on any category above to filter resources.</p>
+          <div style="background: rgba(106, 130, 251, 0.1); border: 1px solid rgba(106, 130, 251, 0.3); border-radius: 10px; padding: 1rem; margin: 1rem auto; max-width: 600px; text-align: center;">
+            <p style="margin: 0; color: rgba(255,255,255,0.9); font-size: 0.9rem;">
+              💡 <strong>Tip:</strong> Click on any category card above to see resources for that specific type. 
+              {% if paid_status == 'paid' %}
+                You have premium access to all resources (both paid and free)!
+              {% else %}
+                You can access free resources. Upgrade to premium to unlock paid resources!
+              {% endif %}
+            </p>
+          </div>
         </div>
         
         <!-- Resources for each category -->
@@ -808,19 +883,10 @@
                   
                   {# Check if user has access to this resource #}
                   {% if resource_paid_status == 'paid' and paid_status != 'paid' %}
-                    {# For unpaid users, still show the card but lock download/preview #}
-                    <div class="resource-card" style="opacity:0.9;">
-                      <div class="resource-badge premium">Premium</div>
-                      <h3>{{ title }}</h3>
-                      {% if description %}
-                        <div class="description">{{ description }}</div>
-                      {% endif %}
-                      <div class="filename">{{ filename }}</div>
-                      <button class="btn-preview" disabled style="cursor:not-allowed; opacity:0.7;">🔒 Upgrade to Access</button>
-                    </div>
-                    {% set has_accessible_resources = true %}
+                    {# For unpaid users, don't show paid resources at all #}
+                    {# This resource is hidden from unpaid users #}
                   {% else %}
-                    {# User has access to this resource #}
+                    {# User has access to this resource (either free resource or paid user accessing paid resource) #}
                     <div class="resource-card">
                       {% if resource_paid_status == 'paid' %}
                         <div class="resource-badge premium">Premium</div>
@@ -833,7 +899,7 @@
                       {% endif %}
                       <div class="filename">{{ filename }}</div>
                       <a href="/preview/{{ filename }}" class="btn-preview">📖 Preview Document</a>
-                      </div>
+                    </div>
                     {% set has_accessible_resources = true %}
                   {% endif %}
                   {% endif %}
@@ -940,11 +1006,22 @@
     <script src="study-resources.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // Ensure resources are hidden until a category is selected
+        // Show resources section by default
         const resSection = document.querySelector('.resources-section');
         if (resSection) {
-          resSection.classList.remove('show');
+          resSection.classList.add('show');
+        }
+        
+        // Show the first category by default
+        const firstCategory = document.querySelector('.category-card');
+        if (firstCategory) {
+          firstCategory.classList.add('active');
+          const firstCategoryId = firstCategory.getAttribute('onclick').match(/'([^']+)'/)[1];
+          const firstCategoryContent = document.getElementById(firstCategoryId);
+          if (firstCategoryContent) {
+            firstCategoryContent.classList.add('active');
           }
+        }
       });
     </script>
     <script src="navbar-functions.js"></script>
