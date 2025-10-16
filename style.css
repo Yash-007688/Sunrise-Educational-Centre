@@ -9,6 +9,77 @@ body {
   color: var(--text-color);
 }
 
+/* Force consistent text color across pages in light mode */
+body:not(.dark-mode) h1,
+body:not(.dark-mode) h2,
+body:not(.dark-mode) h3,
+body:not(.dark-mode) h4,
+body:not(.dark-mode) h5,
+body:not(.dark-mode) h6,
+body:not(.dark-mode) p,
+body:not(.dark-mode) span,
+body:not(.dark-mode) div,
+body:not(.dark-mode) li,
+body:not(.dark-mode) label,
+body:not(.dark-mode) strong,
+body:not(.dark-mode) b,
+body:not(.dark-mode) a,
+body:not(.dark-mode) small,
+body:not(.dark-mode) em {
+  color: var(--text-color) !important;
+}
+
+/* Force consistent text color across pages in dark mode */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode div,
+body.dark-mode li,
+body.dark-mode label,
+body.dark-mode strong,
+body.dark-mode b,
+body.dark-mode a,
+body.dark-mode small,
+body.dark-mode em {
+  color: var(--text-color) !important;
+}
+
+/* Theme-based global button colors (exclude hero panel/buttons) */
+/* Dark theme: buttons become white */
+body.dark-mode .btn:not(.hero-section .btn):not(.hero-buttons .uiverse-btn),
+body.dark-mode a.btn:not(.hero-section .btn):not(.hero-buttons .uiverse-btn),
+body.dark-mode .btn-primary:not(.hero-section .btn-primary):not(.hero-buttons .uiverse-btn),
+body.dark-mode .btn-secondary:not(.hero-section .btn-secondary):not(.hero-buttons .uiverse-btn),
+body.dark-mode .btn-modern:not(.hero-section .btn-modern):not(.hero-buttons .uiverse-btn),
+body.dark-mode .btn-primary-modern:not(.hero-section .btn-primary-modern):not(.hero-buttons .uiverse-btn),
+body.dark-mode .btn-secondary-modern:not(.hero-section .btn-secondary-modern):not(.hero-buttons .uiverse-btn),
+body.dark-mode .uiverse-gradient-btn:not(.hero-section .uiverse-gradient-btn):not(.hero-buttons .uiverse-btn),
+body.dark-mode button:not(.hero-section button):not(.hero-buttons .uiverse-btn) {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-color: rgba(0,0,0,0.15) !important;
+}
+
+/* Light theme: buttons become dark */
+body:not(.dark-mode) .btn:not(.hero-section .btn):not(.hero-buttons .uiverse-btn),
+body:not(.dark-mode) a.btn:not(.hero-section .btn):not(.hero-buttons .uiverse-btn),
+body:not(.dark-mode) .btn-primary:not(.hero-section .btn-primary):not(.hero-buttons .uiverse-btn),
+body:not(.dark-mode) .btn-secondary:not(.hero-section .btn-secondary):not(.hero-buttons .uiverse-btn),
+body:not(.dark-mode) .btn-modern:not(.hero-section .btn-modern):not(.hero-buttons .uiverse-btn),
+body:not(.dark-mode) .btn-primary-modern:not(.hero-section .btn-primary-modern):not(.hero-buttons .uiverse-btn),
+body:not(.dark-mode) .btn-secondary-modern:not(.hero-section .btn-secondary-modern):not(.hero-buttons .uiverse-btn),
+body:not(.dark-mode) .uiverse-gradient-btn:not(.hero-section .uiverse-gradient-btn):not(.hero-buttons .uiverse-btn),
+body:not(.dark-mode) button:not(.hero-section button):not(.hero-buttons .uiverse-btn) {
+  background: #0f172a !important; /* slate-900 */
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.2) !important;
+}
+
 body.dark-mode {
   background: linear-gradient(120deg, #232946 0%, #16161a 100%);
   color: var(--text-color);
@@ -3291,6 +3362,16 @@ body.dark-mode #faq .faq-answer {
   body.dark-mode .notification-item:hover {
     background: #44476a !important;
   }
+}
+
+/* Ensure navbar text is white in both light and dark themes */
+.navbar,
+.navbar a,
+.nav-logo span,
+body.dark-mode .navbar,
+body.dark-mode .navbar a,
+body.dark-mode .nav-logo span {
+  color: #fff !important;
 }
 
 /* Dark Mode for New Styles */
