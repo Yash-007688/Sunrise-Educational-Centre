@@ -48,10 +48,12 @@
         }
         
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            /* Light theme background (white) */
+            background: #ffffff;
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
+            color: var(--text-color);
         }
         
         .admission-container {
@@ -151,7 +153,7 @@
         /* Dark Mode Styles */
         body.dark-mode {
             background: linear-gradient(135deg, #232946 0%, #16161a 100%);
-            color: #f4f4f4;
+            color: var(--text-color);
         }
         
         body.dark-mode .admission-card {

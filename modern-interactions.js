@@ -390,6 +390,8 @@ class ThemeSwitcher {
 
     init() {
         const toggles = document.querySelectorAll('#darkModeToggle, #footerThemeToggle');
+        const slider = document.getElementById('footerThemeSlider');
+        const sliderLabel = document.getElementById('footerThemeSliderLabel');
 
         toggles.forEach(toggle => {
             if (!toggle.dataset.boundTheme) {
@@ -409,7 +411,27 @@ class ThemeSwitcher {
         } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.body.classList.add('dark-mode');
         }
+
+        // Initialize footer slider state and bind change
+        if (slider && !slider.dataset.boundTheme) {
+            slider.checked = document.body.classList.contains('dark-mode');
+            slider.addEventListener('change', () => {
+                const wantDark = !!slider.checked;
+                document.body.classList.toggle('dark-mode', wantDark);
+                try {
+                    localStorage.setItem('preferredTheme', wantDark ? 'dark' : 'light');
+                    localStorage.setItem('theme', wantDark ? 'dark' : 'light');
+                } catch (e) {}
+                this.updateToggleText();
+                this.updateFooterSlider(slider, sliderLabel);
+                document.body.style.transition = 'all 0.3s ease';
+                setTimeout(() => { document.body.style.transition = ''; }, 300);
+            });
+            slider.dataset.boundTheme = 'true';
+        }
+
         this.updateToggleText();
+        this.updateFooterSlider(slider, sliderLabel);
     }
 
     toggleTheme() {
@@ -439,6 +461,14 @@ class ThemeSwitcher {
             toggle.textContent = isDark ? '☀️' : '🌙';
             toggle.title = isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode';
         });
+    }
+
+    updateFooterSlider(sliderEl, labelEl) {
+        const isDark = document.body.classList.contains('dark-mode');
+        const slider = sliderEl || document.getElementById('footerThemeSlider');
+        const label = labelEl || document.getElementById('footerThemeSliderLabel');
+        if (slider) slider.checked = isDark;
+        if (label) label.textContent = isDark ? 'Dark' : 'Light';
     }
 }
 
