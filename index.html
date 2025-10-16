@@ -122,7 +122,6 @@
         /* Hero Section */
         .hero-section {
             min-height: 100vh;
-            background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('attached_assets/image_1750584670920.png') center/cover no-repeat;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -130,6 +129,49 @@
             color: white;
             position: relative;
             overflow: hidden;
+        }
+
+        /* Hero Background Slider */
+        .hero-background-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .hero-bg-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .hero-bg-slide.active {
+            opacity: 1;
+        }
+
+        .hero-bg-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
+            z-index: 2;
         }
 
         .hero-section::before {
@@ -431,11 +473,334 @@
             100% { transform: translateY(-100px) rotate(360deg); }
         }
 
+        /* Testimonial Slider Styles */
+        .testimonial-slider-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        .testimonial-slider-wrapper {
+            overflow: hidden;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .testimonial-slider {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .testimonial-slide {
+            min-width: 100%;
+            padding: 0 1rem;
+            box-sizing: border-box;
+        }
+
+        .testimonial-slide.active {
+            display: block;
+        }
+
+        .testimonial-navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .testimonial-nav-btn {
+            background: rgba(5, 6, 10, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+        }
+
+        .testimonial-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+        }
+
+        .testimonial-nav-btn:active {
+            transform: scale(0.95);
+        }
+
+        .testimonial-dots {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .testimonial-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .testimonial-dot.active {
+            background: rgba(255, 255, 255, 0.9);
+            transform: scale(1.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .testimonial-dot:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(1.2);
+        }
+
+        /* Responsive testimonial slider */
+        @media (max-width: 768px) {
+            .testimonial-slider-container {
+                padding: 1rem 0;
+            }
+            
+            .testimonial-navigation {
+                gap: 1rem;
+                margin-top: 1.5rem;
+            }
+            
+            .testimonial-nav-btn {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .testimonial-dots {
+                gap: 0.75rem;
+            }
+            
+            .testimonial-dot {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        /* Reviews Modal Styles */
+        .reviews-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .reviews-modal-content {
+            background: rgba(5, 6, 10, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 20px;
+            margin: 2% auto;
+            padding: 2rem;
+            width: 95%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            position: relative;
+        }
+
+        .reviews-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .reviews-modal-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .reviews-modal-close {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .reviews-modal-close:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .review-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .review-card::before {
+            content: '"';
+            position: absolute;
+            top: -5px;
+            left: 15px;
+            font-size: 3rem;
+            color: rgba(106, 130, 251, 0.3);
+            font-family: serif;
+            line-height: 1;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(106, 130, 251, 0.5);
+        }
+
+        .review-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .review-author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .review-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .review-info h5 {
+            margin: 0;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .review-info p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+        }
+
+        .review-rating {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive reviews grid */
+        @media (max-width: 1024px) {
+            .reviews-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .reviews-modal-content {
+                margin: 5% auto;
+                padding: 1.5rem;
+                width: 98%;
+            }
+            
+            .reviews-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .reviews-modal-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .hero-content {
-            z-index: 2;
+            z-index: 3;
             max-width: 800px;
             padding: 0 20px;
             animation: fadeInUp 1s ease-out 0.5s both;
+            position: relative;
+        }
+
+        /* Hero Slider Indicators */
+        .hero-slider-indicators {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 4;
+        }
+
+        .hero-indicator {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .hero-indicator.active {
+            background: rgba(255, 255, 255, 0.9);
+            transform: scale(1.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .hero-indicator:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(1.2);
         }
 
         .hero-logo {
@@ -488,6 +853,7 @@
             flex-wrap: wrap;
             animation: fadeInUp 1s ease-out 1.4s both;
         }
+
 
         .btn-hero {
             padding: 15px 30px;
@@ -871,6 +1237,15 @@
                 align-items: center;
             }
 
+            .hero-slider-indicators {
+                bottom: 20px;
+            }
+
+            .hero-indicator {
+                width: 12px;
+                height: 12px;
+            }
+
             .contact-grid {
                 flex-direction: column;
                 align-items: center;
@@ -895,6 +1270,15 @@
                 font-size: 1rem;
             }
 
+            .hero-slider-indicators {
+                bottom: 15px;
+            }
+
+            .hero-indicator {
+                width: 10px;
+                height: 10px;
+            }
+
             /* Responsive Admission Button */
             .admission-btn {
                 width: 180px;
@@ -903,13 +1287,6 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .admission-btn {
-                width: 160px;
-                height: 45px;
-                font-size: 0.9rem;
-            }
-        }
     </style>
 </head>
 <body>
@@ -958,8 +1335,21 @@
     </div>
 
 
-    <!-- Enhanced Hero Section with Floating Particles -->
+    <!-- Enhanced Hero Section with Background Image Slider -->
     <section class="hero-section hero-modern">
+        <!-- Background Image Slider -->
+        <div class="hero-background-slider">
+            <div class="hero-bg-slide active">
+                <img src="./hero pannel/2023_2024_scholars.jpeg" alt="2023-2024 Scholars" class="hero-bg-image">
+                <div class="hero-bg-overlay"></div>
+            </div>
+            <div class="hero-bg-slide">
+                <img src="./hero pannel/2024_2025_achievements.jpeg" alt="2024-2025 Achievements" class="hero-bg-image">
+                <div class="hero-bg-overlay"></div>
+            </div>
+        </div>
+        
+        <!-- Floating Particles -->
         <div class="floating-particles">
             <div class="particle"></div>
             <div class="particle"></div>
@@ -971,6 +1361,14 @@
             <div class="particle"></div>
             <div class="particle"></div>
         </div>
+        
+        <!-- Slider Indicators -->
+        <div class="hero-slider-indicators">
+            <span class="hero-indicator active" data-slide="0"></span>
+            <span class="hero-indicator" data-slide="1"></span>
+        </div>
+        
+        <!-- Hero Content -->
         <div class="hero-content hero-content-modern">
             <div class="logo-container">
                 <img src="attached_assets/image_1750584670920.png" alt="Sunrise Educational Centre" class="main-logo">
@@ -978,6 +1376,7 @@
             </div>
             <h1 id="typing-hero" class="hero-title-modern" style="border-right: 2px solid rgba(255,255,255,0.8); white-space: nowrap; overflow: hidden; display: inline-block; padding-right: 8px; min-height: 1em;"> </h1>
             <p class="hero-subtitle-modern">Empowering students from Class 9 to 12 with expert coaching, personalized attention, and a proven track record of success. Join our vibrant learning community and unlock your full potential!</p>
+            
             <div class="hero-buttons hero-buttons-modern">
                 <a href="/admission" class="uiverse-btn uiverse-primary" style="margin: 10px;">
                     <span class="btn-icon">🎓</span>
@@ -1003,62 +1402,111 @@
     <section id="testimonials" class="card-section scroll-reveal" style="margin:3rem 0 2.5rem 0;">
         <div class="container">
             <h2 class="heading-modern heading-lg text-center">What Our Students Say</h2>
-            <div class="card-grid-modern">
-                <div class="testimonial-card floating-element">
-                    <p class="testimonial-text">“The concepts finally clicked! The personalized attention and doubt-clearing sessions helped me jump from average to excellent.”</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">AK</div>
-                        <div class="testimonial-info">
-                            <h4>Arjun Kumar</h4>
-                            <p>Class 10 • Scored 95% in Maths</p>
+            
+            <!-- Testimonial Slider Container -->
+            <div class="testimonial-slider-container">
+                <div class="testimonial-slider-wrapper">
+                    <div class="testimonial-slider" id="testimonialSlider">
+                        <div class="testimonial-slide">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">"The concepts finally clicked! The personalized attention and doubt-clearing sessions helped me jump from average to excellent."</p>
+                                <div class="testimonial-author">
+                                    <div class="testimonial-avatar">AK</div>
+                                    <div class="testimonial-info">
+                                        <h4>Arjun Kumar</h4>
+                                        <p>Class 10 • Scored 95% in Maths</p>
+                                    </div>
+                                </div>
+                                <div style="margin-top:1rem;">⭐️⭐️⭐️⭐️⭐️</div>
+                            </div>
                         </div>
-                    </div>
-                    <div style="margin-top:1rem;">⭐️⭐️⭐️⭐️⭐️</div>
-                </div>
 
-                <div class="testimonial-card floating-element" style="animation-delay: .3s;">
-                    <p class="testimonial-text">“Crisp notes, regular practice, and mock tests made all the difference. I improved my speed and accuracy a lot.”</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">PS</div>
-                        <div class="testimonial-info">
-                            <h4>Priya Sharma</h4>
-                            <p>Class 12 • JEE Prep Batch</p>
+                        <div class="testimonial-slide">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">"Crisp notes, regular practice, and mock tests made all the difference. I improved my speed and accuracy a lot."</p>
+                                <div class="testimonial-author">
+                                    <div class="testimonial-avatar">PS</div>
+                                    <div class="testimonial-info">
+                                        <h4>Priya Sharma</h4>
+                                        <p>Class 12 • JEE Prep Batch</p>
+                                    </div>
+                                </div>
+                                <div style="margin-top:1rem;">⭐️⭐️⭐️⭐️⭐️</div>
+                            </div>
                         </div>
-                    </div>
-                    <div style="margin-top:1rem;">⭐️⭐️⭐️⭐️⭐️</div>
-                </div>
 
-                <div class="testimonial-card floating-element" style="animation-delay: .6s;">
-                    <p class="testimonial-text">“The teaching style is engaging and practical. Weekly targets kept me consistent and motivated.”</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">RM</div>
-                        <div class="testimonial-info">
-                            <h4>Rahul Mehta</h4>
-                            <p>Class 11 • Applied Mathematics</p>
+                        <div class="testimonial-slide">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">"The teaching style is engaging and practical. Weekly targets kept me consistent and motivated."</p>
+                                <div class="testimonial-author">
+                                    <div class="testimonial-avatar">RM</div>
+                                    <div class="testimonial-info">
+                                        <h4>Rahul Mehta</h4>
+                                        <p>Class 11 • Applied Mathematics</p>
+                                    </div>
+                                </div>
+                                <div style="margin-top:1rem;">⭐️⭐️⭐️⭐️⭐️</div>
+                            </div>
                         </div>
-                    </div>
-                    <div style="margin-top:1rem;">⭐️⭐️⭐️⭐️⭐️</div>
-                </div>
 
-                <div class="testimonial-card floating-element" style="animation-delay: .9s;">
-                    <p class="testimonial-text">“Best institute for strong fundamentals. The teachers genuinely care about your progress.”</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">SN</div>
-                        <div class="testimonial-info">
-                            <h4>Shreya Narang</h4>
-                            <p>Class 9 • Foundation Course</p>
+                        <div class="testimonial-slide">
+                            <div class="testimonial-card">
+                                <p class="testimonial-text">"Best institute for strong fundamentals. The teachers genuinely care about your progress."</p>
+                                <div class="testimonial-author">
+                                    <div class="testimonial-avatar">SN</div>
+                                    <div class="testimonial-info">
+                                        <h4>Shreya Narang</h4>
+                                        <p>Class 9 • Foundation Course</p>
+                                    </div>
+                                </div>
+                                <div style="margin-top:1rem;">⭐️⭐️⭐️⭐️⭐️</div>
+                            </div>
                         </div>
                     </div>
-                    <div style="margin-top:1rem;">⭐️⭐️⭐️⭐️⭐️</div>
+                </div>
+                
+                <!-- Slider Navigation -->
+                <div class="testimonial-navigation">
+                    <button class="testimonial-nav-btn prev-btn" onclick="changeTestimonialSlide(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="testimonial-dots">
+                        <span class="testimonial-dot active" onclick="currentTestimonialSlide(1)"></span>
+                        <span class="testimonial-dot" onclick="currentTestimonialSlide(2)"></span>
+                        <span class="testimonial-dot" onclick="currentTestimonialSlide(3)"></span>
+                        <span class="testimonial-dot" onclick="currentTestimonialSlide(4)"></span>
+                    </div>
+                    <button class="testimonial-nav-btn next-btn" onclick="changeTestimonialSlide(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
             </div>
 
             <div style="text-align:center; margin-top: .5rem; display:flex; gap:.75rem; justify-content:center; flex-wrap:wrap;">
-                <a href="/forum" class="uiverse-btn">💬 Read more reviews</a>
+                <button onclick="showAllReviews()" class="uiverse-btn">💬 Read more reviews</button>
                 <a href="#contact" class="morph-btn" style="width:auto; padding:10px 16px; height:auto;">✍️ Write a review</a>
             </div>
         </div>
     </section>
+
+    <!-- Reviews Modal -->
+    <div id="reviewsModal" class="reviews-modal">
+        <div class="reviews-modal-content">
+            <div class="reviews-modal-header">
+                <h2 class="reviews-modal-title">🌟 Student Reviews & Testimonials</h2>
+                <span class="reviews-modal-close" onclick="closeReviewsModal()">&times;</span>
+            </div>
+            
+            <div class="reviews-grid" id="reviewsGrid">
+                <!-- Reviews will be populated by JavaScript -->
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button onclick="closeReviewsModal()" class="uiverse-btn" style="margin-right: 1rem;">Close</button>
+                <a href="#contact" class="morph-btn" onclick="closeReviewsModal()">Write Your Review</a>
+            </div>
+        </div>
+    </div>
 
     <!-- Statistics Section -->
     <section class="stats-section scroll-reveal">
@@ -1779,13 +2227,307 @@
     `;
     document.head.appendChild(rippleStyle);
 
-    // Initialize floating elements animation
-    document.addEventListener('DOMContentLoaded', function() {
-        const floatingElements = document.querySelectorAll('.floating-element');
-        floatingElements.forEach((element, index) => {
-            element.style.animationDelay = (index * 0.5) + 's';
+        // Initialize floating elements animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const floatingElements = document.querySelectorAll('.floating-element');
+            floatingElements.forEach((element, index) => {
+                element.style.animationDelay = (index * 0.5) + 's';
+            });
+
+            // Initialize hero slider
+            initHeroSlider();
+            
+            // Initialize testimonial slider
+            initTestimonialSlider();
         });
-    });
+
+        // Hero Background Slider Functionality
+        function initHeroSlider() {
+            const slides = document.querySelectorAll('.hero-bg-slide');
+            const indicators = document.querySelectorAll('.hero-indicator');
+            let currentSlide = 0;
+            let slideInterval;
+
+            // Debug: Check if slides are found
+            console.log('Hero slider initialized with', slides.length, 'slides');
+
+            function showSlide(index) {
+                // Remove active class from all slides and indicators
+                slides.forEach(slide => slide.classList.remove('active'));
+                indicators.forEach(indicator => indicator.classList.remove('active'));
+                
+                // Add active class to current slide and indicator
+                if (slides[index]) {
+                    slides[index].classList.add('active');
+                    console.log('Showing slide', index);
+                }
+                if (indicators[index]) {
+                    indicators[index].classList.add('active');
+                }
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            function startSlider() {
+                slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+            }
+
+            function stopSlider() {
+                clearInterval(slideInterval);
+            }
+
+            // Add click event listeners to indicators
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', () => {
+                    currentSlide = index;
+                    showSlide(currentSlide);
+                    stopSlider();
+                    startSlider(); // Restart auto-slide
+                });
+            });
+
+            // Pause slider on hover over hero section
+            const heroSection = document.querySelector('.hero-section');
+            heroSection.addEventListener('mouseenter', stopSlider);
+            heroSection.addEventListener('mouseleave', startSlider);
+
+            // Add image loading error handling
+            const images = document.querySelectorAll('.hero-bg-image');
+            images.forEach((img, index) => {
+                img.addEventListener('error', function() {
+                    console.error('Failed to load hero image:', this.src);
+                    // Add fallback styling
+                    this.style.display = 'none';
+                });
+                img.addEventListener('load', function() {
+                    console.log('Hero image loaded successfully:', this.src);
+                });
+            });
+
+            // Start the automatic slider
+            startSlider();
+        }
+
+        // Testimonial Slider Functionality
+        let currentTestimonialSlideIndex = 0;
+        const testimonialSlides = document.querySelectorAll('.testimonial-slide');
+        const testimonialDots = document.querySelectorAll('.testimonial-dot');
+        let testimonialAutoSlideInterval;
+
+        function initTestimonialSlider() {
+            console.log('Initializing testimonial slider...');
+            console.log('Testimonial slides found:', testimonialSlides.length);
+            console.log('Testimonial dots found:', testimonialDots.length);
+            
+            if (testimonialSlides.length === 0) {
+                console.log('No testimonial slides found, skipping initialization');
+                return;
+            }
+            
+            // Show first slide
+            showTestimonialSlide(0);
+            
+            // Start auto-slide
+            startTestimonialAutoSlide();
+            
+            // Pause auto-slide on hover
+            const sliderContainer = document.querySelector('.testimonial-slider-container');
+            if (sliderContainer) {
+                sliderContainer.addEventListener('mouseenter', stopTestimonialAutoSlide);
+                sliderContainer.addEventListener('mouseleave', startTestimonialAutoSlide);
+                console.log('Hover events added to slider container');
+            } else {
+                console.log('Slider container not found');
+            }
+            
+            console.log('Testimonial slider initialized successfully');
+        }
+
+        function showTestimonialSlide(index) {
+            const slider = document.getElementById('testimonialSlider');
+            if (!slider) return;
+            
+            // Calculate transform value
+            const translateX = -index * 25; // Each slide is 25% width
+            slider.style.transform = `translateX(${translateX}%)`;
+            
+            // Remove active class from all dots
+            testimonialDots.forEach(dot => {
+                dot.classList.remove('active');
+            });
+            
+            // Activate current dot
+            if (testimonialDots[index]) {
+                testimonialDots[index].classList.add('active');
+            }
+            
+            currentTestimonialSlideIndex = index;
+        }
+
+        function changeTestimonialSlide(direction) {
+            let newIndex = currentTestimonialSlideIndex + direction;
+            
+            if (newIndex >= testimonialSlides.length) {
+                newIndex = 0;
+            } else if (newIndex < 0) {
+                newIndex = testimonialSlides.length - 1;
+            }
+            
+            showTestimonialSlide(newIndex);
+            
+            // Restart auto-slide
+            stopTestimonialAutoSlide();
+            startTestimonialAutoSlide();
+        }
+
+        function currentTestimonialSlide(slideNumber) {
+            const index = slideNumber - 1; // Convert to 0-based index
+            showTestimonialSlide(index);
+            
+            // Restart auto-slide
+            stopTestimonialAutoSlide();
+            startTestimonialAutoSlide();
+        }
+
+        function startTestimonialAutoSlide() {
+            testimonialAutoSlideInterval = setInterval(() => {
+                changeTestimonialSlide(1);
+            }, 5000); // Change slide every 5 seconds
+        }
+
+        function stopTestimonialAutoSlide() {
+            if (testimonialAutoSlideInterval) {
+                clearInterval(testimonialAutoSlideInterval);
+            }
+        }
+
+        // Reviews Modal Functionality
+        function showAllReviews() {
+            const modal = document.getElementById('reviewsModal');
+            const reviewsGrid = document.getElementById('reviewsGrid');
+            
+            if (!modal || !reviewsGrid) return;
+            
+            // Populate reviews grid
+            populateReviewsGrid(reviewsGrid);
+            
+            // Show modal
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeReviewsModal() {
+            const modal = document.getElementById('reviewsModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Restore scrolling
+            }
+        }
+
+        function populateReviewsGrid(container) {
+            const reviews = [
+                {
+                    text: "The concepts finally clicked! The personalized attention and doubt-clearing sessions helped me jump from average to excellent.",
+                    author: "Arjun Kumar",
+                    class: "Class 10 • Scored 95% in Maths",
+                    avatar: "AK",
+                    rating: "⭐️⭐️⭐️⭐️⭐️"
+                },
+                {
+                    text: "Crisp notes, regular practice, and mock tests made all the difference. I improved my speed and accuracy a lot.",
+                    author: "Priya Sharma",
+                    class: "Class 12 • JEE Prep Batch",
+                    avatar: "PS",
+                    rating: "⭐️⭐️⭐️⭐️⭐️"
+                },
+                {
+                    text: "The teaching style is engaging and practical. Weekly targets kept me consistent and motivated.",
+                    author: "Rahul Mehta",
+                    class: "Class 11 • Applied Mathematics",
+                    avatar: "RM",
+                    rating: "⭐️⭐️⭐️⭐️⭐️"
+                },
+                {
+                    text: "Best institute for strong fundamentals. The teachers genuinely care about your progress.",
+                    author: "Shreya Narang",
+                    class: "Class 9 • Foundation Course",
+                    avatar: "SN",
+                    rating: "⭐️⭐️⭐️⭐️⭐️"
+                },
+                {
+                    text: "Amazing doubt clearing sessions! The teachers are always available and explain concepts in the simplest way possible.",
+                    author: "Vikram Singh",
+                    class: "Class 10 • Scored 92% in Maths",
+                    avatar: "VS",
+                    rating: "⭐️⭐️⭐️⭐️⭐️"
+                },
+                {
+                    text: "The study material is comprehensive and well-structured. It helped me understand complex topics easily.",
+                    author: "Ananya Patel",
+                    class: "Class 12 • JEE Advanced",
+                    avatar: "AP",
+                    rating: "⭐️⭐️⭐️⭐️⭐️"
+                },
+                {
+                    text: "Regular mock tests and feedback sessions helped me identify my weak areas and improve significantly.",
+                    author: "Rohit Agarwal",
+                    class: "Class 11 • Applied Mathematics",
+                    avatar: "RA",
+                    rating: "⭐️⭐️⭐️⭐️⭐️"
+                },
+                {
+                    text: "The teachers are very patient and supportive. They never give up on any student and ensure everyone understands.",
+                    author: "Kavya Reddy",
+                    class: "Class 9 • Foundation Course",
+                    avatar: "KR",
+                    rating: "⭐️⭐️⭐️⭐️⭐️"
+                },
+                {
+                    text: "Excellent coaching with personalized attention. The small batch size ensures individual focus on every student.",
+                    author: "Siddharth Joshi",
+                    class: "Class 10 • Scored 98% in Maths",
+                    avatar: "SJ",
+                    rating: "⭐️⭐️⭐️⭐️⭐️"
+                }
+            ];
+
+            container.innerHTML = '';
+            
+            reviews.forEach(review => {
+                const reviewCard = document.createElement('div');
+                reviewCard.className = 'review-card';
+                reviewCard.innerHTML = `
+                    <p class="review-text">"${review.text}"</p>
+                    <div class="review-author">
+                        <div class="review-avatar">${review.avatar}</div>
+                        <div class="review-info">
+                            <h5>${review.author}</h5>
+                            <p>${review.class}</p>
+                        </div>
+                    </div>
+                    <div class="review-rating">${review.rating}</div>
+                `;
+                container.appendChild(reviewCard);
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('reviewsModal');
+            if (event.target === modal) {
+                closeReviewsModal();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeReviewsModal();
+            }
+        });
 </script>
 <script src="modern-navbar.js"></script>
 </html>
