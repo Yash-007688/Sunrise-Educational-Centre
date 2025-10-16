@@ -191,11 +191,28 @@
     <div class="container nav-content">
       <div class="nav-logo">
         <img src="attached_assets/image_1750584670920.png" alt="Logo">
+        <span>Admin Panel</span>
       </div>
       <ul class="nav-links">
-        <li><a href="/admin">Admin Panel</a></li>
-        <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+        <li><a href="/admin">Dashboard</a></li>
+        {% if username %}
+        <li class="profile-dropdown">
+          <a href="#" id="profileLink">{{ username }} ▾</a>
+          <div class="profile-dropdown-menu" id="profileDropdown">
+            <a href="/profile" class="dropdown-item">My Profile</a>
+            <a href="/notifications" class="dropdown-item">Notifications</a>
+            <a href="/logout" class="dropdown-item">Logout</a>
+          </div>
+        </li>
+        {% else %}
+        <li><a href="/auth" class="btn-primary">Login</a></li>
+        {% endif %}
       </ul>
+      <button class="hamburger">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
     </div>
   </nav>
 
@@ -203,25 +220,32 @@
     <div class="upload-container">
       <a href="/admin" class="back-link">&larr; Back to Admin Panel</a>
       
-      <div class="header-section">
-        <h1>📁 Resource Management</h1>
-        <p>Upload, schedule, and manage all your educational resources</p>
+      <div class="header-section glass-card" style="border-radius:16px; padding:1.5rem; margin-bottom:1.2rem;">
+        <h1 style="margin:0; background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">📁 Resource Management</h1>
+        <p style="margin:0.5rem 0 0 0; color: var(--text-color); opacity:0.8;">Upload, schedule, and manage all your educational resources</p>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.8rem;">
+          <span class="uiverse-stat-chip">📦 Total: {{ resources|length if resources else 0 }}</span>
+          <span class="uiverse-stat-chip">🗂️ Categories: {{ categories|length if categories else 0 }}</span>
+          <span class="uiverse-stat-chip">🏫 Classes: {{ all_classes|length if all_classes else 0 }}</span>
+        </div>
       </div>
       
       <div class="tab-container">
-        <button class="tab-btn active" onclick="showTab('upload')">📤 Upload Resources</button>
+        <button class="tab-btn active" onclick="showTab('upload')">📤 Upload</button>
+        <button class="tab-btn" onclick="showTab('resources-tab')">🗂️ Resources</button>
+        <button class="tab-btn" onclick="showTab('categories-tab')">📁 Categories</button>
+        <button class="tab-btn" onclick="showTab('settings-tab')">⚙️ Settings</button>
         <button class="tab-btn" onclick="showTab('bulk-upload')">🚀 Bulk Upload</button>
         <button class="tab-btn" onclick="showTab('smart-upload-tab')">🤖 Smart Upload</button>
-        <button class="tab-btn" onclick="showTab('categories-tab')">📁 Categories</button>
         <button class="tab-btn" onclick="showTab('analytics-tab')">📊 Analytics</button>
         <button class="tab-btn" onclick="showTab('scheduled-tab')">⏰ Scheduled</button>
         <button class="tab-btn" onclick="showTab('history-tab')">📚 History</button>
-        <button class="tab-btn" onclick="showTab('settings-tab')">⚙️ Settings</button>
       </div>
       
       <!-- Upload Resource Tab -->
       <div id="upload-tab" class="tab-content active">
-      <h2>Upload New Resource</h2>
+      <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+      <h2 style="margin-top:0;">Upload New Resource</h2>
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
@@ -310,12 +334,107 @@
         <button type="submit" class="btn btn-primary" style="margin-top:1rem;">Upload Resource</button>
       </form>
       </div>
+      </div>
+
+      <!-- Resources Tab -->
+      <div id="resources-tab" class="tab-content">
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+          <h2 style="margin-top:0;">Resources</h2>
+          <div class="filter-controls" style="background: #f8f9ff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #e0e7ff;">
+            <h3 style="margin-bottom: 1rem; color: #232946;">Sort & Filter Resources</h3>
+            <div class="filter-controls" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+              <div>
+                <label for="sortBy" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Sort By:</label>
+                <select id="sortBy" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
+                  <option value="filename">File Name</option>
+                  <option value="title">Title</option>
+                  <option value="class">Class</option>
+                  <option value="category">Category</option>
+                  <option value="date">Upload Date</option>
+                </select>
+              </div>
+              <div>
+                <label for="filterClass" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Filter by Class:</label>
+                <select id="filterClass" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
+                  <option value="">All Classes</option>
+                  {% for cid, cname in all_classes %}
+                  <option value="{{ cid }}">{{ cname|title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div>
+                <label for="filterCategory" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Filter by Category:</label>
+                <select id="filterCategory" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
+                  <option value="">All Categories</option>
+                  <option value="notes">Notes</option>
+                  <option value="worksheet">Worksheet</option>
+                  <option value="formula">Formula Sheet</option>
+                  <option value="practice_test">Practice Test</option>
+                  <option value="reference_book">Reference Book</option>
+                  <option value="video">Video</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label for="searchText" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Search:</label>
+                <input type="text" id="searchText" placeholder="Search by title, filename, or description..." style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
+              </div>
+            </div>
+            <div class="filter-buttons" style="margin-top:1rem; display:flex; gap:.5rem; flex-wrap:wrap;">
+              <button onclick="applyFilters()" class="btn-primary">Apply Filters</button>
+              <button onclick="clearFilters()" class="btn-secondary">Clear Filters</button>
+              <button onclick="exportFilteredResults()" class="export-btn">Export Results</button>
+            </div>
+            <div id="filterResults" style="margin-top: 1rem; padding: 0.8rem; background: #e8f5e8; border-radius: 8px; display: none;">
+              <span id="resultCount" style="font-weight: 600; color: #155724;"></span>
+            </div>
+          </div>
+          <div class="resource-grid" id="resourcesGrid">
+            {% for r in resources %}
+            {% set filename = r[1] %}
+            {% set class_id = r[2] %}
+            {% set filepath = r[3] %}
+            {% set title = r[4] %}
+            {% set description = r[5] %}
+            {% set category = r[6] %}
+            <div class="resource-card" 
+                 data-filename="{{ filename }}" 
+                 data-title="{{ title or filename }}" 
+                 data-class="{{ class_id }}" 
+                 data-category="{{ category }}"
+                 data-description="{{ description or '' }}"
+                 data-class-name="{% for cid, cname in all_classes %}{% if cid == class_id %}{{ cname|title }}{% endif %}{% endfor %}">
+              <span class="resource-status {% if category in ['worksheet', 'formula'] %}status-paid{% else %}status-unpaid{% endif %}">
+                {% if category in ['worksheet', 'formula'] %}Paid{% else %}Free{% endif %}
+              </span>
+              <h3>{{ title or filename }}</h3>
+              <p><strong>File:</strong> {{ filename }}</p>
+              <p><strong>Category:</strong> {{ category|title }}</p>
+              <p><strong>Class:</strong> 
+                {% for cid, cname in all_classes %}{% if cid == class_id %}{{ cname|title }}{% endif %}{% endfor %}
+              </p>
+              {% if description %}
+              <p><strong>Description:</strong> {{ description[:100] }}{% if description|length > 100 %}...{% endif %}</p>
+              {% endif %}
+              <div style="margin-top: 1rem;">
+                <a href="/preview/{{ filename }}" class="btn-primary">Preview Document</a>
+                <button onclick="editResource('{{ filename }}', '{{ class_id }}', '{{ category }}', '{{ title or filename }}', '{{ description or '' }}')" class="btn-secondary">Edit</button>
+                <form method="POST" action="/admin/delete-resource/{{ filename }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this resource?');">
+                  <button type="submit" class="btn-secondary">Delete</button>
+                </form>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
       
 
       
       <!-- Bulk Upload Tab -->
       <div id="bulk-upload-tab" class="tab-content">
-        <h2>Bulk Upload Study Resources</h2>
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+        <h2 style="margin-top:0;">Bulk Upload Study Resources</h2>
         <div class="bulk-upload-container">
           <!-- Excel Upload Section -->
           <div class="excel-upload-section">
@@ -391,13 +510,15 @@
             <div class="results-content" id="results-content"></div>
           </div>
         </div>
+        </div>
       </div>
 
       
       <!-- Manage Categories Tab -->
       <div id="categories-tab" class="tab-content">
-        <h2>Manage Categories</h2>
-        <p style="color: #666; margin-bottom: 2rem;">Create and manage categories for organizing your educational resources</p>
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+        <h2 style="margin-top:0;">Manage Categories</h2>
+        <p style="color: var(--text-color); opacity:0.8; margin-bottom: 2rem;">Create and manage categories for organizing your educational resources</p>
         
         <!-- Create New Category Form -->
         <div style="background: #f8f9ff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #e0e7ff;">
@@ -444,7 +565,7 @@
         </div>
         
         <!-- Existing Categories -->
-        <div style="background: #fff; border-radius: 12px; padding: 1.5rem; border: 1px solid #e0e7ff;">
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
           <h3 style="margin-bottom: 1rem; color: #232946;">📋 Existing Categories</h3>
           <div class="resource-grid" id="categoriesGrid">
             <!-- Default Categories -->
@@ -530,11 +651,13 @@
             {% endfor %}
           </div>
         </div>
+        </div>
       </div>
       
       <!-- Scheduled Resources Tab -->
       <div id="scheduled-tab" class="tab-content">
-        <h2>Scheduled Resources</h2>
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+        <h2 style="margin-top:0;">Scheduled Resources</h2>
         <div class="resource-grid">
           <div class="resource-card">
             <span class="resource-status status-scheduled">Scheduled</span>
@@ -564,99 +687,14 @@
             </div>
           </div>
         </div>
+        </div>
       </div>
       
       <!-- Upload History Tab -->
       <div id="history-tab" class="tab-content">
-        <h2>Upload History</h2>
-        
-        <!-- Sorting and Filtering Controls -->
-        <div style="background: #f8f9ff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #e0e7ff;">
-          <h3 style="margin-bottom: 1rem; color: #232946;">Sort & Filter Resources</h3>
-          <div class="filter-controls">
-            <div>
-              <label for="sortBy" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Sort By:</label>
-              <select id="sortBy" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
-                <option value="filename">File Name</option>
-                <option value="title">Title</option>
-                <option value="class">Class</option>
-                <option value="category">Category</option>
-                <option value="date">Upload Date</option>
-              </select>
-            </div>
-            <div>
-              <label for="filterClass" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Filter by Class:</label>
-              <select id="filterClass" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
-                <option value="">All Classes</option>
-                {% for cid, cname in all_classes %}
-                <option value="{{ cid }}">{{ cname|title }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div>
-              <label for="filterCategory" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Filter by Category:</label>
-              <select id="filterCategory" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
-                <option value="">All Categories</option>
-                <option value="notes">Notes</option>
-                <option value="worksheet">Worksheet</option>
-                <option value="formula">Formula Sheet</option>
-                <option value="practice_test">Practice Test</option>
-                <option value="reference_book">Reference Book</option>
-                <option value="video">Video</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            <div>
-              <label for="searchText" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Search:</label>
-              <input type="text" id="searchText" placeholder="Search by title, filename, or description..." style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
-            </div>
-          </div>
-          <div class="filter-buttons">
-            <button onclick="applyFilters()" class="btn-primary">Apply Filters</button>
-            <button onclick="clearFilters()" class="btn-secondary">Clear Filters</button>
-            <button onclick="exportFilteredResults()" class="export-btn">Export Results</button>
-          </div>
-          <div id="filterResults" style="margin-top: 1rem; padding: 0.8rem; background: #e8f5e8; border-radius: 8px; display: none;">
-            <span id="resultCount" style="font-weight: 600; color: #155724;"></span>
-          </div>
-        </div>
-        
-        <div class="resource-grid" id="resourcesGrid">
-          {% for r in resources %}
-          {% set filename = r[1] %}
-          {% set class_id = r[2] %}
-          {% set filepath = r[3] %}
-          {% set title = r[4] %}
-          {% set description = r[5] %}
-          {% set category = r[6] %}
-          <div class="resource-card" 
-               data-filename="{{ filename }}" 
-               data-title="{{ title or filename }}" 
-               data-class="{{ class_id }}" 
-               data-category="{{ category }}"
-               data-description="{{ description or '' }}"
-               data-class-name="{% for cid, cname in all_classes %}{% if cid == class_id %}{{ cname|title }}{% endif %}{% endfor %}">
-            <span class="resource-status {% if category in ['worksheet', 'formula'] %}status-paid{% else %}status-unpaid{% endif %}">
-              {% if category in ['worksheet', 'formula'] %}Paid{% else %}Free{% endif %}
-            </span>
-            <h3>{{ title or filename }}</h3>
-            <p><strong>File:</strong> {{ filename }}</p>
-            <p><strong>Category:</strong> {{ category|title }}</p>
-            <p><strong>Class:</strong> 
-              {% for cid, cname in all_classes %}{% if cid == class_id %}{{ cname|title }}{% endif %}{% endfor %}
-            </p>
-            {% if description %}
-            <p><strong>Description:</strong> {{ description[:100] }}{% if description|length > 100 %}...{% endif %}</p>
-            {% endif %}
-            <div style="margin-top: 1rem;">
-              <a href="/preview/{{ filename }}" class="btn-primary">Preview Document</a>
-              <button onclick="editResource('{{ filename }}', '{{ class_id }}', '{{ category }}', '{{ title or filename }}', '{{ description or '' }}')" class="btn-secondary">Edit</button>
-              <form method="POST" action="/admin/delete-resource/{{ filename }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this resource?');">
-                <button type="submit" class="btn-secondary">Delete</button>
-              </form>
-            </div>
-          </div>
-          {% endfor %}
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+          <h2 style="margin-top:0;">Upload History</h2>
+          <p style="color: var(--text-color); opacity:0.8;">View recent uploads and system actions here. (Detailed resource listing has moved to the Resources tab.)</p>
         </div>
       </div>
     </div>
@@ -733,7 +771,7 @@
           <img src="footer/youtube-brands-solid-full.svg" alt="YouTube" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
         </a>
         <a href="https://wa.me/917224860881" target="_blank" class="uiverse-social-btn whatsapp" title="WhatsApp">
-          <img src="footer/whatsapp-brands-solid-full.svg" alt="WhatsApp" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+          <i class="fa-brands fa-whatsapp" style="font-size:24px; line-height:24px; color: #25D366;"></i>
         </a>
       </div>
       <div class="footer-links">

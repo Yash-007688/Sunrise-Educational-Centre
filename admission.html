@@ -541,6 +541,20 @@
             color: #e2e8f0;
         }
         
+        /* Status card + badge styles */
+        .status-card {
+            background: #fff !important;
+            color: #111827 !important;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        body.dark-mode .status-card {
+            background: #ffffff !important; /* keep white even in dark */
+            color: #111827 !important;      /* keep pen color black */
+            border-color: #e2e8f0;
+        }
+
         /* Status badge styles */
         .status-badge {
             display: inline-block;
@@ -877,7 +891,6 @@
         // Show admission status
         function showAdmissionStatus(admission) {
             const statusDiv = document.getElementById('admissionStatus');
-            const formDiv = document.getElementById('admissionForm');
             const statusContent = document.getElementById('statusContent');
             
             let statusClass = '';
@@ -903,12 +916,10 @@
             }
             
             statusContent.innerHTML = `
-                <div style="text-align: center; margin-bottom: 2rem;">
+                <div class="status-card">
                     <div style="font-size: 3rem; margin-bottom: 1rem;">${statusIcon}</div>
-                    <h2 style="color: #232946; margin-bottom: 1rem;">Status: 
-                        <span class="status-badge ${statusClass}">${admission.status.toUpperCase()}</span>
-                    </h2>
-                    <p style="color: #64748b; font-size: 1.1rem; line-height: 1.6;">${statusMessage}</p>
+                    <span class="status-badge ${statusClass}">${admission.status.toUpperCase()}</span>
+                    <p style="color: #111827; font-size: 1.1rem; line-height: 1.6;">${statusMessage}</p>
                 </div>
                 
                 <div style="background: #f8f9ff; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">

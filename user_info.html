@@ -447,7 +447,18 @@
       </div>
       <ul class="nav-links">
         <li><a href="/admin">Dashboard</a></li>
-        <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+        {% if username %}
+        <li class="profile-dropdown">
+          <a href="#" id="profileLink">{{ username }} ▾</a>
+          <div class="profile-dropdown-menu" id="profileDropdown">
+            <a href="/profile" class="dropdown-item">My Profile</a>
+            <a href="/notifications" class="dropdown-item">Notifications</a>
+            <a href="/logout" class="dropdown-item">Logout</a>
+          </div>
+        </li>
+        {% else %}
+        <li><a href="/auth" class="btn-primary">Login</a></li>
+        {% endif %}
       </ul>
     </div>
   </nav>

@@ -6,7 +6,36 @@
   <title>Batch Overview</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="floating-navbar.css" />
-    <link rel="stylesheet" href="uiverse-components.css">
+  <link rel="stylesheet" href="uiverse-components.css">
+  <style>
+    /* Aesthetic batch overview theme */
+    body { 
+      background: linear-gradient(135deg, #0f1117 0%, #161a25 50%, #1a1f2e 100%);
+      position: relative;
+    }
+    body::before { content:''; position:fixed; inset:0; background:
+      radial-gradient(800px 600px at 20% 20%, rgba(106,130,251,.15) 0%, transparent 50%),
+      radial-gradient(600px 400px at 80% 80%, rgba(252,92,125,.10) 0%, transparent 50%);
+      pointer-events:none; z-index:-1;
+    }
+    .black-glass { 
+      background: rgba(5, 6, 10, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 60px rgba(0,0,0,.8), 0 8px 32px rgba(106,130,251,.1), inset 0 1px 0 rgba(255,255,255,.1);
+      backdrop-filter: blur(24px) saturate(120%);
+      -webkit-backdrop-filter: blur(24px) saturate(120%);
+      color: #fff;
+      border-radius: 20px;
+    }
+    .batch-card { border:1px solid rgba(255,255,255,0.12); border-radius:20px; overflow:hidden; background:rgba(10,12,18,.8); color:#fff; box-shadow:0 20px 60px rgba(0,0,0,.6); transition:all .35s ease; }
+    .batch-card:hover { transform: translateY(-6px); box-shadow:0 28px 72px rgba(0,0,0,.75); border-color:rgba(255,255,255,.2); }
+    .batch-image { height:180px; position:relative; background: linear-gradient(135deg, rgba(106,130,251,.1), rgba(252,92,125,.1)); }
+    .batch-image img { width:100%; height:100%; object-fit:cover; }
+    .batch-info h3 { color:#8fa3ff; font-weight:800; letter-spacing:-.02em; }
+    .btn { border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.08); color:#fff; border-radius:12px; padding:.7rem 1.1rem; font-weight:700; }
+    .btn:hover { background:rgba(255,255,255,.15); transform: translateY(-2px); }
+    .btn-primary { background: linear-gradient(135deg, #6a82fb 0%, #5a6fd8 100%); border-color:#6a82fb; }
+  </style>
 </head>
 <body>
   <nav class="floating-navbar black-glass">
@@ -17,17 +46,24 @@
     </button>
     <ul class="nav-links">
       <li><a href="/">Home</a></li>
-      <li><a href="/batch">Batches</a></li>
+      
       <li><a href="/admission">Admission</a></li>
     </ul>
   </nav>
 
   <main class="container main-content">
     <section class="card animated-card black-glass" style="padding:1rem;">
-      <h2 style="margin-top:0;">Available Batches</h2>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <h2 style="margin:0; color:#8fa3ff; letter-spacing:-.02em;">Available Batches</h2>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn" onclick="filterGrid('all')">All</button>
+          <button class="btn" onclick="filterGrid('paid')">Paid</button>
+          <button class="btn" onclick="filterGrid('free')">Free</button>
+        </div>
+      </div>
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem;">
         {% for cls in classes %}
-        <div class="batch-card black-glass" style="border-radius:16px;">
+        <div class="batch-card black-glass" style="border-radius:16px;" data-paid="{{ 'paid' if cls.meta.paid_status == 'paid' else 'free' }}">
           <div class="batch-image" style="height:140px;">
             <img src="{{ cls.meta.image or 'img/default-banner.jpg' }}" alt="{{ cls.name }}" />
           </div>
@@ -47,6 +83,16 @@
       </div>
     </section>
   </main>
+
+  <script>
+    function filterGrid(filter){
+      const cards = document.querySelectorAll('[data-paid]');
+      cards.forEach(c => {
+        const paid = c.getAttribute('data-paid');
+        c.style.display = (filter==='all' || filter===paid) ? '' : 'none';
+      });
+    }
+  </script>
 
   <script src="script.js"></script>
 
