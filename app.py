@@ -5084,10 +5084,10 @@ def handle_chat_message(data):
             'created_at': datetime.now().isoformat()
         }
         
-    print(f"[Chat] Broadcasting new_chat_message in room liveclass_{class_id} from {username} (user_id={user_id})")
-    print(f"[Chat] Room participants: {room_participants.get('liveclass_' + str(class_id), [])}")
-    socketio.emit('new_chat_message', message_data, room=f'liveclass_{class_id}')
-    print(f"[Chat] new_chat_message emitted for class {class_id}")
+        print(f"[Chat] Broadcasting new_chat_message in room liveclass_{class_id} from {username} (user_id={user_id})")
+        print(f"[Chat] Room participants: {room_participants.get('liveclass_' + str(class_id), [])}")
+        socketio.emit('new_chat_message', message_data, room=f'liveclass_{class_id}')
+        print(f"[Chat] new_chat_message emitted for class {class_id}")
         
     except Exception as e:
         print(f"Error handling chat message: {e}")
