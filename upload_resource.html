@@ -182,6 +182,107 @@
     body.dark-mode .modal-content form {
       background: #232946;
     }
+
+    /* Enhanced Tab Button Styles */
+    .tab-btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .tab-btn:hover::before {
+      left: 100%;
+    }
+
+    .tab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .tab-btn.active {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(106, 130, 251, 0.4);
+    }
+
+    /* Responsive tab buttons */
+    @media (max-width: 768px) {
+      .tab-container {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .tab-btn {
+        width: 100%;
+        text-align: center;
+        padding: 1rem;
+      }
+    }
+
+    /* Upload dialog modal improvements */
+    .upload-modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+    }
+
+    .upload-modal-content {
+      background: linear-gradient(135deg, #232946 0%, #1a1a2e 100%);
+      margin: 5% auto;
+      padding: 0;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      animation: modalSlideIn 0.4s ease-out;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .upload-modal-header {
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .upload-modal-header h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .upload-close {
+      color: white;
+      font-size: 2.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0.5rem;
+      border-radius: 50%;
+    }
+
+    .upload-close:hover {
+      background: rgba(255,255,255,0.2);
+      transform: rotate(90deg);
+    }
   </style>
     <link rel="stylesheet" href="floating-navbar.css">
     <link rel="stylesheet" href="uiverse-components.css">
@@ -230,22 +331,27 @@
         </div>
       </div>
       
-      <div class="tab-container">
-        <button class="tab-btn active" onclick="showTab('upload')">📤 Upload</button>
-        <button class="tab-btn" onclick="showTab('resources-tab')">🗂️ Resources</button>
-        <button class="tab-btn" onclick="showTab('categories-tab')">📁 Categories</button>
-        <button class="tab-btn" onclick="showTab('settings-tab')">⚙️ Settings</button>
-        <button class="tab-btn" onclick="showTab('bulk-upload')">🚀 Bulk Upload</button>
-        <button class="tab-btn" onclick="showTab('smart-upload-tab')">🤖 Smart Upload</button>
-        <button class="tab-btn" onclick="showTab('analytics-tab')">📊 Analytics</button>
-        <button class="tab-btn" onclick="showTab('scheduled-tab')">⏰ Scheduled</button>
-        <button class="tab-btn" onclick="showTab('history-tab')">📚 History</button>
+      <div class="tab-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
+        <button class="tab-btn active" onclick="showTab('upload')" style="background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(106,130,251,0.3);">📤 Upload</button>
+        <button class="tab-btn" onclick="showTab('resources-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🗂️ Resources</button>
+        <button class="tab-btn" onclick="showTab('categories-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📁 Categories</button>
+        <button class="tab-btn" onclick="showTab('settings-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">⚙️ Settings</button>
+        <button class="tab-btn" onclick="showTab('bulk-upload')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🚀 Bulk Upload</button>
+        <button class="tab-btn" onclick="showTab('smart-upload-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🤖 Smart Upload</button>
+        <button class="tab-btn" onclick="showTab('analytics-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📊 Analytics</button>
+        <button class="tab-btn" onclick="showTab('scheduled-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">⏰ Scheduled</button>
+        <button class="tab-btn" onclick="showTab('history-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📚 History</button>
       </div>
       
       <!-- Upload Resource Tab -->
       <div id="upload-tab" class="tab-content active">
       <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
-      <h2 style="margin-top:0;">Upload New Resource</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="margin:0;">Upload New Resource</h2>
+        <button onclick="openUploadModal()" class="btn btn-primary" style="background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(106,130,251,0.3);">
+          📤 Quick Upload
+        </button>
+      </div>
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
@@ -418,7 +524,12 @@
               {% endif %}
               <div style="margin-top: 1rem;">
                 <a href="/preview/{{ filename }}" class="btn-primary">Preview Document</a>
-                <button onclick="editResource('{{ filename }}', '{{ class_id }}', '{{ category }}', '{{ title or filename }}', '{{ description or '' }}')" class="btn-secondary">Edit</button>
+                <button class="btn-secondary edit-resource-btn" 
+                        data-filename="{{ filename }}" 
+                        data-class-id="{{ class_id }}" 
+                        data-category="{{ category }}" 
+                        data-title="{{ title or filename }}" 
+                        data-description="{{ description or '' }}">Edit</button>
                 <form method="POST" action="/admin/delete-resource/{{ filename }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this resource?');">
                   <button type="submit" class="btn-secondary">Delete</button>
                 </form>
@@ -644,8 +755,8 @@
               <p><strong>Access:</strong> {{ category[5]|title }}</p>
               <p><strong>Description:</strong> {{ category[2] or 'No description' }}</p>
               <div style="margin-top: 1rem;">
-                <button class="btn-secondary" onclick="editCategory({{ category[0] }})">Edit</button>
-                <button class="btn-secondary" onclick="deleteCategory({{ category[0] }})">Delete</button>
+                <button class="btn-secondary" onclick="editCategory('{{ category[0] }}')">Edit</button>
+                <button class="btn-secondary" onclick="deleteCategory('{{ category[0] }}')">Delete</button>
               </div>
             </div>
             {% endfor %}
@@ -798,14 +909,54 @@
     function showTab(tabName) {
       // Hide all tab contents
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        // Reset button styles
+        btn.style.background = 'rgba(255,255,255,0.1)';
+        btn.style.color = '#fff';
+        btn.style.border = '1px solid rgba(255,255,255,0.2)';
+        btn.style.transform = 'translateY(0)';
+        btn.style.boxShadow = 'none';
+      });
       
       // Resolve id: accept both 'upload' and 'upload-tab'
       const targetId = tabName.endsWith('-tab') ? tabName : (tabName + '-tab');
       const target = document.getElementById(targetId);
       if (target) target.classList.add('active');
+      
+      // Update clicked button styles
       if (window.event && window.event.target) {
-        window.event.target.classList.add('active');
+        const clickedBtn = window.event.target;
+        clickedBtn.classList.add('active');
+        clickedBtn.style.background = 'linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%)';
+        clickedBtn.style.color = 'white';
+        clickedBtn.style.border = 'none';
+        clickedBtn.style.transform = 'translateY(-2px)';
+        clickedBtn.style.boxShadow = '0 8px 25px rgba(106,130,251,0.4)';
+      }
+    }
+
+    // Upload modal functions
+    function openUploadModal() {
+      document.getElementById('uploadModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeUploadModal() {
+      document.getElementById('uploadModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const uploadModal = document.getElementById('uploadModal');
+      const editModal = document.getElementById('editResourceDialog');
+      
+      if (event.target === uploadModal) {
+        closeUploadModal();
+      }
+      if (event.target === editModal) {
+        closeEditDialog();
       }
     }
     
@@ -814,6 +965,12 @@
     const fileUploadArea = document.getElementById('fileUploadArea');
     const fileInfo = document.getElementById('fileInfo');
     const fileName = document.getElementById('fileName');
+
+    // Modal file upload handling
+    const modalFileInput = document.getElementById('modal_file');
+    const modalFileUploadArea = document.getElementById('modalFileUploadArea');
+    const modalFileInfo = document.getElementById('modalFileInfo');
+    const modalFileName = document.getElementById('modalFileName');
     
     fileInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
@@ -844,6 +1001,39 @@
         fileInput.files = files;
         fileName.textContent = files[0].name;
         fileInfo.style.display = 'block';
+      }
+    });
+
+    // Modal file upload handling
+    modalFileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        modalFileName.textContent = file.name;
+        modalFileInfo.style.display = 'block';
+      } else {
+        modalFileInfo.style.display = 'none';
+      }
+    });
+    
+    // Modal drag and drop functionality
+    modalFileUploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      modalFileUploadArea.classList.add('dragover');
+    });
+    
+    modalFileUploadArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      modalFileUploadArea.classList.remove('dragover');
+    });
+    
+    modalFileUploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      modalFileUploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        modalFileInput.files = files;
+        modalFileName.textContent = files[0].name;
+        modalFileInfo.style.display = 'block';
       }
     });
     
@@ -1210,6 +1400,18 @@
           }
         });
       }
+
+      // Add event listeners for edit resource buttons
+      document.querySelectorAll('.edit-resource-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const filename = this.dataset.filename;
+          const classId = this.dataset.classId;
+          const category = this.dataset.category;
+          const title = this.dataset.title;
+          const description = this.dataset.description;
+          editResource(filename, classId, category, title, description);
+        });
+      });
     });
   </script>
 
@@ -1237,6 +1439,80 @@
                 <div style="font-size: 0.9rem; opacity: 0.8; color: rgba(255,255,255,0.8);">Check out new features and content</div>
             </div>
         </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="upload-modal">
+      <div class="upload-modal-content">
+        <div class="upload-modal-header">
+          <h2>📤 Quick Upload Resource</h2>
+          <span class="upload-close" onclick="closeUploadModal()">&times;</span>
+        </div>
+        <div style="padding: 2rem;">
+          <form method="POST" action="/upload-resource" enctype="multipart/form-data" class="login-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="modal_title">Resource Title *</label>
+                <input type="text" id="modal_title" name="title" placeholder="e.g., Algebra Chapter 5 Notes" required>
+              </div>
+              <div class="form-group">
+                <label for="modal_category">Category *</label>
+                <select id="modal_category" name="category" required>
+                  <option value="">Select Category</option>
+                  <option value="notes">Notes</option>
+                  <option value="worksheet">Worksheet</option>
+                  <option value="formula">Formula Sheet</option>
+                  <option value="practice_test">Practice Test</option>
+                  <option value="reference_book">Reference Book</option>
+                  <option value="video">Video</option>
+                  <option value="other">Other</option>
+                  {% for category in categories %}
+                    <option value="{{ category[1] }}">{{ category[1] }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="modal_class_id">Target Class *</label>
+                <select id="modal_class_id" name="class_id" required>
+                  <option value="">Select Class</option>
+                  {% for id, name in all_classes %}
+                    <option value="{{ id }}">{{ name|title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="modal_paid_status">Paid Status</label>
+                <select id="modal_paid_status" name="paid_status">
+                  <option value="unpaid">Free</option>
+                  <option value="paid">Paid</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="modal_description">Description</label>
+              <textarea id="modal_description" name="description" placeholder="Brief description of the resource content..."></textarea>
+            </div>
+            
+            <div class="file-upload-area" id="modalFileUploadArea">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
+              <h3>Drop files here or click to upload</h3>
+              <p style="color: #666; margin-bottom: 1rem;">Supports PDF, DOC, PPT, MP4, and other educational formats</p>
+              <input type="file" id="modal_file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.jpg,.jpeg,.png" required style="display: none;">
+              <button type="button" class="btn-primary" onclick="document.getElementById('modal_file').click()">Choose File</button>
+            </div>
+            
+            <div id="modalFileInfo" style="display: none; background: #f8f9ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+              <strong>Selected File:</strong> <span id="modalFileName"></span>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+              <button type="button" class="btn-secondary" onclick="closeUploadModal()">Cancel</button>
+              <button type="submit" class="btn-primary">Upload Resource</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
     <script src="navbar-functions.js"></script>

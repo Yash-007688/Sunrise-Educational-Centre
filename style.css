@@ -3364,10 +3364,10 @@ body.dark-mode #faq .faq-answer {
   }
 }
 
-/* Ensure navbar text is white in both light and dark themes */
-.navbar,
-.navbar a,
-.nav-logo span,
+/* Ensure navbar text is white in both light and dark themes (override global theme rules) */
+body:not(.dark-mode) .navbar,
+body:not(.dark-mode) .navbar a,
+body:not(.dark-mode) .nav-logo span,
 body.dark-mode .navbar,
 body.dark-mode .navbar a,
 body.dark-mode .nav-logo span {

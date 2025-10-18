@@ -26545,3 +26545,1058 @@ Parsed data - Username: raj, Class ID: 4, Selected Role: class 11 applied
 2025-10-16 16:48:16,298 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:16] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
 2025-10-16 16:48:16,327 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:16] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
 2025-10-16 16:48:16,327 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:16] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,010 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "GET / HTTP/1.1" 200 -
+2025-10-16 16:48:53,010 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "GET / HTTP/1.1" 200 -
+2025-10-16 16:48:53,176 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,176 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,182 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,182 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,191 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,191 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,196 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,196 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,212 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,212 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,215 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /hero%20pannel/2024_2025_achievements.jpeg HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,215 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /hero%20pannel/2024_2025_achievements.jpeg HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,228 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,228 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,233 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,233 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,255 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,255 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,265 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,265 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,272 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,272 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,281 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,281 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,287 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,287 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,311 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,311 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,320 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /hero%20pannel/2023_2024_scholars.jpeg HTTP/1.1[0m" 304 -
+2025-10-16 16:48:53,320 [INFO] werkzeug: 127.0.0.1 - - [16/Oct/2025 16:48:53] "[36mGET /hero%20pannel/2023_2024_scholars.jpeg HTTP/1.1[0m" 304 -
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4dc' in position 37: character maps to <undefined>
+Call stack:
+  File "C:\Sunrise-Educational-Centre\app.py", line 7529, in <module>
+    logging.info('📜 Logging initialized. Writing to %s', log_file_path)
+Message: '📜 Logging initialized. Writing to %s'
+Arguments: ('C:\\Sunrise-Educational-Centre\\server.log',)
+🧹 Session cleanup service started
+Session cleanup service started
+🧹 Session cleanup service started
+✅ Database and services initialized successfully
+============================================================
+SUNRISE EDUCATIONAL CENTRE SERVER
+============================================================
+Server will start on: http://localhost:10000
+External access: http://0.0.0.0:10000
+Mobile access: Use your computer's IP address
+Note: WebRTC features require HTTPS in production
+Session cleanup service: Active (runs every hour)
+Auto-restart: Enabled (server will restart on errors)
+To stop: Press Ctrl+C
+============================================================
+Starting Sunrise Educational Centre server on port 10000...
+ * Serving Flask app 'app'
+ * Debug mode: off
+2025-10-17 07:14:31,936 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:10000
+ * Running on http://192.168.1.42:10000
+2025-10-17 07:14:31,936 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:10000
+ * Running on http://192.168.1.42:10000
+2025-10-17 07:14:31,937 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2025-10-17 07:14:31,937 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2025-10-17 07:14:35,746 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:35] "GET / HTTP/1.1" 200 -
+2025-10-17 07:14:35,746 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:35] "GET / HTTP/1.1" 200 -
+2025-10-17 07:14:36,248 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,248 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,258 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "GET /style.css HTTP/1.1" 200 -
+2025-10-17 07:14:36,258 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "GET /style.css HTTP/1.1" 200 -
+2025-10-17 07:14:36,263 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,263 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,281 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,284 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /hero%20pannel/2023_2024_scholars.jpeg HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,281 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,286 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,291 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,284 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /hero%20pannel/2023_2024_scholars.jpeg HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,286 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,291 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,297 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /hero%20pannel/2024_2025_achievements.jpeg HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,297 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /hero%20pannel/2024_2025_achievements.jpeg HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,301 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,301 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,321 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,321 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,343 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,343 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,349 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,349 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,356 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,356 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,370 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,370 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,388 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:14:36,388 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:14:36] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4dc' in position 37: character maps to <undefined>
+Call stack:
+  File "C:\Sunrise-Educational-Centre\app.py", line 7529, in <module>
+    logging.info('📜 Logging initialized. Writing to %s', log_file_path)
+Message: '📜 Logging initialized. Writing to %s'
+Arguments: ('C:\\Sunrise-Educational-Centre\\server.log',)
+🧹 Session cleanup service started
+Session cleanup service started
+🧹 Session cleanup service started
+✅ Database and services initialized successfully
+============================================================
+SUNRISE EDUCATIONAL CENTRE SERVER
+============================================================
+Server will start on: http://localhost:10000
+External access: http://0.0.0.0:10000
+Mobile access: Use your computer's IP address
+Note: WebRTC features require HTTPS in production
+Session cleanup service: Active (runs every hour)
+Auto-restart: Enabled (server will restart on errors)
+To stop: Press Ctrl+C
+============================================================
+Starting Sunrise Educational Centre server on port 10000...
+ * Serving Flask app 'app'
+ * Debug mode: off
+2025-10-17 07:22:34,919 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:10000
+ * Running on http://192.168.1.42:10000
+2025-10-17 07:22:34,919 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:10000
+ * Running on http://192.168.1.42:10000
+2025-10-17 07:22:34,919 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2025-10-17 07:22:34,919 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2025-10-17 07:22:36,469 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:36] "[32mGET /study-resources HTTP/1.1[0m" 302 -
+2025-10-17 07:22:36,469 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:36] "[32mGET /study-resources HTTP/1.1[0m" 302 -
+2025-10-17 07:22:36,551 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:36] "GET /auth?next=study_resources HTTP/1.1" 200 -
+2025-10-17 07:22:36,551 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:36] "GET /auth?next=study_resources HTTP/1.1" 200 -
+2025-10-17 07:22:37,016 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,016 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,021 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,021 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,039 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,039 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,052 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,052 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,073 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,074 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,073 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,074 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,099 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,099 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-17 07:22:37,605 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[32mGET /favicon.ico HTTP/1.1[0m" 302 -
+2025-10-17 07:22:37,605 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "[32mGET /favicon.ico HTTP/1.1[0m" 302 -
+2025-10-17 07:22:37,640 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "GET /auth?next=favicon HTTP/1.1" 200 -
+2025-10-17 07:22:37,640 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:37] "GET /auth?next=favicon HTTP/1.1" 200 -
+Auth POST request received
+Form data: {'username': 'raj', 'password': 'raj', 'class_id': '4', 'admin_code': '', 'next': 'study_resources'}
+Parsed data - Username: raj, Class ID: 4, Selected Role: class 11 applied
+2025-10-17 07:22:51,884 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:51] "[32mPOST /auth HTTP/1.1[0m" 302 -
+2025-10-17 07:22:51,884 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:51] "[32mPOST /auth HTTP/1.1[0m" 302 -
+2025-10-17 07:22:52,016 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "GET /study-resources HTTP/1.1" 200 -
+2025-10-17 07:22:52,016 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "GET /study-resources HTTP/1.1" 200 -
+2025-10-17 07:22:52,084 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,084 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,091 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,091 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,095 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,095 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,110 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,110 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,121 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,121 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,126 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,126 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,140 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,140 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,149 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /navbar-functions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,149 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /navbar-functions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,156 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,156 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,173 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,173 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,197 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /study-resources.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,197 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /study-resources.js HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,203 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,203 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,204 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,204 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-17 07:22:52,466 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "GET /favicon.ico HTTP/1.1" 200 -
+2025-10-17 07:22:52,466 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:22:52] "GET /favicon.ico HTTP/1.1" 200 -
+2025-10-17 07:23:03,204 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "GET / HTTP/1.1" 200 -
+2025-10-17 07:23:03,204 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "GET / HTTP/1.1" 200 -
+2025-10-17 07:23:03,266 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,266 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,268 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,268 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,273 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,273 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,284 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,284 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,297 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,297 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,315 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,315 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,321 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,321 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,337 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,337 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,348 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,348 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,351 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /hero%20pannel/2023_2024_scholars.jpeg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,351 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /hero%20pannel/2023_2024_scholars.jpeg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,358 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,358 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,370 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,370 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,375 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,375 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,386 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /hero%20pannel/2024_2025_achievements.jpeg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,386 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /hero%20pannel/2024_2025_achievements.jpeg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,401 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:03,401 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:03] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,231 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "GET /online-class HTTP/1.1" 200 -
+2025-10-17 07:23:08,231 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "GET /online-class HTTP/1.1" 200 -
+2025-10-17 07:23:08,304 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,304 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,310 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,310 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,315 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,315 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,322 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,322 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,330 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,330 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,341 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,341 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,353 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,353 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,362 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,362 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,368 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,368 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,377 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,377 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,383 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /navbar-functions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,383 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /navbar-functions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,405 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,405 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,414 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:08,414 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:08] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-17 07:23:38,390 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:38] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-17 07:23:38,390 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:38] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-17 07:23:38,522 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:38] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-17 07:23:38,522 [INFO] werkzeug: 127.0.0.1 - - [17/Oct/2025 07:23:38] "GET /api/live-classes/status HTTP/1.1" 200 -
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4dc' in position 37: character maps to <undefined>
+Call stack:
+  File "C:\Sunrise-Educational-Centre\app.py", line 7529, in <module>
+    logging.info('📜 Logging initialized. Writing to %s', log_file_path)
+Message: '📜 Logging initialized. Writing to %s'
+Arguments: ('C:\\Sunrise-Educational-Centre\\server.log',)
+🧹 Session cleanup service started
+Session cleanup service started
+🧹 Session cleanup service started
+✅ Database and services initialized successfully
+============================================================
+SUNRISE EDUCATIONAL CENTRE SERVER
+============================================================
+Server will start on: http://localhost:10000
+External access: http://0.0.0.0:10000
+Mobile access: Use your computer's IP address
+Note: WebRTC features require HTTPS in production
+Session cleanup service: Active (runs every hour)
+Auto-restart: Enabled (server will restart on errors)
+To stop: Press Ctrl+C
+============================================================
+Starting Sunrise Educational Centre server on port 10000...
+ * Serving Flask app 'app'
+ * Debug mode: off
+2025-10-18 08:00:42,309 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:10000
+ * Running on http://192.168.1.42:10000
+2025-10-18 08:00:42,309 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:10000
+ * Running on http://192.168.1.42:10000
+2025-10-18 08:00:42,309 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2025-10-18 08:00:42,309 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2025-10-18 08:00:47,312 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET / HTTP/1.1" 200 -
+2025-10-18 08:00:47,312 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET / HTTP/1.1" 200 -
+2025-10-18 08:00:47,874 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /modern-navbar.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,874 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /modern-navbar.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,890 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /enhanced-aesthetic.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,890 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /enhanced-aesthetic.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,897 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /uiverse-components.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,897 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /uiverse-components.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,901 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /style.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,901 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /style.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,930 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /modern-components.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,930 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /modern-components.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,933 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /floating-navbar.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,933 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /floating-navbar.css HTTP/1.1" 200 -
+2025-10-18 08:00:47,946 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /hero%20pannel/2023_2024_scholars.jpeg HTTP/1.1" 200 -
+2025-10-18 08:00:47,946 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /hero%20pannel/2023_2024_scholars.jpeg HTTP/1.1" 200 -
+2025-10-18 08:00:47,953 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /hero%20pannel/2024_2025_achievements.jpeg HTTP/1.1" 200 -
+2025-10-18 08:00:47,953 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /hero%20pannel/2024_2025_achievements.jpeg HTTP/1.1" 200 -
+2025-10-18 08:00:47,957 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /script.js HTTP/1.1" 200 -
+2025-10-18 08:00:47,957 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /script.js HTTP/1.1" 200 -
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:47] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp%20(1).jpg HTTP/1.1', '200', '-')
+2025-10-18 08:00:47,980 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /modern-interactions.js HTTP/1.1" 200 -
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:47] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp.jpg HTTP/1.1', '200', '-')
+2025-10-18 08:00:47,994 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /attached_assets/theme.js HTTP/1.1" 200 -
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:47] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp%20(1).jpg HTTP/1.1', '200', '-')
+2025-10-18 08:00:47,980 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /modern-interactions.js HTTP/1.1" 200 -
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:47] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp.jpg HTTP/1.1', '200', '-')
+2025-10-18 08:00:47,994 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:47] "GET /attached_assets/theme.js HTTP/1.1" 200 -
+2025-10-18 08:00:48,014 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:48] "GET /modern-navbar.js HTTP/1.1" 200 -
+2025-10-18 08:00:48,014 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:48] "GET /modern-navbar.js HTTP/1.1" 200 -
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:48] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp%20(3).jpg HTTP/1.1', '200', '-')
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:48] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp%20(2).jpg HTTP/1.1', '200', '-')
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:48] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp%20(4).jpg HTTP/1.1', '200', '-')
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:48] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp%20(3).jpg HTTP/1.1', '200', '-')
+2025-10-18 08:00:48,052 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:48] "GET /footer/instagram-brands-solid-full.svg HTTP/1.1" 200 -
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:48] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp%20(2).jpg HTTP/1.1', '200', '-')
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:48] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp%20(4).jpg HTTP/1.1', '200', '-')
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:48] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp%20(5).jpg HTTP/1.1', '200', '-')
+2025-10-18 08:00:48,052 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:48] "GET /footer/instagram-brands-solid-full.svg HTTP/1.1" 200 -
+2025-10-18 08:00:48,084 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:48] "GET /attached_assets/image_1750584670920.png HTTP/1.1" 200 -
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4cd' in position 98: character maps to <undefined>
+Call stack:
+  File "C:\Program Files\Python313\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Program Files\Python313\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 398, in handle
+    super().handle()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Program Files\Python313\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 370, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 334, in execute
+    write(data)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 271, in write
+    self.send_response(code, msg)
+  File "C:\Program Files\Python313\Lib\http\server.py", line 501, in send_response
+    self.log_request(code)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 467, in log_request
+    self.log("info", '"%s" %s %s', msg, code, size)
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\serving.py", line 478, in log
+    _log(
+  File "C:\Users\YASH\AppData\Roaming\Python\Python313\site-packages\werkzeug\_internal.py", line 97, in _log
+    getattr(_logger, type)(message.rstrip(), *args, **kwargs)
+Message: '127.0.0.1 - - [18/Oct/2025 08:00:48] "%s" %s %s'
+Arguments: ('GET /hero%20pannel/📍S.E.C.%20congratulates%20all%20the%20students%20for%20their%20remarkable%20performance%20in%20CBSE%20class%2012th%20Boa.webp%20(5).jpg HTTP/1.1', '200', '-')
+2025-10-18 08:00:48,084 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:48] "GET /attached_assets/image_1750584670920.png HTTP/1.1" 200 -
+2025-10-18 08:00:48,106 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:48] "GET /footer/youtube-brands-solid-full.svg HTTP/1.1" 200 -
+2025-10-18 08:00:48,106 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:00:48] "GET /footer/youtube-brands-solid-full.svg HTTP/1.1" 200 -
+2025-10-18 08:01:30,610 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[32mGET /online-class HTTP/1.1[0m" 302 -
+2025-10-18 08:01:30,610 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[32mGET /online-class HTTP/1.1[0m" 302 -
+2025-10-18 08:01:30,674 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "GET /auth?next=live_classes.online_class HTTP/1.1" 200 -
+2025-10-18 08:01:30,674 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "GET /auth?next=live_classes.online_class HTTP/1.1" 200 -
+2025-10-18 08:01:30,766 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,766 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,771 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,771 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,779 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,779 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,787 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,787 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,798 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,798 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,819 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,819 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,836 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:01:30,836 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:30] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+Auth POST request received
+Form data: {'username': 'raj', 'password': 'raj', 'class_id': '4', 'admin_code': '', 'next': 'live_classes.online_class'}
+Parsed data - Username: raj, Class ID: 4, Selected Role: class 11 applied
+2025-10-18 08:01:36,520 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[32mPOST /auth HTTP/1.1[0m" 302 -
+2025-10-18 08:01:36,520 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[32mPOST /auth HTTP/1.1[0m" 302 -
+2025-10-18 08:01:36,639 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "GET /online-class HTTP/1.1" 200 -
+2025-10-18 08:01:36,639 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "GET /online-class HTTP/1.1" 200 -
+2025-10-18 08:01:36,749 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,749 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,753 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,753 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,765 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,765 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,780 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,780 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,795 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,795 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,806 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,806 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,811 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,811 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,822 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,822 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,833 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,833 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,838 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,838 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,848 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "GET /navbar-functions.js HTTP/1.1" 200 -
+2025-10-18 08:01:36,848 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "GET /navbar-functions.js HTTP/1.1" 200 -
+2025-10-18 08:01:36,858 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,858 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,882 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:01:36,882 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:36] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:01:40,399 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:40] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:01:40,399 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:40] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:01:43,412 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[32mGET /join-class/405176 HTTP/1.1[0m" 302 -
+2025-10-18 08:01:43,412 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[32mGET /join-class/405176 HTTP/1.1[0m" 302 -
+2025-10-18 08:01:43,465 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "GET /online-class HTTP/1.1" 200 -
+2025-10-18 08:01:43,465 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "GET /online-class HTTP/1.1" 200 -
+2025-10-18 08:01:43,574 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,574 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,579 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,579 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,591 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,591 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,599 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,599 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,609 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,609 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,613 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,613 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /modern-navbar.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,620 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,620 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,633 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,633 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,638 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,638 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,643 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,643 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,650 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,650 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,658 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,658 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /modern-navbar.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,670 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /navbar-functions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:43,670 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:43] "[36mGET /navbar-functions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:01:46,204 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:46] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:01:46,204 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:46] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:01:47,079 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:47] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:01:47,079 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:01:47] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:02:07,529 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:02:07,529 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:02:07,570 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:02:07,570 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:02:11,369 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "GET /auth HTTP/1.1" 200 -
+2025-10-18 08:02:11,369 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "GET /auth HTTP/1.1" 200 -
+2025-10-18 08:02:11,479 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,479 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,484 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,484 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /modern-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,490 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,490 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /modern-interactions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,497 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,497 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,517 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,517 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /enhanced-aesthetic.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,532 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,532 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,556 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:02:11,556 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:11] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+Auth POST request received
+Form data: {'username': 'yash', 'password': 'yash', 'class_id': '8', 'admin_code': 'sec@011'}
+Parsed data - Username: yash, Class ID: 8, Selected Role: admin
+2025-10-18 08:02:21,714 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "[32mPOST /auth HTTP/1.1[0m" 302 -
+2025-10-18 08:02:21,714 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "[32mPOST /auth HTTP/1.1[0m" 302 -
+2025-10-18 08:02:21,856 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "GET /admin HTTP/1.1" 200 -
+2025-10-18 08:02:21,856 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "GET /admin HTTP/1.1" 200 -
+2025-10-18 08:02:21,945 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "GET /forum.css HTTP/1.1" 200 -
+2025-10-18 08:02:21,945 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "GET /forum.css HTTP/1.1" 200 -
+2025-10-18 08:02:21,951 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:21,951 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:21,960 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:02:21,960 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:02:21,968 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-18 08:02:21,968 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:21] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-18 08:02:22,182 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:22] "[35m[1mGET /api/admin/metrics/traffic HTTP/1.1[0m" 500 -
+2025-10-18 08:02:22,182 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:22] "[35m[1mGET /api/admin/metrics/traffic HTTP/1.1[0m" 500 -
+2025-10-18 08:02:22,189 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:22] "GET /api/admin/sessions HTTP/1.1" 200 -
+2025-10-18 08:02:22,189 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:22] "GET /api/admin/sessions HTTP/1.1" 200 -
+2025-10-18 08:02:22,196 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:22] "GET /admin/countdown/settings HTTP/1.1" 200 -
+2025-10-18 08:02:22,196 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:22] "GET /admin/countdown/settings HTTP/1.1" 200 -
+2025-10-18 08:02:35,737 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:35] "GET /content-management HTTP/1.1" 200 -
+2025-10-18 08:02:35,737 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:35] "GET /content-management HTTP/1.1" 200 -
+2025-10-18 08:02:35,864 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:35] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:35,864 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:35] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:35,875 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:35] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:02:35,875 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:35] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:02:37,530 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:02:37,530 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:02:37,561 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:02:37,561 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:02:47,872 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:47] "GET /upload-resource HTTP/1.1" 200 -
+2025-10-18 08:02:47,872 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:47] "GET /upload-resource HTTP/1.1" 200 -
+2025-10-18 08:02:47,973 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:47] "GET /admin-modern.css HTTP/1.1" 200 -
+2025-10-18 08:02:47,973 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:47] "GET /admin-modern.css HTTP/1.1" 200 -
+2025-10-18 08:02:47,977 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:47] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-18 08:02:47,977 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:47] "[36mGET /script.js HTTP/1.1[0m" 304 -
+2025-10-18 08:02:47,983 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:47] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:47,983 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:47] "[36mGET /floating-navbar.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:47,992 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:47] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:47,992 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:47] "[36mGET /style.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,002 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,002 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /uiverse-components.css HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,007 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,007 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /attached_assets/image_1750584670920.png HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,027 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,027 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /footer/instagram-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,033 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "GET /bulk_upload/bulk_upload.css HTTP/1.1" 200 -
+2025-10-18 08:02:48,033 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "GET /bulk_upload/bulk_upload.css HTTP/1.1" 200 -
+2025-10-18 08:02:48,043 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,043 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /footer/youtube-brands-solid-full.svg HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,069 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "GET /bulk_upload/bulk_upload.js HTTP/1.1" 200 -
+2025-10-18 08:02:48,069 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "GET /bulk_upload/bulk_upload.js HTTP/1.1" 200 -
+2025-10-18 08:02:48,075 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /navbar-functions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,075 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /navbar-functions.js HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,079 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-18 08:02:48,079 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:02:48] "[36mGET /attached_assets/theme.js HTTP/1.1[0m" 304 -
+2025-10-18 08:03:07,482 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:03:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:03:07,482 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:03:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:03:07,515 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:03:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:03:07,515 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:03:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:03:37,543 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:03:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:03:37,543 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:03:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:03:37,571 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:03:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:03:37,571 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:03:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:04:07,530 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:04:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:04:07,530 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:04:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:04:07,566 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:04:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:04:07,566 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:04:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:04:37,539 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:04:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:04:37,539 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:04:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:04:37,566 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:04:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:04:37,566 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:04:37] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:05:07,530 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:05:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:05:07,530 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:05:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:05:07,562 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:05:07] "GET /api/live-classes/status HTTP/1.1" 200 -
+2025-10-18 08:05:07,562 [INFO] werkzeug: 127.0.0.1 - - [18/Oct/2025 08:05:07] "GET /api/live-classes/status HTTP/1.1" 200 -
