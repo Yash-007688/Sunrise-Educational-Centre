@@ -5060,7 +5060,10 @@ def handle_chat_message(data):
         message = data.get('message')
         message_type = data.get('type', 'chat')  # chat, system, etc.
         
+        print(f"[Chat] Received chat_message - class_id={class_id}, user_id={user_id}, username={username}")
+        
         if not class_id or not message:
+            print(f"[Chat] ERROR: Missing required fields - class_id={class_id}, message={bool(message)}")
             emit('error', {'message': 'Invalid chat data'})
             return
         
@@ -5072,10 +5075,11 @@ def handle_chat_message(data):
             VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
         ''', (class_id, user_id, username, message, message_type))
         db.commit()
+        message_id = c.lastrowid
         
         # Broadcast message to all users in the room
         message_data = {
-            'id': c.lastrowid,
+            'id': message_id,
             'class_id': class_id,
             'user_id': user_id,
             'username': username,
@@ -5084,13 +5088,19 @@ def handle_chat_message(data):
             'created_at': datetime.now().isoformat()
         }
         
-        print(f"[Chat] Broadcasting new_chat_message in room liveclass_{class_id} from {username} (user_id={user_id})")
-        print(f"[Chat] Room participants: {room_participants.get('liveclass_' + str(class_id), [])}")
-        socketio.emit('new_chat_message', message_data, room=f'liveclass_{class_id}')
-        print(f"[Chat] new_chat_message emitted for class {class_id}")
+        room_name = f'liveclass_{class_id}'
+        participants = room_participants.get(room_name, [])
+        print(f"[Chat] Broadcasting new_chat_message to room '{room_name}'")
+        print(f"[Chat] Room has {len(participants)} participants: {participants}")
+        print(f"[Chat] Message: {message[:50]}..." if len(message) > 50 else f"[Chat] Message: {message}")
+        
+        socketio.emit('new_chat_message', message_data, room=room_name)
+        print(f"[Chat] ✅ new_chat_message emitted successfully for class {class_id}")
         
     except Exception as e:
-        print(f"Error handling chat message: {e}")
+        print(f"[Chat] ❌ ERROR handling chat message: {e}")
+        import traceback
+        traceback.print_exc()
         emit('error', {'message': 'Failed to send message'})
 
 @socketio.on('get_chat_messages')
@@ -5142,7 +5152,10 @@ def handle_create_poll(data):
         correct_answer = data.get('correct_answer')
         duration = data.get('duration', 15)
         
+        print(f"[Poll] Received create_poll - class_id={class_id}, question='{question[:30]}...', created_by={created_by}")
+        
         if not class_id or not question or len(options) < 2:
+            print(f"[Poll] ERROR: Invalid poll data - class_id={class_id}, question={bool(question)}, options_count={len(options)}")
             emit('error', {'message': 'Invalid poll data'})
             return
         
@@ -5163,11 +5176,17 @@ def handle_create_poll(data):
         poll['correct_answer'] = correct_answer
         poll['duration'] = duration
         
-        socketio.emit('new_poll', poll, room=f'liveclass_{class_id}')
-        print(f"Poll created: {poll_id} for class {class_id}")
+        room_name = f'liveclass_{class_id}'
+        print(f"[Poll] Broadcasting new_poll to room '{room_name}' - poll_id={poll_id}")
+        print(f"[Poll] Room has {len(room_participants.get(room_name, []))} participants")
+        
+        socketio.emit('new_poll', poll, room=room_name)
+        print(f"[Poll] ✅ Poll {poll_id} created and broadcasted for class {class_id}")
         
     except Exception as e:
-        print(f"Error creating poll: {e}")
+        print(f"[Poll] ❌ ERROR creating poll: {e}")
+        import traceback
+        traceback.print_exc()
         emit('error', {'message': 'Failed to create poll'})
 
 @socketio.on('vote_poll')
@@ -5195,17 +5214,39 @@ def handle_vote_poll(data):
 
 @socketio.on('submit_doubt')
 def handle_submit_doubt(data):
-    class_id = data.get('class_id')
-    user_id = data.get('user_id')
-    username = data.get('username')
-    doubt_text = data.get('doubt_text')
-    db = get_db()
-    c = db.cursor()
-    c.execute('INSERT INTO doubts (class_id, user_id, username, doubt_text) VALUES (?, ?, ?, ?)', (class_id, user_id, username, doubt_text))
-    db.commit()
-    c.execute('SELECT * FROM doubts WHERE class_id=? ORDER BY created_at ASC', (class_id,))
-    doubts = [dict(row) for row in c.fetchall()]
-    socketio.emit('update_doubts', {'doubts': doubts}, room=f'liveclass_{class_id}')
+    try:
+        class_id = data.get('class_id')
+        user_id = data.get('user_id')
+        username = data.get('username')
+        doubt_text = data.get('doubt_text')
+        
+        print(f"[Doubt] Received submit_doubt - class_id={class_id}, username={username}, doubt='{doubt_text[:30]}...'")
+        
+        if not class_id or not doubt_text:
+            print(f"[Doubt] ERROR: Missing required fields")
+            emit('error', {'message': 'Invalid doubt data'})
+            return
+        
+        db = get_db()
+        c = db.cursor()
+        c.execute('INSERT INTO doubts (class_id, user_id, username, doubt_text) VALUES (?, ?, ?, ?)', (class_id, user_id, username, doubt_text))
+        db.commit()
+        
+        c.execute('SELECT * FROM doubts WHERE class_id=? ORDER BY created_at ASC', (class_id,))
+        doubts = [dict(row) for row in c.fetchall()]
+        
+        room_name = f'liveclass_{class_id}'
+        print(f"[Doubt] Broadcasting update_doubts to room '{room_name}' - {len(doubts)} total doubts")
+        print(f"[Doubt] Room has {len(room_participants.get(room_name, []))} participants")
+        
+        socketio.emit('update_doubts', {'doubts': doubts}, room=room_name)
+        print(f"[Doubt] ✅ Doubt submitted and broadcasted for class {class_id}")
+        
+    except Exception as e:
+        print(f"[Doubt] ❌ ERROR submitting doubt: {e}")
+        import traceback
+        traceback.print_exc()
+        emit('error', {'message': 'Failed to submit doubt'})
 
 @socketio.on('resolve_doubt')
 def handle_resolve_doubt(data):
