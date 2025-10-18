@@ -1242,16 +1242,35 @@ function insertEmojiHost(char) {
     
     async function handleStudentOffer(studentId, offer) {
       try {
+        console.log(`[Host] Handling offer from student ${studentId}`);
+        console.log(`[Host] Local stream status:`, localStream ? 'Available' : 'Not available');
+        console.log(`[Host] Streaming status:`, isStreaming);
+        
+        if (!localStream) {
+          console.error('[Host] Cannot create peer connection - no local stream');
+          showNotification('⚠️ Please start your camera first before students can connect', 'warning');
+          return;
+        }
+        
         let peerConnection = peerConnections.get(studentId);
         
         if (!peerConnection) {
+          console.log(`[Host] Creating new peer connection for student ${studentId}`);
           peerConnection = await createPeerConnection(studentId);
+          if (!peerConnection) {
+            console.error('[Host] Failed to create peer connection');
+            return;
+          }
         }
         
+        console.log(`[Host] Setting remote description for student ${studentId}`);
         await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+        
+        console.log(`[Host] Creating answer for student ${studentId}`);
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
         
+        console.log(`[Host] Sending answer to student ${studentId}`);
         socket.emit('webrtc_answer', {
           class_id: classId,
           answer: answer,
@@ -1259,9 +1278,11 @@ function insertEmojiHost(char) {
           to_user: studentId
         });
         
-        console.log(`Sent answer to student ${studentId}`);
+        console.log(`[Host] ✅ Successfully sent answer to student ${studentId}`);
+        showNotification(`📡 Connected to student ${studentId}`, 'success');
       } catch (error) {
-        console.error('Error handling student offer:', error);
+        console.error('[Host] Error handling student offer:', error);
+        showNotification(`❌ Failed to connect to student: ${error.message}`, 'error');
       }
     }
     
@@ -2355,21 +2376,26 @@ function insertEmojiHost(char) {
 
     // WebRTC Event Listeners
     socket.on('webrtc_offer', (data) => {
-      if (data.from_user !== 'host') {
+      console.log('[Host] Received webrtc_offer:', data);
+      // Only handle offers directed to the host
+      if (data.to_user === 'host' && data.from_user !== 'host') {
+        console.log(`[Host] Processing offer from student ${data.from_user}`);
         handleStudentOffer(data.from_user, data.offer);
       }
     });
     
     socket.on('webrtc_answer', (data) => {
+      console.log('[Host] Received webrtc_answer:', data);
       // Answers will typically come from students (not the host).
-      // Use the `answer` property from the payload (was incorrectly using `offer`).
       if (data.from_user !== 'host') {
         handleStudentAnswer(data.from_user, data.answer);
       }
     });
     
     socket.on('webrtc_ice_candidate', (data) => {
-      if (data.from_user !== 'host') {
+      console.log('[Host] Received webrtc_ice_candidate:', data);
+      // Only handle ICE candidates directed to the host
+      if (data.to_user === 'host' && data.from_user !== 'host') {
         handleStudentICECandidate(data.from_user, data.candidate);
       }
     });
