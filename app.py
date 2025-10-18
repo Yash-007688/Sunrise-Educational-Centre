@@ -5350,16 +5350,21 @@ def handle_webrtc_offer(data):
         class_id = data.get('class_id')
         offer = data.get('offer')
         from_user = data.get('from_user')
+        to_user = data.get('to_user')  # Get target user
         
         if class_id and offer:
-            # Debug: log and broadcast the offer to all other users in the room
-            print(f"[Signaling] webrtc_offer from {from_user} in class {class_id}, sid={request.sid}")
+            # Debug: log the offer
+            print(f"[Signaling] webrtc_offer from {from_user} to {to_user} in class {class_id}, sid={request.sid}")
             print(f"[Signaling] room participants: {room_participants.get('liveclass_' + str(class_id), [])}")
+            
+            # Broadcast to all users in the room (including host)
+            # Don't skip sender so we can handle targeted delivery
             socketio.emit('webrtc_offer', {
                 'offer': offer,
-                'from_user': from_user
-            }, room=f'liveclass_{class_id}', skip_sid=request.sid)
-            print(f"[Signaling] webrtc_offer forwarded for class {class_id}")
+                'from_user': from_user,
+                'to_user': to_user
+            }, room=f'liveclass_{class_id}')
+            print(f"[Signaling] webrtc_offer forwarded to room liveclass_{class_id}")
     except Exception as e:
         print(f"Error handling WebRTC offer: {e}")
 
@@ -5369,14 +5374,18 @@ def handle_webrtc_answer(data):
         class_id = data.get('class_id')
         answer = data.get('answer')
         from_user = data.get('from_user')
+        to_user = data.get('to_user')  # Get target user
         
         if class_id and answer:
-            # Broadcast the answer to all other users in the room
+            print(f"[Signaling] webrtc_answer from {from_user} to {to_user} in class {class_id}")
+            
+            # Broadcast the answer to all users in the room
             socketio.emit('webrtc_answer', {
                 'answer': answer,
-                'from_user': from_user
-            }, room=f'liveclass_{class_id}', skip_sid=request.sid)
-            print(f"WebRTC answer from {from_user} in class {class_id}")
+                'from_user': from_user,
+                'to_user': to_user
+            }, room=f'liveclass_{class_id}')
+            print(f"[Signaling] webrtc_answer forwarded to room liveclass_{class_id}")
     except Exception as e:
         print(f"Error handling WebRTC answer: {e}")
 
@@ -5386,14 +5395,16 @@ def handle_webrtc_ice_candidate(data):
         class_id = data.get('class_id')
         candidate = data.get('candidate')
         from_user = data.get('from_user')
+        to_user = data.get('to_user')  # Get target user
         
         if class_id and candidate:
-            # Broadcast the ICE candidate to all other users in the room
+            # Broadcast the ICE candidate to all users in the room
             socketio.emit('webrtc_ice_candidate', {
                 'candidate': candidate,
-                'from_user': from_user
-            }, room=f'liveclass_{class_id}', skip_sid=request.sid)
-            print(f"WebRTC ICE candidate from {from_user} in class {class_id}")
+                'from_user': from_user,
+                'to_user': to_user
+            }, room=f'liveclass_{class_id}')
+            print(f"[Signaling] WebRTC ICE candidate from {from_user} to {to_user} in class {class_id}")
     except Exception as e:
         print(f"Error handling WebRTC ICE candidate: {e}")
 
