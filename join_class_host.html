@@ -795,7 +795,8 @@ function insertEmojiHost(char) {
 
     // Room management
     socket.on('joined-room', (data) => {
-      console.log('Joined room:', data.room);
+      console.log('[Host] ✅ Joined room successfully:', data.room);
+      console.log('[Host] Session ID:', data.session_id);
       joinedRoom = true;
     });
     
@@ -1389,7 +1390,9 @@ function insertEmojiHost(char) {
           duration: 15 // 15 seconds
         };
         
+        console.log('[Host Poll] Creating poll:', pollData);
         socket.emit('create_poll', pollData);
+        console.log('[Host Poll] ✅ Poll emitted to server');
         document.getElementById('pollForm').reset();
         resetPollForm();
       }
@@ -1463,8 +1466,10 @@ function insertEmojiHost(char) {
 
     // Listen for new polls
     socket.on('new_poll', poll => {
+      console.log('[Host Poll] 📩 Received new_poll event:', poll);
       startPollTimer(poll.id);
       socket.emit('get_polls_and_doubts', { class_id: classId });
+      console.log('[Host Poll] Requested polls and doubts update');
     });
     
     // Listen for poll results
@@ -1624,13 +1629,17 @@ function insertEmojiHost(char) {
     }
     
     socket.on('update_doubts', data => {
+      console.log('[Host Doubt] 📩 Received update_doubts event');
+      console.log('[Host Doubt] Doubts data:', data);
       renderDoubts(data.doubts);
     });
     
     // Listen for new doubts
     socket.on('new_doubt', data => {
+      console.log('[Host Doubt] 📩 Received new_doubt event:', data);
       if (data.class_id === classId) {
         socket.emit('get_polls_and_doubts', { class_id: classId });
+        console.log('[Host Doubt] Requested polls and doubts update');
       }
     });
 
@@ -1743,8 +1752,16 @@ function insertEmojiHost(char) {
           type: 'chat'
         };
         
+        // Debug: Check connection status
+        console.log('[Host Chat] Sending message...');
+        console.log('[Host Chat] Room joined:', joinedRoom);
+        console.log('[Host Chat] Socket connected:', isConnected);
+        console.log('[Host Chat] Class ID:', classId);
+        console.log('[Host Chat] Room name:', room);
+        
         // Emit the message
         socket.emit('chat_message', messageData);
+        console.log('[Host Chat] ✅ Message emitted to server:', messageData);
         
         // Clear input
         chatInput.value = '';
@@ -1752,7 +1769,7 @@ function insertEmojiHost(char) {
         // Show typing indicator
         showTypingIndicator('Host');
         
-        console.log('Host sent message:', messageData);
+        console.log('[Host Chat] Message data sent:', messageData);
       }
     }
 
@@ -1798,7 +1815,9 @@ function insertEmojiHost(char) {
 
     // Enhanced chat event listeners
     socket.on('new_chat_message', (messageData) => {
-      console.debug('Received new chat message (host page):', messageData);
+      console.log('[Host Chat] 📩 Received new_chat_message event');
+      console.log('[Host Chat] Message data:', messageData);
+      console.log('[Host Chat] Message class_id:', messageData.class_id, 'My class_id:', classId);
       // Render all incoming messages (including host) so the host UI stays in sync
       renderChatMessage(messageData);
 

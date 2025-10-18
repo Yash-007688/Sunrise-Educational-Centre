@@ -1062,8 +1062,10 @@ socket.on('error', (data) => {
 
 // Room management
 socket.on('joined-room', (data) => {
-  console.log('Joined room:', data.room);
+  console.log('[Student] ✅ Joined room successfully:', data.room);
+  console.log('[Student] Session ID:', data.session_id);
   joinedRoom = true;
+  showNotification('Connected to live class room', 'success');
 });
 
 // Live Camera Stream Variables
@@ -1571,7 +1573,9 @@ function votePoll(pollId, optionId, pollDiv) {
   }
 }
 socket.on('new_poll', poll => {
+  console.log('[Student Poll] 📩 Received new_poll event:', poll);
   socket.emit('get_polls_and_doubts', { class_id: classId });
+  console.log('[Student Poll] Requested polls and doubts update');
 });
 socket.on('poll_results', data => {
   if (data && data.results) {
@@ -1612,10 +1616,15 @@ document.getElementById('doubtForm').onsubmit = function(e) {
   var doubtInput = document.getElementById('doubtInput');
   var text = doubtInput.value.trim();
   if (!text) return;
-  socket.emit('submit_doubt', { class_id: classId, user_id: getUserId(), username: getUsername(), doubt_text: text });
+  const doubtData = { class_id: classId, user_id: getUserId(), username: getUsername(), doubt_text: text };
+  console.log('[Student Doubt] Submitting doubt:', doubtData);
+  socket.emit('submit_doubt', doubtData);
+  console.log('[Student Doubt] ✅ Doubt emitted to server');
   doubtInput.value = '';
 };
 socket.on('update_doubts', data => {
+  console.log('[Student Doubt] 📩 Received update_doubts event');
+  console.log('[Student Doubt] Doubts data:', data);
   renderDoubts(data.doubts);
 });
 
@@ -1645,8 +1654,16 @@ function sendChatMessage() {
       type: 'chat'
     };
     
+    // Debug: Check connection status
+    console.log('[Student Chat] Sending message...');
+    console.log('[Student Chat] Room joined:', joinedRoom);
+    console.log('[Student Chat] Socket connected:', isConnected);
+    console.log('[Student Chat] Class ID:', classId);
+    console.log('[Student Chat] Room name:', room);
+    
     // Emit the message
     socket.emit('chat_message', messageData);
+    console.log('[Student Chat] ✅ Message emitted to server:', messageData);
     
     // Clear input
     chatInput.value = '';
@@ -1654,7 +1671,7 @@ function sendChatMessage() {
     // Show typing indicator
     showTypingIndicator(getUsername());
     
-    console.log('Student sent message:', messageData);
+    console.log('[Student Chat] Message data sent:', messageData);
   }
 }
 
@@ -1737,7 +1754,9 @@ function renderChatMessage(messageData) {
 
 // Enhanced chat event listeners
 socket.on('new_chat_message', (messageData) => {
-  console.debug('Received new chat message (student page):', messageData);
+  console.log('[Student Chat] 📩 Received new_chat_message event');
+  console.log('[Student Chat] Message data:', messageData);
+  console.log('[Student Chat] Message class_id:', messageData.class_id, 'My class_id:', classId);
   renderChatMessage(messageData);
 });
 
