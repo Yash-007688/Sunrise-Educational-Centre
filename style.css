@@ -3566,3 +3566,395 @@ body.dark-mode .section-item h5 {
     margin-bottom: 0.5rem;
   }
 }
+
+/* ========================================
+   COMPREHENSIVE MOBILE OPTIMIZATION
+   ======================================== */
+
+/* Mobile-First Base Adjustments */
+@media (max-width: 768px) {
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  /* Make all containers mobile-friendly */
+  .container, .main-content {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  /* Optimize navbar for mobile */
+  .navbar {
+    position: sticky;
+  }
+  
+  .nav-content {
+    padding: 0.8rem 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .nav-logo img {
+    height: 35px;
+  }
+  
+  /* Mobile navigation improvements */
+  .nav-links {
+    gap: 0.5rem;
+    padding: 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.3) transparent;
+  }
+  
+  .nav-links a {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.9rem;
+    white-space: nowrap;
+  }
+  
+  /* Hero section mobile optimization */
+  .hero-section {
+    padding: 3rem 1rem 2rem;
+  }
+  
+  .hero-content h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin-bottom: 0.8rem;
+  }
+  
+  .hero-content p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Card grid mobile layout */
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0;
+  }
+  
+  .card {
+    padding: 1.5rem;
+    margin-bottom: 0;
+  }
+  
+  .card img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .card h3 {
+    font-size: 1.2rem;
+  }
+  
+  .card p {
+    font-size: 0.95rem;
+  }
+  
+  /* Button optimization for touch */
+  .btn, .btn-primary, .btn-cta {
+    min-height: 44px; /* iOS recommended touch target */
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    touch-action: manipulation;
+  }
+  
+  /* Forms mobile optimization */
+  input, textarea, select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    min-height: 44px;
+    padding: 0.7rem;
+    border-radius: 8px;
+  }
+  
+  /* Table responsiveness */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+  
+  /* Modal mobile adjustments */
+  .modal, .popup {
+    width: 95% !important;
+    max-width: 95% !important;
+    margin: 1rem auto;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  /* Footer mobile layout */
+  .footer {
+    padding: 1.5rem 0;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  
+  .footer-social {
+    align-items: center;
+  }
+  
+  .footer-social a {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+  }
+  
+  /* Subscribe form mobile */
+  .subscribe-form {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .subscribe-form input {
+    width: 100%;
+    max-width: none;
+  }
+  
+  .subscribe-form button {
+    width: 100%;
+  }
+  
+  /* Contact cards mobile */
+  .contact-grid {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .contact-card {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  /* Profile dropdown mobile */
+  .profile-dropdown-menu {
+    right: -10px;
+    min-width: 220px;
+  }
+  
+  /* Fame slider mobile */
+  .fame-slider {
+    gap: 1rem;
+    padding: 1rem 0.5rem;
+  }
+  
+  .fame-card {
+    min-width: 180px;
+    max-width: 180px;
+    padding: 1rem;
+  }
+  
+  .fame-photo {
+    height: 200px;
+  }
+  
+  .fame-arrow {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+  }
+}
+
+/* Small Mobile Devices (480px and below) */
+@media (max-width: 480px) {
+  /* Typography scaling */
+  body {
+    font-size: 14px;
+  }
+  
+  h1 { font-size: 1.8rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.2rem; }
+  h4 { font-size: 1.1rem; }
+  
+  /* Tighter spacing */
+  .container {
+    padding: 0 0.75rem;
+  }
+  
+  .hero-section {
+    padding: 2rem 0.75rem 1.5rem;
+  }
+  
+  .hero-content h1 {
+    font-size: 1.6rem;
+  }
+  
+  .hero-content p {
+    font-size: 1rem;
+  }
+  
+  /* Navigation compact */
+  .nav-content {
+    padding: 0.6rem 0.75rem;
+  }
+  
+  .nav-logo img {
+    height: 30px;
+  }
+  
+  .nav-links {
+    gap: 0.3rem;
+  }
+  
+  .nav-links a {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.7rem;
+  }
+  
+  /* Cards compact */
+  .card {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+  
+  .card-grid {
+    gap: 1rem;
+  }
+  
+  /* Buttons full-width on small screens */
+  .btn, .btn-primary, .btn-cta {
+    width: 100%;
+    max-width: 320px;
+    margin: 0.5rem auto;
+    display: block;
+  }
+  
+  /* Fame cards smaller */
+  .fame-card {
+    min-width: 160px;
+    max-width: 160px;
+    padding: 0.8rem;
+  }
+  
+  .fame-photo {
+    height: 180px;
+  }
+  
+  .fame-name {
+    font-size: 0.9rem;
+  }
+  
+  .fame-meta {
+    font-size: 0.75rem;
+  }
+  
+  /* Footer social buttons */
+  .footer-social a {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Extra Small Devices (360px and below) */
+@media (max-width: 360px) {
+  body {
+    font-size: 13px;
+  }
+  
+  .container {
+    padding: 0 0.5rem;
+  }
+  
+  .hero-content h1 {
+    font-size: 1.4rem;
+  }
+  
+  .hero-content p {
+    font-size: 0.9rem;
+  }
+  
+  .nav-links a {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+  }
+  
+  .card {
+    padding: 0.8rem;
+  }
+  
+  .fame-card {
+    min-width: 140px;
+    max-width: 140px;
+  }
+  
+  .fame-photo {
+    height: 160px;
+  }
+}
+
+/* Landscape orientation optimization */
+@media (max-width: 896px) and (orientation: landscape) {
+  .hero-section {
+    padding: 2rem 1rem;
+  }
+  
+  .hero-content h1 {
+    font-size: 1.8rem;
+  }
+  
+  .modal, .popup {
+    max-height: 85vh;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets */
+  a, button, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Remove hover effects on touch devices */
+  .card:hover,
+  .btn:hover,
+  .nav-links a:hover {
+    transform: none;
+  }
+  
+  /* Active states instead */
+  .card:active {
+    transform: scale(0.98);
+  }
+  
+  .btn:active {
+    transform: scale(0.97);
+  }
+}
+
+/* High DPI / Retina displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .nav-logo img,
+  .card img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark mode mobile optimizations */
+@media (max-width: 768px) {
+  body.dark-mode .navbar {
+    background: rgba(35, 41, 70, 0.95);
+  }
+  
+  body.dark-mode .card {
+    background: rgba(35, 41, 70, 0.95);
+  }
+  
+  body.dark-mode input,
+  body.dark-mode textarea,
+  body.dark-mode select {
+    background: rgba(26, 26, 42, 0.95) !important;
+  }
+}
