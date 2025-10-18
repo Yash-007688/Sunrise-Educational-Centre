@@ -732,6 +732,7 @@ function insertEmojiHost(char) {
     const room = 'liveclass_' + classId;
     let isConnected = false;
     let reconnectAttempts = 0;
+  let joinedRoom = false; // set true when server confirms join
 
     // Connection management
     socket.on('connect', () => {
@@ -795,6 +796,7 @@ function insertEmojiHost(char) {
     // Room management
     socket.on('joined-room', (data) => {
       console.log('Joined room:', data.room);
+      joinedRoom = true;
     });
     
     // Student count management
@@ -1706,6 +1708,11 @@ function insertEmojiHost(char) {
       const chatInput = document.getElementById('chatInput');
       const message = chatInput.value.trim();
       
+      if (!joinedRoom) {
+        showNotification('Not yet connected to chat room. Please wait a moment.', 'warning');
+        return;
+      }
+
       if (message && isConnected) {
         const messageData = {
           class_id: classId,
@@ -1770,13 +1777,12 @@ function insertEmojiHost(char) {
 
     // Enhanced chat event listeners
     socket.on('new_chat_message', (messageData) => {
-      console.log('Received new chat message:', messageData);
-      
-      // Don't render if it's our own message (host messages)
+      console.debug('Received new chat message (host page):', messageData);
+      // Render all incoming messages (including host) so the host UI stays in sync
+      renderChatMessage(messageData);
+
+      // Show notification for student messages
       if (messageData.username !== 'Host') {
-        renderChatMessage(messageData);
-        
-        // Show notification for new student messages
         showChatNotification(`New message from ${messageData.username}`, 'info');
       }
     });
@@ -2355,8 +2361,10 @@ function insertEmojiHost(char) {
     });
     
     socket.on('webrtc_answer', (data) => {
+      // Answers will typically come from students (not the host).
+      // Use the `answer` property from the payload (was incorrectly using `offer`).
       if (data.from_user !== 'host') {
-        handleStudentAnswer(data.from_user, data.offer);
+        handleStudentAnswer(data.from_user, data.answer);
       }
     });
     

@@ -5084,8 +5084,10 @@ def handle_chat_message(data):
             'created_at': datetime.now().isoformat()
         }
         
-        socketio.emit('new_chat_message', message_data, room=f'liveclass_{class_id}')
-        print(f"Chat message sent: {username}: {message} in class {class_id}")
+    print(f"[Chat] Broadcasting new_chat_message in room liveclass_{class_id} from {username} (user_id={user_id})")
+    print(f"[Chat] Room participants: {room_participants.get('liveclass_' + str(class_id), [])}")
+    socketio.emit('new_chat_message', message_data, room=f'liveclass_{class_id}')
+    print(f"[Chat] new_chat_message emitted for class {class_id}")
         
     except Exception as e:
         print(f"Error handling chat message: {e}")
@@ -5350,12 +5352,14 @@ def handle_webrtc_offer(data):
         from_user = data.get('from_user')
         
         if class_id and offer:
-            # Broadcast the offer to all other users in the room
+            # Debug: log and broadcast the offer to all other users in the room
+            print(f"[Signaling] webrtc_offer from {from_user} in class {class_id}, sid={request.sid}")
+            print(f"[Signaling] room participants: {room_participants.get('liveclass_' + str(class_id), [])}")
             socketio.emit('webrtc_offer', {
                 'offer': offer,
                 'from_user': from_user
             }, room=f'liveclass_{class_id}', skip_sid=request.sid)
-            print(f"WebRTC offer from {from_user} in class {class_id}")
+            print(f"[Signaling] webrtc_offer forwarded for class {class_id}")
     except Exception as e:
         print(f"Error handling WebRTC offer: {e}")
 

@@ -57,6 +57,8 @@ class LiveClassManager:
                     'created_at': datetime.now().isoformat(),
                 }
 
+                # Debug: log where message is being emitted
+                print(f"[LiveClassManager] chat_message from {user_id} in class {class_id} -> broadcasting to room liveclass_{class_id}")
                 socketio.emit('new_chat_message', message_data, room=f'liveclass_{class_id}')
             except Exception as e:
                 print(f"[LiveClassManager] chat_message error: {e}")
@@ -126,6 +128,7 @@ class LiveClassManager:
                 offer = data.get('offer')
                 from_user = data.get('from_user')
                 if class_id and offer:
+                    print(f"[LiveClassManager] webrtc_offer from {from_user} for class {class_id}")
                     socketio.emit('webrtc_offer', {'offer': offer, 'from_user': from_user}, room=f'liveclass_{class_id}', skip_sid=None)
             except Exception as e:
                 print(f"[LiveClassManager] webrtc_offer error: {e}")
@@ -137,6 +140,7 @@ class LiveClassManager:
                 answer = data.get('answer')
                 to_user = data.get('to_user')
                 if class_id and answer:
+                    print(f"[LiveClassManager] webrtc_answer to {to_user} for class {class_id}")
                     socketio.emit('webrtc_answer', {'answer': answer, 'from_user': 'host', 'to_user': to_user}, room=f'liveclass_{class_id}')
             except Exception as e:
                 print(f"[LiveClassManager] webrtc_answer error: {e}")
@@ -148,6 +152,7 @@ class LiveClassManager:
                 candidate = data.get('candidate')
                 from_user = data.get('from_user')
                 if class_id and candidate:
+                    print(f"[LiveClassManager] webrtc_ice_candidate from {from_user} for class {class_id}")
                     socketio.emit('webrtc_ice_candidate', {'candidate': candidate, 'from_user': from_user}, room=f'liveclass_{class_id}', skip_sid=None)
             except Exception as e:
                 print(f"[LiveClassManager] webrtc_ice_candidate error: {e}")

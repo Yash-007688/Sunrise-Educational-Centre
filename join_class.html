@@ -749,6 +749,7 @@ if (typeof socket.onAny === 'function') {
 const room = 'liveclass_' + classId;
 let isConnected = false;
 let reconnectAttempts = 0;
+let joinedRoom = false;
 let classStartTime = Date.now();
 let isClassEnded = false;
 let sections = [];
@@ -1062,6 +1063,7 @@ socket.on('error', (data) => {
 // Room management
 socket.on('joined-room', (data) => {
   console.log('Joined room:', data.room);
+  joinedRoom = true;
 });
 
 // Live Camera Stream Variables
@@ -1629,6 +1631,11 @@ function sendChatMessage() {
   const chatInput = document.getElementById('chatInput');
   const message = chatInput.value.trim();
   
+  if (!joinedRoom) {
+    showNotification('Not connected to chat room yet. Please wait...', 'warning');
+    return;
+  }
+
   if (message && isConnected) {
     const messageData = {
       class_id: classId,
@@ -1730,7 +1737,7 @@ function renderChatMessage(messageData) {
 
 // Enhanced chat event listeners
 socket.on('new_chat_message', (messageData) => {
-  console.log('Received new chat message:', messageData);
+  console.debug('Received new chat message (student page):', messageData);
   renderChatMessage(messageData);
 });
 
