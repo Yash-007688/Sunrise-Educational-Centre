@@ -360,6 +360,121 @@ body.dark-mode .participant-item:hover {
   .students-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  
+  /* Mobile Navigation */
+  .navbar-modern {
+    top: 1rem;
+    padding: 0.5rem 1rem;
+    width: calc(100% - 2rem);
+    left: 1rem;
+    transform: none;
+  }
+  
+  .navbar-container {
+    gap: 1rem;
+  }
+  
+  .navbar-nav {
+    gap: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  
+  .navbar-nav::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .nav-link {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  
+  /* Mobile class cards */
+  .classes-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+  
+  .class-card {
+    padding: 1.5rem;
+  }
+  
+  /* Mobile video section */
+  .video-section {
+    padding: 1rem;
+  }
+  
+  /* Mobile class controls */
+  .class-controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .control-btn {
+    flex: 1;
+    min-width: calc(50% - 0.5rem);
+  }
+  
+  /* Mobile sidebar */
+  .class-sidebar {
+    max-height: 300px;
+  }
+}
+
+/* Small Mobile Devices */
+@media (max-width: 480px) {
+  .navbar-modern {
+    padding: 0.4rem 0.75rem;
+  }
+  
+  .brand-link {
+    font-size: 1rem;
+  }
+  
+  .nav-link {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+  }
+  
+  .classes-grid {
+    padding: 0 0.5rem;
+  }
+  
+  .class-card {
+    padding: 1rem;
+  }
+  
+  .class-title {
+    font-size: 1.2rem;
+  }
+  
+  .students-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .control-btn {
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .class-card,
+  .control-btn,
+  .nav-link {
+    min-height: 44px;
+  }
+  
+  .class-card:hover {
+    transform: none;
+  }
+  
+  .class-card:active {
+    transform: scale(0.98);
+  }
 }
 
 /* Theme Toggle Button Styles */
