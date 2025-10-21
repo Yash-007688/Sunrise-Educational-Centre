@@ -1,0 +1,9 @@
+# Ignore environment files
+.env
+
+# SQLite temporary files
+*.db-shm
+*.db-wal
+
+# VS Code workspace
+.vscode/

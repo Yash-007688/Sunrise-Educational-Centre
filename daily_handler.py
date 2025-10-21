@@ -3,6 +3,14 @@ import requests
 from flask import jsonify
 from datetime import datetime, timedelta
 
+# try to load environment variables from a .env file if python-dotenv is available
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    # dotenv is optional; environment variables can be provided by the host
+    pass
+
 class DailyHandler:
     def __init__(self, api_key):
         self.api_key = api_key
@@ -190,5 +198,11 @@ class DailyHandler:
                 'message': str(e)
             }), 500
 
-# Initialize Daily handler with API key
 daily_handler = DailyHandler(os.getenv('DAILY_API_KEY'))
+# Initialize Daily handler with API key
+DAILY_API_KEY = os.getenv('DAILY_API_KEY')
+if not DAILY_API_KEY:
+    # Do not log secrets; provide a helpful message for developers
+    print('Warning: DAILY_API_KEY not set. Daily.co API requests will fail until you set this environment variable.')
+
+daily_handler = DailyHandler(DAILY_API_KEY)
