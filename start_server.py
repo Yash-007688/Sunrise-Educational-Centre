@@ -16,11 +16,11 @@ def check_requirements():
         import flask
         import flask_socketio
         import sqlite3
-        print("✅ All required packages are available")
+        print("All required packages are available")
         return True
     except ImportError as e:
-        print(f"❌ Missing required package: {e}")
-        print("📦 Please install requirements: pip install -r requirements.txt")
+        print(f"Missing required package: {e}")
+        print("Please install requirements: pip install -r requirements.txt")
         return False
 
 def start_server():
@@ -28,10 +28,10 @@ def start_server():
     if not check_requirements():
         return
     
-    print("🚀 Starting Sunrise Educational Centre Server...")
-    print("📍 Current directory:", os.getcwd())
-    print("🔄 Auto-restart enabled - server will restart if it crashes")
-    print("⏹️  Press Ctrl+C to stop the server")
+    print("Starting Sunrise Educational Centre Server...")
+    print("Current directory:", os.getcwd())
+    print("Auto-restart enabled - server will restart if it crashes")
+    print("Press Ctrl+C to stop the server")
     print("-" * 50)
     
     restart_count = 0
@@ -40,7 +40,7 @@ def start_server():
     while restart_count < max_restarts:
         try:
             if restart_count > 0:
-                print(f"🔄 Restarting server (attempt {restart_count + 1}/{max_restarts})...")
+                print(f"Restarting server (attempt {restart_count + 1}/{max_restarts})...")
                 time.sleep(2)
             
             # Run the main app
@@ -52,11 +52,11 @@ def start_server():
                 print("✅ Server shut down normally")
                 break
             else:
-                print(f"⚠️  Server exited with code {process.returncode}")
+                print(f"Server exited with code {process.returncode}")
                 restart_count += 1
                 
         except KeyboardInterrupt:
-            print("\n⏹️  Server stopped by user")
+            print("\nServer stopped by user")
             try:
                 process.terminate()
                 process.wait(timeout=5)
@@ -64,16 +64,16 @@ def start_server():
                 process.kill()
             break
         except FileNotFoundError:
-            print("❌ app.py not found. Make sure you're in the correct directory.")
+            print("app.py not found. Make sure you're in the correct directory.")
             break
         except Exception as e:
-            print(f"❌ Unexpected error: {e}")
+            print(f"Unexpected error: {e}")
             restart_count += 1
             time.sleep(5)
     
     if restart_count >= max_restarts:
-        print(f"❌ Server failed to start after {max_restarts} attempts")
-        print("🔍 Check the server.log file for detailed error information")
+        print(f"Server failed to start after {max_restarts} attempts")
+        print("Check the server.log file for detailed error information")
 
 if __name__ == "__main__":
     start_server()

@@ -1,11 +1,49 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 import sqlite3
-from .daily_handler import daily_handler
+from daily_handler import daily_handler
 
 # Separate blueprint for live class routes
 live_classes_bp = Blueprint('live_classes', __name__)
 
 DATABASE = 'users.db'
+
+
+def _extract_daily_response(resp):
+    """Normalize responses from daily_handler to (data_dict, status_code).
+    daily_handler methods may return Flask responses, tuples (response, status),
+    requests.Response, or plain dicts. This helper extracts a Python dict and
+    status code for easy consumption.
+    """
+    try:
+        # Tuple like (response, status)
+        if isinstance(resp, tuple):
+            resp_obj, status = resp
+            if hasattr(resp_obj, 'get_json'):
+                return resp_obj.get_json(), status
+            if isinstance(resp_obj, dict):
+                return resp_obj, status
+            try:
+                return resp_obj.json(), status
+            except Exception:
+                return {}, status
+
+        # Flask Response (has get_json)
+        if hasattr(resp, 'get_json'):
+            return resp.get_json(), getattr(resp, 'status_code', 200)
+
+        # requests.Response-like
+        try:
+            return resp.json(), getattr(resp, 'status_code', 200)
+        except Exception:
+            pass
+
+        # dict fallback
+        if isinstance(resp, dict):
+            return resp, 200
+
+    except Exception:
+        pass
+    return {}, getattr(resp, 'status_code', 500)
 
 @live_classes_bp.route('/online-class', methods=['GET'])
 def online_class():
@@ -50,11 +88,12 @@ def join_class(class_id):
         
     # Get Daily.co room URL
     daily_response = daily_handler.get_room(class_id)
-    if not daily_response.json.get('success'):
+    resp_json, resp_status = _extract_daily_response(daily_response)
+    if not resp_json.get('success'):
         flash('Failed to get class room. Please try again.', 'error')
         return redirect(url_for('live_classes.online_class'))
-        
-    meeting_url = daily_response.json['room_url']
+
+    meeting_url = resp_json.get('room_url')
     
     # Log attendance
     try:
@@ -84,8 +123,8 @@ def join_class(class_id):
 @live_classes_bp.route('/join-class-host/<int:class_id>')
 def join_class_host(class_id):
     if session.get('role') not in ['admin', 'teacher']:
-        flash('Access denied. Only hosts can access this page.', 'error')
-        return redirect(url_for('admin_panel'))
+        flash('Access denied. Only hosts can access this page. Please login as a host.', 'error')
+        return redirect(url_for('auth'))
     
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
@@ -105,14 +144,20 @@ def join_class_host(class_id):
         
     # Get Daily.co room URL
     daily_response = daily_handler.get_room(class_id)
-    if not daily_response.json.get('success'):
+    resp_json, resp_status = _extract_daily_response(daily_response)
+    if not resp_json.get('success'):
         # Try creating new room if it doesn't exist
         daily_response = daily_handler.create_room(class_id)
-        if not daily_response.json.get('success'):
-            flash('Failed to create class room. Please try again.', 'error')
-            return redirect(url_for('admin_panel'))
-            
-    meeting_url = daily_response.json['room_url']
+        resp_json, resp_status = _extract_daily_response(daily_response)
+        if not resp_json.get('success'):
+            # Don't redirect the host back to admin panel on API failures.
+            # Instead, render the host page and show an error so the host can retry
+            flash('Failed to create class room with Daily.co. The host page is available — try starting the class again or check API configuration.', 'error')
+            meeting_url = ''
+        else:
+            meeting_url = resp_json.get('room_url') or ''
+    else:
+        meeting_url = resp_json.get('room_url') or ''
     
     return render_template('join_class_host.html',
                          class_id=class_id,
@@ -140,7 +185,8 @@ def start_live_class_route():
     
     # Create Daily.co room
     daily_response = daily_handler.create_room(class_id)
-    if not daily_response.json.get('success'):
+    resp_json, resp_status = _extract_daily_response(daily_response)
+    if not resp_json.get('success'):
         flash('Failed to create class room. Please try again.', 'error')
         return redirect(url_for('live_classes.online_class'))
         
@@ -152,7 +198,7 @@ def start_live_class_route():
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
         c.execute('UPDATE live_classes SET room_url = ? WHERE id = ?', 
-                 (daily_response.json['room_url'], class_id))
+                  (resp_json.get('room_url'), class_id))
         conn.commit()
     finally:
         conn.close()

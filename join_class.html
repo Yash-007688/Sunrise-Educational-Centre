@@ -4,6 +4,8 @@
   <title>Join Live Class</title>
   <link rel="stylesheet" href="style.css" />
   <script src="script.js"></script>
+  <!-- Daily.co client SDK (only needed for joining rooms) -->
+  <script src="https://unpkg.com/@daily-co/daily-js"></script>
   <style>
     .join-container { display: flex; max-width: 1100px; margin: 3rem auto; background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(100,100,255,0.10); }
     .video-section { flex: 2; padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%); }
@@ -381,7 +383,21 @@
   </script>
     <link rel="stylesheet" href="floating-navbar.css">
     <link rel="stylesheet" href="uiverse-components.css">
-</head>
+    <script>
+      // Mobile navbar toggle
+      document.addEventListener('DOMContentLoaded', function() {
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (hamburger && navLinks) {
+          hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+          });
+        }
+      });
+    </script>
+  </head>
 <body>
   
   <div class="join-container">
@@ -432,8 +448,11 @@
           </div>
         </div>
         
+        <!-- Daily.co iframe container (hidden by default) -->
+        <div id="dailyContainer" style="display: none; width:100%; height:360px; border-radius:12px; overflow:hidden;"></div>
+
         <!-- Content Video (YouTube or uploaded video) -->
-        <div id="contentVideo" style="display: block;">
+          <div id="contentVideo" style="display: block;">
           {% set is_youtube = 'youtube.com' in meeting_url or 'youtu.be' in meeting_url %}
           {% if is_youtube %}
             {% set youtube_id = None %}
@@ -1998,6 +2017,37 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Check if host is already streaming
   socket.emit('request_host_stream', { class_id: classId });
+
+  // If meeting_url is a Daily.co room, embed Daily iframe and join as Student
+  try {
+    const meetingUrl = {{ meeting_url|tojson }} || '';
+    if (meetingUrl && meetingUrl.includes('daily.co')) {
+      console.log('Detected Daily.co meeting URL - using Daily iframe for video');
+      const dailyContainer = document.getElementById('dailyContainer');
+      const contentVideo = document.getElementById('contentVideo');
+      // Show Daily container and hide content video
+      if (dailyContainer) dailyContainer.style.display = 'block';
+      if (contentVideo) contentVideo.style.display = 'none';
+
+      // Create and join Daily iframe
+      const callFrame = window.DailyIframe.createFrame(dailyContainer, {
+        iframeStyle: { width: '100%', height: '100%', border: '0' },
+        showLeaveButton: true,
+        showFullscreenButton: true
+      });
+
+      callFrame.join({ url: meetingUrl, userName: (window.username || 'Student') }).then(() => {
+        console.log('Joined Daily room:', meetingUrl);
+      }).catch(err => {
+        console.error('Failed to join Daily room:', err);
+        // Fallback: show content video again
+        if (dailyContainer) dailyContainer.style.display = 'none';
+        if (contentVideo) contentVideo.style.display = 'block';
+      });
+    }
+  } catch (e) {
+    console.error('Daily embed init error:', e);
+  }
 
   // Setup custom content video controls if applicable
   setupStudentContentControls();

@@ -1265,10 +1265,66 @@ body.dark-mode .hamburger .bar {
     .nav-content {
         padding: 0 0.5rem;
     }
-    
+
+    .nav-links {
+        flex-direction: column; /* Stack links vertically on very small screens */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .nav-links.active {
+        max-height: 500px; /* Show when active */
+    }
+
     .nav-links a {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.85rem;
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-links a:last-child {
+        border-bottom: none;
+    }
+
+    /* Add hamburger menu for small screens */
+    .hamburger {
+        display: block !important;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+
+    .hamburger .bar {
+        display: block;
+        width: 25px;
+        height: 3px;
+        margin: 5px auto;
+        -webkit-transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+        background-color: #fff;
+    }
+
+    .hamburger.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+
+    .hamburger.active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+
+    .hamburger.active .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
     }
     
     .hero-content h1 {
@@ -1309,30 +1365,74 @@ body.dark-mode .hamburger .bar {
         padding: 0.2rem 0.4rem;
         font-size: 0.8rem;
     }
-    
+
     .hero-content h1 {
         font-size: 1.5rem;
     }
-    
+
     .hero-content p {
         font-size: 0.9rem;
     }
-    
+
     .card-section h2 {
         font-size: 1.3rem;
     }
-    
+
     .container {
         padding: 0 0.3rem;
     }
-    
+
     .card {
         padding: 0.8rem;
     }
-    
+
     .btn {
         padding: 0.5rem 1rem;
         font-size: 0.85rem;
+    }
+}
+
+/* Ensure all containers are visible on mobile */
+@media (max-width: 768px) {
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        overflow-x: hidden; /* Prevent horizontal scroll */
+        width: 100%;
+        min-width: 0;
+    }
+
+    .container, .card, .nav-content, .hero-section, .main-content, .footer-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    /* Make sure no elements are hidden */
+    .container, .card, .nav-links, .hero-content, .main-content, .footer, .subscribe-section, .contact-section {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Ensure flex containers stack properly */
+    .card-grid, .contact-grid, .footer-content, .subscribe-form {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+
+    /* Fix any absolute positioned elements */
+    .profile-dropdown-menu, #notifDropdown {
+        position: fixed !important;
+        left: 1rem !important;
+        right: 1rem !important;
+        width: auto !important;
+        max-width: calc(100vw - 2rem) !important;
     }
 }
 

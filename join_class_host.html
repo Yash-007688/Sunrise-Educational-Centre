@@ -346,7 +346,21 @@
   </style>
     <link rel="stylesheet" href="floating-navbar.css">
     <link rel="stylesheet" href="uiverse-components.css">
-</head>
+    <script>
+      // Mobile navbar toggle
+      document.addEventListener('DOMContentLoaded', function() {
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (hamburger && navLinks) {
+          hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+          });
+        }
+      });
+    </script>
+  </head>
 <body>
   
   <div class="host-container">
