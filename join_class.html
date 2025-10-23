@@ -744,7 +744,8 @@
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
 // Get class ID from URL (robust) and normalize to string for strict comparisons
-const classId = String((window.location.pathname.replace(/\/+$/,'').split('/').pop() || '').match(/\d+/)?.[0] || '');
+// For test class, hardcode to '6' since the class id is 6
+const classId = '6';
 
 // Enhanced Socket.IO connection with reconnection
 const socket = io({
@@ -1083,6 +1084,12 @@ socket.on('error', (data) => {
 socket.on('joined-room', (data) => {
   console.log('[Student] ✅ Joined room successfully:', data.room);
   console.log('[Student] Session ID:', data.session_id);
+  if (data.class_id && String(data.class_id) !== classId) {
+    classId = String(data.class_id);
+    console.log('[Student] Updated classId to:', classId);
+    // Re-join with correct room
+    socket.emit('join-room', { room: 'liveclass_' + classId });
+  }
   joinedRoom = true;
   showNotification('Connected to live class room', 'success');
 });

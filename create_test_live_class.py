@@ -36,7 +36,7 @@ def create_demo_live_class():
     status = "active"  # active = live now, scheduled = for future
     
     # Create the live class
-    print("🎓 Creating Live Class...")
+    print("Creating Live Class...")
     print("=" * 60)
     
     try:
@@ -56,9 +56,9 @@ def create_demo_live_class():
             teacher_name=teacher_name
         )
         
-        print(f"✅ Live Class Created Successfully!")
+        print(f"Live Class Created Successfully!")
         print("=" * 60)
-        print(f"\n📋 CLASS DETAILS:")
+        print(f"\nCLASS DETAILS:")
         print(f"   Class ID: {new_class_id}")
         print(f"   Topic: {topic}")
         print(f"   Teacher: {teacher_name}")
@@ -68,35 +68,35 @@ def create_demo_live_class():
         print(f"   Access: {paid_status.upper()}")
         print(f"   Status: {status.upper()}")
         print(f"   Scheduled: {scheduled_time}")
-        print(f"\n🔐 ACCESS CREDENTIALS:")
+        print(f"\nACCESS CREDENTIALS:")
         print(f"   Class Code: {class_code}")
         print(f"   PIN: {pin}")
-        print(f"\n🔗 LINKS:")
+        print(f"\nLINKS:")
         print(f"   Host Page: http://localhost:10000/join-class-host/{new_class_id}")
         print(f"   Student Page: http://localhost:10000{meeting_url}")
-        print(f"\n💡 FEATURES ENABLED:")
-        print(f"   ✓ Live Video Streaming (WebRTC)")
-        print(f"   ✓ Real-time Chat")
-        print(f"   ✓ Interactive Polls")
-        print(f"   ✓ Doubt Submission")
-        print(f"   ✓ Class Recording")
-        print(f"   ✓ Screen Sharing")
+        print(f"\nFEATURES ENABLED:")
+        print(f"   * Live Video Streaming (WebRTC)")
+        print(f"   * Real-time Chat")
+        print(f"   * Interactive Polls")
+        print(f"   * Doubt Submission")
+        print(f"   * Class Recording")
+        print(f"   * Screen Sharing")
         
         # Create a notification for the class
         try:
             add_notification(
-                message=f'🔴 LIVE NOW: {topic} by {teacher_name}',
+                message=f'LIVE NOW: {topic} by {teacher_name}',
                 class_id=None,  # For live classes, we use the class_id directly
                 target_paid_status='all',
                 status='active',
                 notification_type='live_class'
             )
-            print(f"\n📢 Notification Created: All students will be notified")
+            print(f"\nNotification Created: All students will be notified")
         except Exception as e:
-            print(f"\n⚠️  Note: Could not create notification - {e}")
+            print(f"\nNote: Could not create notification - {e}")
         
         print("\n" + "=" * 60)
-        print("🚀 To start the class:")
+        print("To start the class:")
         print(f"   1. Open host page: http://localhost:10000/join-class-host/{new_class_id}")
         print(f"   2. Start your camera and go live")
         print(f"   3. Students can join at: http://localhost:10000{meeting_url}")
