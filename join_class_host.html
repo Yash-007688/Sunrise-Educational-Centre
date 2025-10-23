@@ -406,6 +406,9 @@
               <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"/>
             </svg>
           </button>
+          <button id="tryDefaultCameraBtn" class="icon-btn" title="Try Default Camera" style="background: linear-gradient(135deg,#ffd54f 0%,#ffb300 100%); color:#111;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14h-2v-2h2v2zm0-4h-2V6h2v6z"/></svg>
+          </button>
           <button id="stopCameraBtn" class="icon-btn icon-btn-stop" title="Stop Camera" style="display: none;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M21 6.5l-4 4V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11zM9.5 16L8 14.5l1.5-1.5L8 11.5 9.5 10l1.5 1.5L12.5 10 14 11.5 12.5 13 14 14.5 12.5 16 11 14.5 9.5 16z"/>
@@ -438,6 +441,7 @@
             <select id="videoSourceSelect" class="device-select">
               <option value="">Select Camera...</option>
             </select>
+            <div id="devLog" style="margin-top:8px; font-size:0.85rem; color:#333; max-height:120px; overflow:auto; background:#fff; border:1px solid #e0e7ff; padding:0.5rem; border-radius:8px; display:none;"></div>
           </div>
           <div class="device-row">
             <svg class="device-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -844,25 +848,15 @@ function insertEmojiHost(char) {
     let streamUrl = null;
     let isBroadcasting = false;
 
-    // Camera Control Elements
-    const hostCamera = document.getElementById('hostCamera');
-    const startCameraBtn = document.getElementById('startCameraBtn');
-    const stopCameraBtn = document.getElementById('stopCameraBtn');
-    const toggleMicBtn = document.getElementById('toggleMicBtn');
-    const showCameraBtn = document.getElementById('showCameraBtn');
-    const showContentBtn = document.getElementById('showContentBtn');
-    const contentVideo = document.getElementById('contentVideo');
-    const statusText = document.getElementById('statusText');
-    const videoSourceSelect = document.getElementById('videoSourceSelect');
-    const audioSourceSelect = document.getElementById('audioSourceSelect');
-    const deviceStatus = document.getElementById('deviceStatus');
+  // Camera Control Elements (will be initialized on DOMContentLoaded)
+  let hostCamera, startCameraBtn, stopCameraBtn, toggleMicBtn, showCameraBtn, showContentBtn, contentVideo, statusText, videoSourceSelect, audioSourceSelect, deviceStatus;
 
     // Start Camera Function
     async function startCamera() {
       try {
+        // If user hasn't selected specific devices, fall back to default devices
         if (!selectedVideoDevice && !selectedAudioDevice) {
-          deviceStatus.innerHTML = '⚠️ Please select camera and microphone devices first';
-          return;
+          deviceStatus.innerHTML = 'ℹ️ No specific devices selected — using default camera/microphone';
         }
 
         await startCameraWithSelectedDevices();
@@ -883,6 +877,18 @@ function insertEmojiHost(char) {
         stopCameraBtn.style.display = 'inline-block';
         statusText.textContent = 'Camera Active - Live Class Ready';
         deviceStatus.innerHTML = '🔴 Live streaming with selected devices';
+
+        // Show camera feed immediately
+        hostCamera.style.display = 'block';
+        contentVideo.style.display = 'none';
+        currentVideoMode = 'camera';
+
+        // Notify students to request the stream
+        socket.emit('host_video_mode', {
+          class_id: classId,
+          mode: 'camera',
+          message: 'Host is showing live camera'
+        });
         
         // Notify students that host camera is live
         socket.emit('host_camera_status', { 
@@ -900,6 +906,7 @@ function insertEmojiHost(char) {
         statusText.textContent = 'Camera Access Error - Check Permissions';
         deviceStatus.innerHTML = '❌ Failed to access selected devices';
         showNotification('Could not access camera. Please check permissions and selected devices.', 'error');
+        try { showTroubleshooting(error); } catch(e) { console.error('Troubleshoot helper failed', e); }
       }
     }
 
@@ -1019,14 +1026,119 @@ function insertEmojiHost(char) {
       });
     }
 
-    // Event Listeners
-    startCameraBtn.addEventListener('click', startCamera);
-    stopCameraBtn.addEventListener('click', stopCamera);
-    toggleMicBtn.addEventListener('click', toggleMicrophone);
-    showCameraBtn.addEventListener('click', showCameraVideo);
-    showContentBtn.addEventListener('click', showContentVideo);
-    videoSourceSelect.addEventListener('change', handleDeviceSelection);
-    audioSourceSelect.addEventListener('change', handleDeviceSelection);
+    // Attach event listeners after DOM is ready
+    function checkPermissions() {
+      // Use Permissions API when available to inform user
+      try {
+        if (navigator.permissions) {
+          navigator.permissions.query({ name: 'camera' }).then(res => {
+            devLog(`Camera permission state: ${res.state}`);
+            if (res.state === 'denied') {
+              deviceStatus && (deviceStatus.innerHTML = '❌ Camera permission denied. Open site settings to allow.');
+              showTroubleshooting({ message: 'Camera permission denied' });
+            }
+          }).catch(() => {});
+          navigator.permissions.query({ name: 'microphone' }).then(res => {
+            devLog(`Microphone permission state: ${res.state}`);
+            if (res.state === 'denied') {
+              deviceStatus && (deviceStatus.innerHTML = '❌ Microphone permission denied. Open site settings to allow.');
+              showTroubleshooting({ message: 'Microphone permission denied' });
+            }
+          }).catch(() => {});
+        }
+      } catch (e) {
+        console.warn('Permissions API not fully supported', e);
+      }
+    }
+
+    function initCameraControls() {
+      // Re-query DOM for elements (ensures script works if executed early)
+      hostCamera = document.getElementById('hostCamera');
+      startCameraBtn = document.getElementById('startCameraBtn');
+      stopCameraBtn = document.getElementById('stopCameraBtn');
+      toggleMicBtn = document.getElementById('toggleMicBtn');
+      showCameraBtn = document.getElementById('showCameraBtn');
+      showContentBtn = document.getElementById('showContentBtn');
+      contentVideo = document.getElementById('contentVideo');
+      statusText = document.getElementById('statusText');
+      videoSourceSelect = document.getElementById('videoSourceSelect');
+      audioSourceSelect = document.getElementById('audioSourceSelect');
+      deviceStatus = document.getElementById('deviceStatus');
+
+      if (startCameraBtn) startCameraBtn.addEventListener('click', startCamera);
+      if (stopCameraBtn) stopCameraBtn.addEventListener('click', stopCamera);
+      if (toggleMicBtn) toggleMicBtn.addEventListener('click', toggleMicrophone);
+      if (showCameraBtn) showCameraBtn.addEventListener('click', showCameraVideo);
+      if (showContentBtn) showContentBtn.addEventListener('click', showContentVideo);
+      if (videoSourceSelect) videoSourceSelect.addEventListener('change', handleDeviceSelection);
+      if (audioSourceSelect) audioSourceSelect.addEventListener('change', handleDeviceSelection);
+
+      const tryDefaultCameraBtnLocal = document.getElementById('tryDefaultCameraBtn');
+      if (tryDefaultCameraBtnLocal) tryDefaultCameraBtnLocal.addEventListener('click', tryDefaultCamera);
+
+      checkPermissions();
+    }
+
+    // Ensure controls init when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCameraControls);
+    } else {
+      initCameraControls();
+    }
+
+    // Dev log helper
+    const devLogEl = document.getElementById('devLog');
+    function devLog(msg) {
+      if (!devLogEl) return;
+      devLogEl.style.display = 'block';
+      const line = document.createElement('div');
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      devLogEl.appendChild(line);
+      devLogEl.scrollTop = devLogEl.scrollHeight;
+    }
+
+    function showTroubleshooting(err) {
+      if (!devLogEl) return;
+      devLog(`Troubleshooting: ${err && err.message ? err.message : err}`);
+      const box = document.createElement('div');
+      box.style.cssText = 'margin-top:8px;padding:8px;border-radius:8px;background:#fffef6;border:1px solid #ffe6a7;color:#222;';
+      box.innerHTML = `
+        <strong>Quick Troubleshooting</strong>
+        <ol style="margin:6px 0 0 18px;padding:0;color:#333">
+          <li>Allow camera & microphone permissions when the browser prompts. If you accidentally blocked, open site settings and allow them.</li>
+          <li>Serve the page over <code>https</code> (or use <code>localhost</code>) — getUserMedia requires a secure origin.</li>
+          <li>Close other apps that might be using the camera (Zoom, Teams, etc.).</li>
+          <li>Check your OS privacy settings to ensure the browser is allowed to access camera/mic.</li>
+          <li>Try the <em>Try Default Camera</em> button again after changing permissions.</li>
+        </ol>
+        <div style="margin-top:6px;color:#555;font-size:0.9rem">If the issue persists, contact your admin or check browser settings (lock icon in address bar).</div>
+      `;
+      devLogEl.appendChild(box);
+      devLogEl.scrollTop = devLogEl.scrollHeight;
+    }
+
+    async function tryDefaultCamera() {
+      try {
+        devLog('Attempting to access default camera/microphone...');
+        // attempt a simple default getUserMedia
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        // stop tracks immediately (we only test permission and devices)
+        stream.getTracks().forEach(t => t.stop());
+        devLog('Default camera access granted. Now starting camera stream...');
+        // Clear selected devices so startCamera uses defaults
+        selectedVideoDevice = null;
+        selectedAudioDevice = null;
+        await startCamera();
+      } catch (err) {
+        console.error('tryDefaultCamera error:', err);
+        devLog(`Error: ${err.message || err}`);
+        deviceStatus.innerHTML = `❌ Default camera test failed: ${err.message || err}`;
+        showNotification('Could not access default camera. Check permissions and try again.', 'error');
+      }
+    }
+
+    const tryDefaultCameraBtn = document.getElementById('tryDefaultCameraBtn');
+    if (tryDefaultCameraBtn) tryDefaultCameraBtn.addEventListener('click', tryDefaultCamera);
 
     // Device Management Functions
     async function enumerateDevices() {
@@ -1174,6 +1286,7 @@ function insertEmojiHost(char) {
         } catch (fallbackError) {
           console.error('Fallback camera also failed:', fallbackError);
           deviceStatus.innerHTML = `❌ Camera failed: ${fallbackError.message}`;
+          try { showTroubleshooting(fallbackError); } catch(e) { console.error('Troubleshoot helper failed', e); }
           throw fallbackError;
         }
       }
