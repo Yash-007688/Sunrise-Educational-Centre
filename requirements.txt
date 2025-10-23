@@ -1,12 +1,13 @@
 Flask
+Flask-Compress
 gunicorn
-werkzeug 
+werkzeug
 pandas
-openpyxl 
+openpyxl
 yt-dlp
 requests
-pytz 
+pytz
 Flask-SocketIO
-eventlet 
+eventlet
 google-api-python-client
 google-auth

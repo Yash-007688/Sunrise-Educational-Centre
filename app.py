@@ -89,8 +89,27 @@ try:
 except Exception as _e:
     print(f"Batch blueprint not loaded: {_e}")
 
+# Initialize Flask-Compress for response compression
+try:
+    from flask_compress import Compress
+    compress = Compress()
+except ImportError:
+    compress = None
+    print("Flask-Compress not available, compression disabled")
+
 # Initialize Flask app
 app = Flask(__name__, static_folder='.', template_folder='.')
+
+# Enable compression if available
+if compress:
+    compress.init_app(app)
+
+# Add cache headers for static files
+@app.after_request
+def add_cache_headers(response):
+    if request.path.startswith('/static/') or '.' in request.path:
+        response.headers['Cache-Control'] = 'public, max-age=3600'
+    return response
 
 # Configuration
 app.config['UPLOAD_FOLDER'] = 'uploads'
