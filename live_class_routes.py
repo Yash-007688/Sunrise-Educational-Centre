@@ -52,7 +52,7 @@ def online_class():
 	username = session.get('username')
 	if not user_id or not role:
 		flash('You must be logged in to access the online class.', 'error')
-		return redirect(url_for('auth'))
+		return redirect(url_for('auth', next='live_classes.online_class'))
 
 	from auth_handler import get_upcoming_live_classes, get_active_live_classes, get_completed_live_classes
 	upcoming_classes = get_upcoming_live_classes()
@@ -68,7 +68,7 @@ def online_class():
 def join_class(class_id):
     if not session.get('user_id'):
         flash('You must be logged in to join a class.', 'error')
-        return redirect(url_for('auth'))
+        return redirect(url_for('auth', next='live_classes.online_class'))
 
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
@@ -90,8 +90,12 @@ def join_class(class_id):
     daily_response = daily_handler.get_room(class_id)
     resp_json, resp_status = _extract_daily_response(daily_response)
     if not resp_json.get('success'):
-        flash('Failed to get class room. Please try again.', 'error')
-        return redirect(url_for('live_classes.online_class'))
+        # Try creating new room if it doesn't exist
+        daily_response = daily_handler.create_room(class_id)
+        resp_json, resp_status = _extract_daily_response(daily_response)
+        if not resp_json.get('success'):
+            flash('Failed to create class room. Please try again.', 'error')
+            return redirect(url_for('live_classes.online_class'))
 
     meeting_url = resp_json.get('room_url')
     
@@ -124,7 +128,7 @@ def join_class(class_id):
 def join_class_host(class_id):
     if session.get('role') not in ['admin', 'teacher']:
         flash('Access denied. Only hosts can access this page. Please login as a host.', 'error')
-        return redirect(url_for('auth'))
+        return redirect(url_for('auth', next='live_classes.online_class'))
     
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
