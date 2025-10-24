@@ -89,22 +89,9 @@ def join_class(class_id):
         
     # Get Daily.co room URL (skip if API key not set for development)
     import os
-    if not os.getenv('DAILY_API_KEY'):
-        # For development/testing without Daily.co API key
-        meeting_url = f"/static/mock-room-{class_id}"
-        flash('Using mock room - Daily.co API key not configured', 'warning')
-    else:
-        daily_response = daily_handler.get_room(class_id)
-        resp_json, resp_status = _extract_daily_response(daily_response)
-        if not resp_json.get('success'):
-            # Try creating new room if it doesn't exist
-            daily_response = daily_handler.create_room(class_id)
-            resp_json, resp_status = _extract_daily_response(daily_response)
-            if not resp_json.get('success'):
-                flash('Failed to create class room. Please try again.', 'error')
-                return redirect(url_for('live_classes.online_class'))
-
-        meeting_url = resp_json.get('room_url')
+    # Force mock room for testing
+    meeting_url = f"/static/mock-room-{class_id}"
+    flash('Using mock room for testing', 'info')
     
     # Log attendance
     try:
