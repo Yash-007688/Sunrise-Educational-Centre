@@ -221,6 +221,21 @@
       background: #1a1a2e;
       border-left-color: #6a82fb;
     }
+
+    /* Dark mode for host video chat container */
+    body.dark-mode .chat-card {
+      background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2e 100%);
+      border-color: #3a3a4a;
+    }
+
+    body.dark-mode #hostVideoChatMessages {
+      border-bottom-color: #3a3a4a;
+    }
+
+    body.dark-mode #hostVideoChatLockedBanner {
+      background: rgba(252,92,125,0.2);
+      border-color: rgba(252,92,125,0.3);
+    }
     
     body.dark-mode .chat-control-btn {
       background: #1a1a2e;
@@ -472,18 +487,32 @@
       <div id="streamingStatus" style="margin-bottom:1rem; color:#6a82fb; text-align: center;">
         <span id="statusText">Camera Off - Ready to Start Live Class</span>
       </div>
-      <div class="class-info">
-        {% if subject or teacher_name or target_class %}
-        <div style="margin:0.4rem 0 0.6rem 0; color:#555;">
-          {% if subject %}<strong>Subject:</strong> {{ subject|capitalize }}{% endif %}
-          {% if teacher_name %}{% if subject %} • {% endif %}<strong>Teacher:</strong> {{ teacher_name }}{% endif %}
-          {% if target_class %}<br><strong>Target:</strong> Class {{ target_class }}{% if target_class in ['11','12'] and class_stream %} ({{ class_stream|capitalize }}){% endif %}{% endif %}
-        </div>
-        {% endif %}
-        <h2 class="class-title">{{ topic or 'Live Class' }}</h2>
-        <p class="class-description">{{ description or '' }}</p>
-        <a href="/online-class" class="back-link">&larr; Back to Online Classes</a>
-      </div>
+       <!-- Chat Container for Host - Similar to Student View -->
+       <div class="chat-card" style="margin-top:1rem; background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%); border-radius:12px; box-shadow: 0 4px 16px rgba(100,100,255,0.08); padding:1.2rem; border: 1px solid #e0e7ff; max-height:300px; min-height:200px; display:flex; flex-direction:column;">
+         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+           <h3 style="color: #6a82fb; margin: 0; font-size: 1.1rem;">💬 Live Chat</h3>
+           <div id="hostVideoChatStatus" style="display: flex; gap: 0.5rem; align-items: center;">
+             <span id="hostVideoChatStatusText" style="font-size: 0.9rem; color: #48bb78;">● Public</span>
+           </div>
+         </div>
+         <div id="hostVideoChatMessages" class="chat-messages" style="flex:1; overflow-y:auto; min-height:120px; max-height:200px; margin-bottom:1rem; border-bottom:1px solid #e0e7ff; padding-bottom:0.5rem; font-size:0.9rem;">
+           <!-- Chat messages will appear here -->
+         </div>
+         <div id="hostVideoChatLockedBanner" style="display:none; margin:-0.6rem 0 0.8rem 0; padding:0.6rem 0.8rem; border-radius:8px; background: rgba(252,92,125,0.1); border:1px solid rgba(252,92,125,0.2); color:#fc5c7d; font-weight:500; font-size:0.85rem;">🔒 Chat is locked by host</div>
+       </div>
+
+       <div class="class-info">
+         {% if subject or teacher_name or target_class %}
+         <div style="margin:0.4rem 0 0.6rem 0; color:#555;">
+           {% if subject %}<strong>Subject:</strong> {{ subject|capitalize }}{% endif %}
+           {% if teacher_name %}{% if subject %} • {% endif %}<strong>Teacher:</strong> {{ teacher_name }}{% endif %}
+           {% if target_class %}<br><strong>Target:</strong> Class {{ target_class }}{% if target_class in ['11','12'] and class_stream %} ({{ class_stream|capitalize }}){% endif %}{% endif %}
+         </div>
+         {% endif %}
+         <h2 class="class-title">{{ topic or 'Live Class' }}</h2>
+         <p class="class-description">{{ description or '' }}</p>
+         <a href="/online-class" class="back-link">&larr; Back to Online Classes</a>
+       </div>
     </div>
     <div class="control-section">
       <div class="tab-container">
@@ -1692,16 +1721,17 @@ function insertEmojiHost(char) {
     }
 
     function renderChatMessage(messageData) {
+      // Render in main chat tab
       const chatMessages = document.getElementById('chatMessages');
       const messageDiv = document.createElement('div');
       messageDiv.className = 'chat-message';
       messageDiv.id = `msg-${messageData.id || Date.now()}`;
-      
+
       const timestamp = new Date(messageData.created_at).toLocaleTimeString();
       const isHost = messageData.username === 'Host';
       const usernameColor = isHost ? '#fc5c7d' : '#6a82fb';
       const messageStyle = isHost ? 'border-left-color: #fc5c7d;' : 'border-left-color: #6a82fb;';
-      
+
       messageDiv.innerHTML = `
         <div style="font-weight: 600; color: ${usernameColor}; font-size: 0.9rem;">
           ${messageData.username} <span style="color: #888; font-weight: 400; font-size: 0.8rem;">${timestamp}</span>
@@ -1709,25 +1739,61 @@ function insertEmojiHost(char) {
         </div>
         <div style="margin-top: 0.2rem;">${messageData.message}</div>
       `;
-      
+
       // Apply message style
       messageDiv.style.borderLeftColor = isHost ? '#fc5c7d' : '#6a82fb';
-      
+
       // Check if message already exists to prevent duplicates
       const existingMessage = document.getElementById(`msg-${messageData.id || Date.now()}`);
       if (!existingMessage) {
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
-        
+
         // Add message animation
         messageDiv.style.opacity = '0';
         messageDiv.style.transform = 'translateY(10px)';
         messageDiv.style.transition = 'all 0.3s ease';
-        
+
         setTimeout(() => {
           messageDiv.style.opacity = '1';
           messageDiv.style.transform = 'translateY(0)';
         }, 100);
+      }
+
+      // Also render in video section chat container
+      const hostVideoChatMessages = document.getElementById('hostVideoChatMessages');
+      if (hostVideoChatMessages) {
+        const videoMessageDiv = document.createElement('div');
+        videoMessageDiv.className = 'chat-message';
+        videoMessageDiv.id = `video-msg-${messageData.id || Date.now()}`;
+
+        // Shorter format for video chat
+        videoMessageDiv.innerHTML = `
+          <div style="font-weight: 600; color: ${usernameColor}; font-size: 0.8rem;">
+            ${messageData.username}${isHost ? ' 👑' : ''}: <span style="color: #888; font-weight: 400; font-size: 0.7rem;">${timestamp}</span>
+          </div>
+          <div style="margin-top: 0.1rem; font-size: 0.85rem;">${messageData.message}</div>
+        `;
+
+        videoMessageDiv.style.borderLeftColor = isHost ? '#fc5c7d' : '#6a82fb';
+        videoMessageDiv.style.margin = '0.2rem 0';
+        videoMessageDiv.style.padding = '0.3rem 0.5rem';
+
+        const existingVideoMessage = document.getElementById(`video-msg-${messageData.id || Date.now()}`);
+        if (!existingVideoMessage) {
+          hostVideoChatMessages.appendChild(videoMessageDiv);
+          hostVideoChatMessages.scrollTop = hostVideoChatMessages.scrollHeight;
+
+          // Add animation
+          videoMessageDiv.style.opacity = '0';
+          videoMessageDiv.style.transform = 'translateY(5px)';
+          videoMessageDiv.style.transition = 'all 0.2s ease';
+
+          setTimeout(() => {
+            videoMessageDiv.style.opacity = '1';
+            videoMessageDiv.style.transform = 'translateY(0)';
+          }, 50);
+        }
       }
     }
 
@@ -1748,15 +1814,19 @@ function insertEmojiHost(char) {
     socket.on('chat_messages_history', (data) => {
       console.log('Received chat history:', data);
       const chatMessages = document.getElementById('chatMessages');
+      const hostVideoChatMessages = document.getElementById('hostVideoChatMessages');
+
       chatMessages.innerHTML = '';
-      
+      if (hostVideoChatMessages) hostVideoChatMessages.innerHTML = '';
+
       if (data.messages && data.messages.length > 0) {
         data.messages.forEach(message => {
           renderChatMessage(message);
         });
-        
+
         // Scroll to bottom
         chatMessages.scrollTop = chatMessages.scrollHeight;
+        if (hostVideoChatMessages) hostVideoChatMessages.scrollTop = hostVideoChatMessages.scrollHeight;
       } else {
         // Show welcome message
         const welcomeDiv = document.createElement('div');
@@ -1766,6 +1836,17 @@ function insertEmojiHost(char) {
         welcomeDiv.style.fontStyle = 'italic';
         welcomeDiv.innerHTML = 'Welcome to the live class! Start chatting below.';
         chatMessages.appendChild(welcomeDiv);
+
+        if (hostVideoChatMessages) {
+          const videoWelcomeDiv = document.createElement('div');
+          videoWelcomeDiv.className = 'chat-message';
+          videoWelcomeDiv.style.textAlign = 'center';
+          videoWelcomeDiv.style.color = '#666';
+          videoWelcomeDiv.style.fontStyle = 'italic';
+          videoWelcomeDiv.style.fontSize = '0.8rem';
+          videoWelcomeDiv.innerHTML = 'Chat messages will appear here.';
+          hostVideoChatMessages.appendChild(videoWelcomeDiv);
+        }
       }
     });
 
@@ -1793,45 +1874,103 @@ function insertEmojiHost(char) {
       }
     });
 
+    // Chat cleared event handling
+    socket.on('chat_cleared', (data) => {
+      if (data.class_id === classId) {
+        const chatMessages = document.getElementById('chatMessages');
+        const hostVideoChatMessages = document.getElementById('hostVideoChatMessages');
+
+        chatMessages.innerHTML = '';
+        if (hostVideoChatMessages) hostVideoChatMessages.innerHTML = '';
+
+        // Show cleared message
+        const clearedDiv = document.createElement('div');
+        clearedDiv.className = 'chat-message';
+        clearedDiv.style.textAlign = 'center';
+        clearedDiv.style.color = '#666';
+        clearedDiv.style.fontStyle = 'italic';
+        clearedDiv.innerHTML = 'Chat has been cleared by host';
+        chatMessages.appendChild(clearedDiv);
+
+        if (hostVideoChatMessages) {
+          const videoClearedDiv = document.createElement('div');
+          videoClearedDiv.className = 'chat-message';
+          videoClearedDiv.style.textAlign = 'center';
+          videoClearedDiv.style.color = '#666';
+          videoClearedDiv.style.fontStyle = 'italic';
+          videoClearedDiv.style.fontSize = '0.8rem';
+          videoClearedDiv.innerHTML = 'Chat cleared';
+          hostVideoChatMessages.appendChild(videoClearedDiv);
+        }
+
+        showNotification('Chat has been cleared by host', 'info');
+      }
+    });
+
     function updateChatStatus(status, message) {
       const statusText = document.getElementById('chatStatusText');
+      const hostVideoChatStatusText = document.getElementById('hostVideoChatStatusText');
       const chatForm = document.getElementById('chatForm');
       const chatInput = document.getElementById('chatInput');
-      
+      const hostVideoChatLockedBanner = document.getElementById('hostVideoChatLockedBanner');
+
       // Remove all status classes
       statusText.classList.remove('locked', 'private', 'public');
-      
+      if (hostVideoChatStatusText) {
+        hostVideoChatStatusText.classList.remove('locked', 'private', 'public');
+      }
+
       if (status === 'locked') {
         statusText.textContent = '🔒 Locked';
         statusText.classList.add('locked');
+        if (hostVideoChatStatusText) {
+          hostVideoChatStatusText.textContent = '🔒 Locked';
+          hostVideoChatStatusText.classList.add('locked');
+        }
         chatForm.style.opacity = '0.5';
         chatInput.disabled = true;
         chatInput.placeholder = 'Chat is locked by host';
-        
+        if (hostVideoChatLockedBanner) hostVideoChatLockedBanner.style.display = 'block';
+
         showChatNotification(message, 'warning');
       } else if (status === 'private') {
         statusText.textContent = '🔒 Private';
         statusText.classList.add('private');
+        if (hostVideoChatStatusText) {
+          hostVideoChatStatusText.textContent = '🔒 Private';
+          hostVideoChatStatusText.classList.add('private');
+        }
         chatForm.style.opacity = '0.5';
         chatInput.disabled = true;
         chatInput.placeholder = 'Chat is private - only host can see messages';
-        
+        if (hostVideoChatLockedBanner) hostVideoChatLockedBanner.style.display = 'none';
+
         showChatNotification(message, 'info');
       } else if (status === 'public') {
         statusText.textContent = '● Public';
         statusText.classList.add('public');
+        if (hostVideoChatStatusText) {
+          hostVideoChatStatusText.textContent = '● Public';
+          hostVideoChatStatusText.classList.add('public');
+        }
         chatForm.style.opacity = '1';
         chatInput.disabled = false;
         chatInput.placeholder = 'Type a message...';
-        
+        if (hostVideoChatLockedBanner) hostVideoChatLockedBanner.style.display = 'none';
+
         showChatNotification(message, 'success');
       } else if (status === 'unlocked') {
         statusText.textContent = '● Public';
         statusText.classList.add('public');
+        if (hostVideoChatStatusText) {
+          hostVideoChatStatusText.textContent = '● Public';
+          hostVideoChatStatusText.classList.add('public');
+        }
         chatForm.style.opacity = '1';
         chatInput.disabled = false;
         chatInput.placeholder = 'Type a message...';
-        
+        if (hostVideoChatLockedBanner) hostVideoChatLockedBanner.style.display = 'none';
+
         showChatNotification(message, 'success');
       }
     }
