@@ -471,7 +471,7 @@
       const dashboardContent = document.getElementById('dashboard-content');
       dashboardContent.innerHTML = '<div class="loading">Loading dashboard...</div>';
       
-      fetch('/api/live-classes/dashboard')
+      fetch('/api/live-classes/dashboard', { credentials: 'include' })
         .then(response => response.json())
         .then(data => {
           if (data.success) {
@@ -601,7 +601,7 @@
     
     function startClass(classId) {
       if (confirm('Start this live class now?')) {
-        fetch('/api/live-classes/start', {
+        fetch('/api/live-classes/start', { credentials: 'include',
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ class_id: classId })
@@ -623,7 +623,7 @@
     
     function endClass(classId) {
       if (confirm('Are you sure you want to end this class?')) {
-        fetch('/api/live-classes/end', {
+        fetch('/api/live-classes/end', { credentials: 'include',
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ class_id: classId })
@@ -652,7 +652,7 @@
     
     function cancelClass(classId) {
       if (confirm('Are you sure you want to cancel this class?')) {
-        fetch('/api/live-classes/cancel', {
+        fetch('/api/live-classes/cancel', { credentials: 'include',
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ class_id: classId })
@@ -674,7 +674,7 @@
     
     function deleteClass(classId) {
       if (confirm('Are you sure you want to delete this class? This action cannot be undone.')) {
-        fetch('/api/live-classes/delete', {
+        fetch('/api/live-classes/delete', { credentials: 'include',
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ class_id: classId })
@@ -781,7 +781,7 @@
       const completedGrid = document.getElementById('completedClassesGrid');
       completedGrid.innerHTML = '<div class="loading">Loading completed classes...</div>';
       
-      fetch('/api/live-classes/completed')
+      fetch('/api/live-classes/completed', { credentials: 'include' })
         .then(response => {
           if (response.redirected) {
             // User is not logged in as admin, redirect to login
@@ -1063,7 +1063,7 @@
     
     function deleteCompletedClass(classId) {
       if (confirm('Are you sure you want to delete this completed class? This action cannot be undone.')) {
-        fetch('/api/live-classes/delete-completed', {
+        fetch('/api/live-classes/delete-completed', { credentials: 'include',
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ class_id: classId })
