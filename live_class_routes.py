@@ -66,9 +66,10 @@ def online_class():
 
 @live_classes_bp.route('/join-class/<int:class_id>')
 def join_class(class_id):
-    if not session.get('user_id'):
-        flash('You must be logged in to join a class.', 'error')
-        return redirect(url_for('auth', next='live_classes.online_class'))
+    # Temporarily skip authentication for testing
+    # if not session.get('user_id'):
+    #     flash('You must be logged in to join a class.', 'error')
+    #     return redirect(url_for('auth', next='live_classes.online_class'))
 
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
