@@ -1514,15 +1514,18 @@ def api_live_classes_status():
 @app.route('/study-resources')
 def study_resources():
     try:
+        print("DEBUG: Starting study_resources route")
         # Require authentication - user must be logged in
         role = session.get('role')
         username = session.get('username')
         user_id = session.get('user_id')
-        
+
+        print(f"DEBUG: user_id={user_id}, role={role}")
+
         if not user_id or not role:
             flash('Please log in to access study resources.', 'info')
             return redirect(url_for('auth', next='study_resources'))
-        
+
         # Redirect admin/teacher to their own panel, as this page is for students
         if role in ['admin', 'teacher']:
             flash('Please use the admin panel to manage all resources.', 'info')
@@ -1532,24 +1535,29 @@ def study_resources():
         class_id = None
         class_name = "Unknown"
         paid_status = None
-        
+
         try:
+            print("DEBUG: Getting user by id")
             user = get_user_by_id(user_id)
+            print(f"DEBUG: User data: {user}")
             if user:
                 # user tuple: (id, username, class_id, paid, class_name, banned, mobile_no, email_address)
                 class_id = user[2] if len(user) > 2 else None
                 class_name = user[4] if len(user) > 4 else role
                 paid_status = user[3] if len(user) > 3 else 'unpaid'
-                
+
+                print(f"DEBUG: class_id={class_id}, class_name={class_name}, paid_status={paid_status}")
+
                 if not class_id:
                     # Fallback: attempt to resolve by role name (case-insensitive)
                     try:
                         from auth_handler import get_class_id_by_name
                         resolved_class_id = get_class_id_by_name(role)
                         class_id = resolved_class_id
+                        print(f"DEBUG: Resolved class_id: {class_id}")
                     except Exception as _:
                         pass
-                        
+
                 if not class_id:
                     flash('Could not determine your class. Please contact administrator.', 'error')
                     return redirect(url_for('home'))
@@ -1561,13 +1569,15 @@ def study_resources():
             print(f"Error determining user class: {e}")
             flash('Error loading user information. Please try again.', 'error')
             return redirect(url_for('auth'))
-        
+
         # Fetch resources for the user's class with proper paid/unpaid filtering
         resources = []
         try:
             if class_id:
+                print("DEBUG: Fetching resources")
                 # Get all resources for the class, but filter by paid status in template
                 resources = get_resources_for_class_id(class_id)
+                print(f"DEBUG: Got {len(resources)} resources")
         except Exception as e:
             print(f"Error fetching resources: {e}")
             resources = []
@@ -1577,12 +1587,17 @@ def study_resources():
         categories = []
         try:
             if class_id:
+                print("DEBUG: Fetching categories")
                 categories = get_categories_for_class(class_id)
+                print(f"DEBUG: Got {len(categories)} categories")
+                if categories:
+                    print(f"DEBUG: First category: {categories[0]}, length: {len(categories[0])}")
         except Exception as e:
             print(f"Error fetching categories: {e}")
             categories = []
             flash('Some categories could not be loaded.', 'warning')
 
+        print("DEBUG: Rendering template")
         # Render template with user information
         return render_template(
             'study-resources.html',
@@ -1595,29 +1610,32 @@ def study_resources():
             role=role,
             is_guest=False  # No more guest access
         )
-        
+
     except Exception as e:
         print(f"Unexpected error in study_resources route: {e}")
+        import traceback
+        traceback.print_exc()
         flash('An unexpected error occurred. Please try again.', 'error')
         return redirect(url_for('auth'))
 
 @app.route('/batch')
 def batch_page():
     # Batch system removed → redirect to study resources
-    return redirect(url_for('study_resources'))
+    # return redirect(url_for('study_resources'))
+    return redirect(url_for('home'))
 
 # Batch Overview per class
-@app.route('/batch/<int:class_id>')
-def batch_overview(class_id):
-    # Batch system removed → redirect to study resources filtered by class if needed
-    try:
-        from auth_handler import get_class_name_by_id
-        class_name = get_class_name_by_id(class_id)
-        if class_name:
-            return redirect(url_for('study_resources', class_name=class_name))
-    except Exception:
-        pass
-    return redirect(url_for('study_resources'))
+# @app.route('/batch/<int:class_id>')
+# def batch_overview(class_id):
+#     # Batch system removed → redirect to study resources filtered by class if needed
+#     try:
+#         from auth_handler import get_class_name_by_id
+#         class_name = get_class_name_by_id(class_id)
+#         if class_name:
+#             return redirect(url_for('study_resources', class_name=class_name))
+#     except Exception:
+#         pass
+#     return redirect(url_for('study_resources'))
 
 # Route for forum
 @app.route("/forum")
@@ -7643,13 +7661,13 @@ if __name__ == '__main__':
         try:
             print(f"Starting Sunrise Educational Centre server on port {port}...")
             socketio.run(
-                app, 
-                host='0.0.0.0', 
-                port=port, 
-                debug=False, 
+                app,
+                host='0.0.0.0',
+                port=port,
+                debug=True,
                 log_output=True,
                 allow_unsafe_werkzeug=True,
-                use_reloader=False  # Disable reloader to prevent stopping
+                use_reloader=True  # Enable reloader for development
             )
         except KeyboardInterrupt:
             print("\nServer stopped by user (Ctrl+C)")
@@ -7674,27 +7692,27 @@ if __name__ == '__main__':
             try:
                 print("Trying alternative host configuration...")
                 socketio.run(
-                    app, 
-                    host='127.0.0.1', 
-                    port=port, 
-                    debug=False, 
+                    app,
+                    host='127.0.0.1',
+                    port=port,
+                    debug=True,
                     log_output=True,
                     allow_unsafe_werkzeug=True,
-                    use_reloader=False
+                    use_reloader=True
                 )
             except Exception as e2:
                 print(f"Alternative configuration failed: {e2}")
                 print("Trying localhost configuration...")
                 try:
-                    socketio.run(
-                        app, 
-                        host='localhost', 
-                        port=port, 
-                        debug=False, 
-                        log_output=True,
-                        allow_unsafe_werkzeug=True,
-                        use_reloader=False
-                    )
+                     socketio.run(
+                         app,
+                         host='localhost',
+                         port=port,
+                         debug=True,
+                         log_output=True,
+                         allow_unsafe_werkzeug=True,
+                         use_reloader=True
+                     )
                 except Exception as e3:
                     print(f"All configurations failed: {e3}")
                     print("Waiting 10 seconds before retry...")
