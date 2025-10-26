@@ -11,70 +11,503 @@
   <link rel="stylesheet" href="admin-modern.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
+    /* Upload Resource Page - Admin Light Theme */
+    body {
+      background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%) !important;
+      color: #232946 !important;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Beautiful 4-Column Resource Grid */
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Responsive Grid */
+    @media (max-width: 1200px) {
+      .resource-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .resource-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .resource-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+
+    /* Enhanced Resource Cards - Admin Theme */
+    .resource-card {
+      background: #fff !important;
+      border: 1px solid #e5e7eb !important;
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .resource-card::before {
+      content: '';
+      position: absolute;
       top: 0;
+      left: -100%;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      backdrop-filter: blur(5px);
+      background: linear-gradient(90deg, transparent, rgba(106, 130, 251, 0.1), transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
     }
-    
-    .modal-content {
-      background: #fff;
-      margin: 5% auto;
-      padding: 0;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-      animation: modalSlideIn 0.3s ease-out;
+
+    .resource-card:hover::before {
+      left: 100%;
     }
-    
-    @keyframes modalSlideIn {
+
+    .resource-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(106, 130, 251, 0.15) !important;
+      border-color: rgba(106, 130, 251, 0.3) !important;
+    }
+
+    .resource-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: #232946 !important;
+      line-height: 1.3;
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .resource-card p {
+      color: #6b7280 !important;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+
+    .resource-card p strong {
+      color: #232946 !important;
+      font-weight: 600;
+    }
+
+    /* Resource Status Badges */
+    .resource-status {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .resource-status.status-paid {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .resource-status.status-unpaid {
+      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+    }
+
+    /* Action Buttons */
+    .resource-card .btn-primary,
+    .resource-card .btn-secondary {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      margin: 0.25rem;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .resource-card .btn-primary {
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(106, 130, 251, 0.3);
+    }
+
+    .resource-card .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(106, 130, 251, 0.4);
+    }
+
+    .resource-card .btn-secondary {
+      background: rgba(255, 255, 255, 0.8);
+      color: #64748b;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .resource-card .btn-secondary:hover {
+      background: rgba(106, 130, 251, 0.1);
+      color: #6a82fb;
+      border-color: rgba(106, 130, 251, 0.3);
+    }
+
+    /* Glass Card Enhancements - Admin Theme */
+    .glass-card {
+      background: #fff !important;
+      border: 1px solid #e5e7eb !important;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+    }
+
+    /* Filter Controls Enhancement - Admin Theme */
+    .filter-controls {
+      background: #fff !important;
+      border: 1px solid #e5e7eb !important;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+    }
+
+    .filter-controls h3 {
+      color: #232946 !important;
+    }
+
+    .filter-controls label {
+      color: #232946 !important;
+    }
+
+    .filter-controls select,
+    .filter-controls input {
+      background: #fff !important;
+      border: 1px solid #d1d5db !important;
+      color: #232946 !important;
+    }
+
+    .filter-controls select:focus,
+    .filter-controls input:focus {
+      outline: none;
+      border-color: #6a82fb !important;
+      box-shadow: 0 0 0 2px rgba(106,130,251,0.2) !important;
+    }
+
+    /* Tab Styling Enhancement - Admin Theme */
+    .tab-btn {
+      background: #fff !important;
+      color: #232946 !important;
+      border: 1px solid #e5e7eb !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab-btn:hover,
+    .tab-btn.active {
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%) !important;
+      color: white !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(106, 130, 251, 0.3);
+    }
+
+    /* Tab Button Hover Effects - Admin Theme */
+    .tab-btn:hover:not(.active) {
+      background: #f9fafb !important;
+      color: #6a82fb !important;
+      border-color: rgba(106, 130, 251, 0.3) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(106, 130, 251, 0.2);
+    }
+
+    /* Additional Enhancements */
+    .resource-card {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .resource-card:nth-child(1) { animation-delay: 0.1s; }
+    .resource-card:nth-child(2) { animation-delay: 0.2s; }
+    .resource-card:nth-child(3) { animation-delay: 0.3s; }
+    .resource-card:nth-child(4) { animation-delay: 0.4s; }
+    .resource-card:nth-child(5) { animation-delay: 0.5s; }
+    .resource-card:nth-child(6) { animation-delay: 0.6s; }
+    .resource-card:nth-child(7) { animation-delay: 0.7s; }
+    .resource-card:nth-child(8) { animation-delay: 0.8s; }
+
+    @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: translateY(-50px);
+        transform: translateY(30px);
       }
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
+
+    /* Enhanced Header Section - Admin Theme */
+    .header-section {
+      background: #fff !important;
+      border: 1px solid #e5e7eb !important;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+    }
+
+    .header-section h1 {
+      color: #232946 !important;
+    }
+
+    .header-section p {
+      color: #6b7280 !important;
+    }
+
+    .uiverse-stat-chip {
+      background: rgba(106, 130, 251, 0.1) !important;
+      color: #6a82fb !important;
+      border: 1px solid rgba(106, 130, 251, 0.2) !important;
+    }
+
+    /* Tab Container Enhancement - Admin Theme */
+    .tab-container {
+      background: #fff !important;
+      border: 1px solid #e5e7eb !important;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+    }
+
+    /* Empty State Styling - Admin Theme */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: #6b7280;
+      background: #fff;
+      border-radius: 16px;
+      border: 2px dashed #e5e7eb;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07);
+    }
+
+    .empty-state h3 {
+      color: #232946;
+      margin-bottom: 1rem;
+    }
+
+    /* Loading States */
+    .resource-card.loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .resource-card.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid rgba(106, 130, 251, 0.3);
+      border-top-color: #6a82fb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Success Animation */
+    .resource-card.success {
+      animation: successPulse 0.6s ease-out;
+    }
+
+    @keyframes successPulse {
+      0% {
+        transform: scale(1);
+        background: rgba(16, 185, 129, 0.1);
+      }
+      50% {
+        transform: scale(1.05);
+        background: rgba(16, 185, 129, 0.2);
+      }
+      100% {
+        transform: scale(1);
+        background: rgba(255, 255, 255, 0.95);
+      }
+    }
+
+    /* Enhanced Modal styles for Edit Resource Dialog */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      animation: modalFadeIn 0.3s ease-out;
+    }
+    
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    .modal-content {
+      background: #fff !important;
+      margin: 3% auto;
+      padding: 0;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+      animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid #e5e7eb !important;
+    }
+    
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-60px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
     
     .modal-header {
       background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
       color: white;
-      padding: 1.5rem;
-      border-radius: 12px 12px 0 0;
+      padding: 2rem;
+      border-radius: 20px 20px 0 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .modal-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
     }
     
     .modal-header h2 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
     }
     
     .close {
       color: white;
-      font-size: 2rem;
+      font-size: 2.5rem;
       font-weight: bold;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 1;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
     }
     
     .close:hover {
-      opacity: 0.7;
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
     }
     
     .modal-content form {
-      padding: 2rem;
+      padding: 2.5rem;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #232946 !important;
+      font-size: 0.95rem;
+    }
+    
+    .form-group label i {
+      margin-right: 0.5rem;
+      color: #6a82fb;
+      width: 16px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 2px solid #d1d5db !important;
+      border-radius: 12px;
+      font-size: 1rem;
+      background: #fff !important;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+      color: #232946 !important;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #6a82fb !important;
+      box-shadow: 0 0 0 2px rgba(106,130,251,0.2) !important;
+      background: #fff !important;
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
     }
     
     .modal-actions {
@@ -82,8 +515,42 @@
       gap: 1rem;
       justify-content: flex-end;
       margin-top: 2rem;
-      padding-top: 1rem;
-      border-top: 1px solid #e0e7ff;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-actions .btn-primary,
+    .modal-actions .btn-secondary {
+      padding: 0.8rem 2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+    
+    .modal-actions .btn-primary {
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(106, 130, 251, 0.3);
+    }
+    
+    .modal-actions .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(106, 130, 251, 0.4);
+    }
+    
+    .modal-actions .btn-secondary {
+      background: #fff !important;
+      color: #6b7280 !important;
+      border: 2px solid #e5e7eb !important;
+    }
+    
+    .modal-actions .btn-secondary:hover {
+      background: #f9fafb !important;
+      color: #6a82fb !important;
+      border-color: rgba(106, 130, 251, 0.3) !important;
     }
     
     /* Flash message styles */
@@ -331,16 +798,16 @@
         </div>
       </div>
       
-      <div class="tab-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
+      <div class="tab-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; padding: 1rem; background: #fff; border-radius: 16px; border: 1px solid #e5e7eb;">
         <button class="tab-btn active" onclick="showTab('upload')" style="background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(106,130,251,0.3);">📤 Upload</button>
-        <button class="tab-btn" onclick="showTab('resources-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🗂️ Resources</button>
-        <button class="tab-btn" onclick="showTab('categories-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📁 Categories</button>
-        <button class="tab-btn" onclick="showTab('settings-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">⚙️ Settings</button>
-        <button class="tab-btn" onclick="showTab('bulk-upload')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🚀 Bulk Upload</button>
-        <button class="tab-btn" onclick="showTab('smart-upload-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🤖 Smart Upload</button>
-        <button class="tab-btn" onclick="showTab('analytics-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📊 Analytics</button>
-        <button class="tab-btn" onclick="showTab('scheduled-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">⏰ Scheduled</button>
-        <button class="tab-btn" onclick="showTab('history-tab')" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📚 History</button>
+        <button class="tab-btn" onclick="showTab('resources-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🗂️ Resources</button>
+        <button class="tab-btn" onclick="showTab('categories-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📁 Categories</button>
+        <button class="tab-btn" onclick="showTab('settings-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">⚙️ Settings</button>
+        <button class="tab-btn" onclick="showTab('bulk-upload')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🚀 Bulk Upload</button>
+        <button class="tab-btn" onclick="showTab('smart-upload-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🤖 Smart Upload</button>
+        <button class="tab-btn" onclick="showTab('analytics-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📊 Analytics</button>
+        <button class="tab-btn" onclick="showTab('scheduled-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">⏰ Scheduled</button>
+        <button class="tab-btn" onclick="showTab('history-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📚 History</button>
       </div>
       
       <!-- Upload Resource Tab -->
@@ -811,62 +1278,66 @@
     </div>
   </main>
 
-  <!-- Edit Resource Dialog -->
+  <!-- Enhanced Edit Resource Dialog -->
   <div id="editResourceDialog" class="modal" style="display: none;">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Edit Resource</h2>
+        <h2><i class="fas fa-edit"></i> Edit Resource</h2>
         <span class="close" onclick="closeEditDialog()">&times;</span>
       </div>
       <form id="editResourceForm" method="POST" action="/edit-resource">
         <input type="hidden" id="editFilename" name="filename">
         <div class="form-grid">
           <div class="form-group">
-            <label for="editTitle">Resource Title</label>
-            <input type="text" id="editTitle" name="title" required>
+            <label for="editTitle"><i class="fas fa-file-alt"></i> Resource Title</label>
+            <input type="text" id="editTitle" name="title" required placeholder="Enter resource title...">
           </div>
           <div class="form-group">
-            <label for="editCategory">Category</label>
+            <label for="editCategory"><i class="fas fa-tags"></i> Category</label>
             <select id="editCategory" name="category" required>
               <option value="">Select Category</option>
               <!-- Default Categories -->
-              <option value="notes">Notes</option>
-              <option value="worksheet">Worksheet</option>
-              <option value="formula">Formula Sheet</option>
-              <option value="practice_test">Practice Test</option>
-              <option value="reference_book">Reference Book</option>
-              <option value="video">Video</option>
-              <option value="other">Other</option>
+              <option value="notes">📚 Notes</option>
+              <option value="worksheet">📝 Worksheet</option>
+              <option value="formula">📐 Formula Sheet</option>
+              <option value="practice_test">📄 Practice Test</option>
+              <option value="reference_book">📖 Reference Book</option>
+              <option value="video">🎥 Video</option>
+              <option value="other">📁 Other</option>
               <!-- Dynamic Categories -->
               {% for category in categories %}
-                <option value="{{ category[1] }}">{{ category[1] }}</option>
+                <option value="{{ category[1] }}">📁 {{ category[1] }}</option>
               {% endfor %}
             </select>
           </div>
           <div class="form-group">
-            <label for="editClass">Target Class</label>
+            <label for="editClass"><i class="fas fa-graduation-cap"></i> Target Class</label>
             <select id="editClass" name="class_id" required>
               <option value="">Select Class</option>
               {% for id, name in all_classes %}
-                <option value="{{ id }}">{{ name|title }}</option>
+                <option value="{{ id }}">🎓 {{ name|title }}</option>
               {% endfor %}
             </select>
           </div>
           <div class="form-group">
-            <label for="editPaidStatus">Access Level</label>
+            <label for="editPaidStatus"><i class="fas fa-lock"></i> Access Level</label>
             <select id="editPaidStatus" name="paid_status">
-              <option value="unpaid">Free</option>
-              <option value="paid">Paid</option>
+              <option value="unpaid">🆓 Free</option>
+              <option value="paid">💎 Paid</option>
             </select>
           </div>
         </div>
         <div class="form-group">
-          <label for="editDescription">Description</label>
-          <textarea id="editDescription" name="description" placeholder="Brief description of the resource content..."></textarea>
+          <label for="editDescription"><i class="fas fa-align-left"></i> Description</label>
+          <textarea id="editDescription" name="description" placeholder="Brief description of the resource content..." rows="4"></textarea>
         </div>
         <div class="modal-actions">
-          <button type="submit" class="btn-primary">Save Changes</button>
-          <button type="button" class="btn-secondary" onclick="closeEditDialog()">Cancel</button>
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+          <button type="button" class="btn-secondary" onclick="closeEditDialog()">
+            <i class="fas fa-times"></i> Cancel
+          </button>
         </div>
       </form>
     </div>
@@ -907,34 +1378,98 @@
   <script src="bulk_upload/bulk_upload.js"></script>
   <script>
     function showTab(tabName) {
-      // Hide all tab contents
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-        // Reset button styles
-        btn.style.background = 'rgba(255,255,255,0.1)';
-        btn.style.color = '#fff';
-        btn.style.border = '1px solid rgba(255,255,255,0.2)';
-        btn.style.transform = 'translateY(0)';
-        btn.style.boxShadow = 'none';
+      // Add loading animation to all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.opacity = '0.5';
+        tab.style.transition = 'opacity 0.3s ease';
       });
       
-      // Resolve id: accept both 'upload' and 'upload-tab'
-      const targetId = tabName.endsWith('-tab') ? tabName : (tabName + '-tab');
-      const target = document.getElementById(targetId);
-      if (target) target.classList.add('active');
-      
-      // Update clicked button styles
-      if (window.event && window.event.target) {
-        const clickedBtn = window.event.target;
-        clickedBtn.classList.add('active');
-        clickedBtn.style.background = 'linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%)';
-        clickedBtn.style.color = 'white';
-        clickedBtn.style.border = 'none';
-        clickedBtn.style.transform = 'translateY(-2px)';
-        clickedBtn.style.boxShadow = '0 8px 25px rgba(106,130,251,0.4)';
-      }
+      // Hide all tab contents with fade out
+      setTimeout(() => {
+        document.querySelectorAll('.tab-content').forEach(tab => {
+          tab.classList.remove('active');
+          tab.style.display = 'none';
+        });
+        
+        // Reset all button styles for light theme
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.classList.remove('active');
+          btn.style.background = 'rgba(255, 255, 255, 0.8)';
+          btn.style.color = '#1e293b';
+          btn.style.border = '1px solid rgba(0, 0, 0, 0.1)';
+          btn.style.transform = 'translateY(0)';
+          btn.style.boxShadow = 'none';
+        });
+        
+        // Resolve id: accept both 'upload' and 'upload-tab'
+        const targetId = tabName.endsWith('-tab') ? tabName : (tabName + '-tab');
+        const target = document.getElementById(targetId);
+        
+        if (target) {
+          target.classList.add('active');
+          target.style.display = 'block';
+          target.style.opacity = '0';
+          
+          // Fade in the target tab
+          setTimeout(() => {
+            target.style.transition = 'opacity 0.5s ease';
+            target.style.opacity = '1';
+          }, 50);
+        }
+        
+        // Update clicked button styles with animation
+        if (window.event && window.event.target) {
+          const clickedBtn = window.event.target;
+          clickedBtn.classList.add('active');
+          
+          // Animate button activation
+          clickedBtn.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+          clickedBtn.style.background = 'linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%)';
+          clickedBtn.style.color = 'white';
+          clickedBtn.style.border = 'none';
+          clickedBtn.style.transform = 'translateY(-2px)';
+          clickedBtn.style.boxShadow = '0 8px 25px rgba(106,130,251,0.3)';
+          
+          // Add ripple effect
+          const ripple = document.createElement('span');
+          ripple.style.position = 'absolute';
+          ripple.style.borderRadius = '50%';
+          ripple.style.background = 'rgba(255, 255, 255, 0.3)';
+          ripple.style.transform = 'scale(0)';
+          ripple.style.animation = 'ripple 0.6s linear';
+          ripple.style.left = '50%';
+          ripple.style.top = '50%';
+          ripple.style.width = '20px';
+          ripple.style.height = '20px';
+          ripple.style.marginLeft = '-10px';
+          ripple.style.marginTop = '-10px';
+          
+          clickedBtn.style.position = 'relative';
+          clickedBtn.style.overflow = 'hidden';
+          clickedBtn.appendChild(ripple);
+          
+          // Remove ripple after animation
+          setTimeout(() => {
+            if (ripple.parentNode) {
+              ripple.parentNode.removeChild(ripple);
+            }
+          }, 600);
+        }
+        
+      }, 150);
     }
+    
+    // Add ripple animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
 
     // Upload modal functions
     function openUploadModal() {
@@ -1323,8 +1858,14 @@
         }
     }
     
-    // Resource edit functions
+    // Enhanced Resource edit functions
     function editResource(filename, classId, category, title, description) {
+        // Add loading animation to the button that was clicked
+        const clickedButton = window.event.target;
+        const originalContent = clickedButton.innerHTML;
+        clickedButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        clickedButton.disabled = true;
+        
         // Populate the edit form
         document.getElementById('editFilename').value = filename;
         document.getElementById('editTitle').value = title;
@@ -1336,21 +1877,61 @@
         const paidStatus = (category === 'worksheet' || category === 'formula') ? 'paid' : 'unpaid';
         document.getElementById('editPaidStatus').value = paidStatus;
         
-        // Show the modal
-        document.getElementById('editResourceDialog').style.display = 'block';
+        // Show the modal with animation
+        const modal = document.getElementById('editResourceDialog');
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // Reset button after modal opens
+        setTimeout(() => {
+            clickedButton.innerHTML = originalContent;
+            clickedButton.disabled = false;
+        }, 500);
+        
+        // Add focus to first input
+        setTimeout(() => {
+            document.getElementById('editTitle').focus();
+        }, 100);
     }
     
     function closeEditDialog() {
-        document.getElementById('editResourceDialog').style.display = 'none';
+        const modal = document.getElementById('editResourceDialog');
+        
+        // Add closing animation
+        modal.style.opacity = '0';
+        modal.style.transform = 'translateY(-60px) scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Reset modal styles for next opening
+            modal.style.opacity = '1';
+            modal.style.transform = 'translateY(0) scale(1)';
+        }, 300);
     }
     
     // Close modal when clicking outside
     window.onclick = function(event) {
-        const modal = document.getElementById('editResourceDialog');
-        if (event.target === modal) {
+        const uploadModal = document.getElementById('uploadModal');
+        const editModal = document.getElementById('editResourceDialog');
+        
+        if (event.target === uploadModal) {
+            closeUploadModal();
+        } else if (event.target === editModal) {
             closeEditDialog();
         }
     }
+    
+    // Add keyboard support for modal
+    document.addEventListener('keydown', function(event) {
+        const editModal = document.getElementById('editResourceDialog');
+        if (editModal.style.display === 'block') {
+            if (event.key === 'Escape') {
+                closeEditDialog();
+            }
+        }
+    });
     
     // Form validation for create resource
     function validateCreateResourceForm() {

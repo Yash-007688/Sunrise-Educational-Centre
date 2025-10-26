@@ -8,6 +8,406 @@
     <link rel="stylesheet" href="floating-navbar.css" />
     <link rel="stylesheet" href="uiverse-components.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Enhanced Notification Page Styling */
+        
+        /* Notification Action Buttons */
+        .notification-action-btn {
+            position: relative;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .notification-action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .notification-action-btn:hover::before {
+            left: 100%;
+        }
+        
+        .notification-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .notification-action-btn:active {
+            transform: translateY(0);
+            transition: all 0.1s ease;
+        }
+        
+        /* Mark as Read Button */
+        .mark-read-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: #ffffff;
+            border-color: rgba(72, 187, 120, 0.3);
+        }
+        
+        .mark-read-btn:hover {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+            box-shadow: 0 8px 20px rgba(72, 187, 120, 0.3);
+        }
+        
+        .mark-read-btn:active {
+            background: linear-gradient(135deg, #2f855a 0%, #276749 100%);
+        }
+        
+        /* Clear/Delete Button */
+        .clear-btn {
+            background: linear-gradient(135deg, #fc5c7d 0%, #e53e3e 100%);
+            color: #ffffff;
+            border-color: rgba(252, 92, 125, 0.3);
+        }
+        
+        .clear-btn:hover {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            box-shadow: 0 8px 20px rgba(252, 92, 125, 0.3);
+        }
+        
+        .clear-btn:active {
+            background: linear-gradient(135deg, #c53030 0%, #9c2626 100%);
+        }
+        
+        /* Mark All as Read Button */
+        .mark-all-read-btn {
+            background: linear-gradient(135deg, #6a82fb 0%, #5a6fd8 100%);
+            color: #ffffff;
+            border-color: rgba(106, 130, 251, 0.3);
+            padding: 0.8rem 1.6rem;
+            font-size: 1rem;
+            border-radius: 16px;
+            box-shadow: 0 6px 16px rgba(106, 130, 251, 0.25);
+        }
+        
+        .mark-all-read-btn:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #4c63d2 100%);
+            box-shadow: 0 10px 24px rgba(106, 130, 251, 0.35);
+            transform: translateY(-3px);
+        }
+        
+        .mark-all-read-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        /* Notification Item Enhancements */
+        .notification-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notification-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transition: left 0.8s ease;
+        }
+        
+        .notification-item:hover::before {
+            left: 100%;
+        }
+        
+        .notification-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Notification Item Actions Container */
+        .notification-actions {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-top: 0.8rem;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .notification-item:hover .notification-actions {
+            opacity: 1;
+        }
+        
+        /* Notification Badge Enhancements */
+        .notification-badge {
+            position: relative;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .notification-badge::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+        
+        .notification-badge:hover::after {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Notification Stats Chips */
+        .notification-stat-chip {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 0.3rem 0.7rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+        
+        .notification-stat-chip:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Notification Content Enhancements */
+        .notification-content {
+            position: relative;
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+        
+        .notification-content:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Loading States */
+        .notification-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .notification-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: notificationSpin 1s linear infinite;
+        }
+        
+        @keyframes notificationSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Success Animation */
+        .notification-success {
+            animation: notificationSuccess 0.6s ease-out;
+        }
+        
+        @keyframes notificationSuccess {
+            0% {
+                transform: scale(1);
+                background: rgba(72, 187, 120, 0.1);
+            }
+            50% {
+                transform: scale(1.05);
+                background: rgba(72, 187, 120, 0.2);
+            }
+            100% {
+                transform: scale(1);
+                background: rgba(72, 187, 120, 0.1);
+            }
+        }
+        
+        /* Delete Animation */
+        .notification-delete {
+            animation: notificationDelete 0.5s ease-out forwards;
+        }
+        
+        @keyframes notificationDelete {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(0.8);
+                opacity: 0;
+                height: 0;
+                margin: 0;
+                padding: 0;
+            }
+        }
+        
+        /* Empty State Styling */
+        .notification-empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        
+        .notification-empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+            display: block;
+        }
+        
+        /* Dark Mode Adjustments */
+        body.dark-mode .notification-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+        
+        body.dark-mode .notification-content {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        body.dark-mode .notification-content:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Mobile Responsive Adjustments */
+        @media (max-width: 768px) {
+            .notification-action-btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+                min-height: 44px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .notification-actions {
+                flex-direction: column;
+                gap: 0.6rem;
+            }
+            
+            .mark-all-read-btn {
+                width: 100%;
+                padding: 1rem;
+                font-size: 1.1rem;
+            }
+            
+            .notification-item {
+                margin-bottom: 1rem;
+            }
+            
+            .notification-content {
+                padding: 1.2rem;
+            }
+        }
+        
+        /* Focus States for Accessibility */
+        .notification-action-btn:focus-visible {
+            outline: 3px solid rgba(106, 130, 251, 0.5);
+            outline-offset: 2px;
+        }
+        
+        .mark-read-btn:focus-visible {
+            outline-color: rgba(72, 187, 120, 0.5);
+        }
+        
+        .clear-btn:focus-visible {
+            outline-color: rgba(252, 92, 125, 0.5);
+        }
+        
+        /* High Contrast Mode Support */
+        @media (prefers-contrast: high) {
+            .notification-action-btn {
+                border-width: 2px;
+            }
+            
+            .notification-badge {
+                border-width: 2px;
+            }
+            
+            .notification-stat-chip {
+                border-width: 2px;
+            }
+        }
+        
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            .notification-action-btn,
+            .notification-item,
+            .notification-badge,
+            .notification-stat-chip,
+            .notification-content {
+                transition: none;
+            }
+            
+            .notification-action-btn::before,
+            .notification-item::before,
+            .notification-badge::after {
+                display: none;
+            }
+            
+            .notification-success,
+            .notification-delete {
+                animation: none;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="floating-navbar-container">
@@ -49,7 +449,10 @@
                 <span class="uiverse-stat-chip">📦 Total: {{ total_count or 0 }}</span>
             </div>
             {% if unread_count and unread_count > 0 %}
-                <button class="uiverse-gradient-btn" onclick="markAllAsRead()" style="margin-bottom:1rem;">✅ Mark All as Read</button>
+                <button class="notification-action-btn mark-all-read-btn" onclick="markAllAsRead()" style="margin-bottom:1rem;">
+                    <i class="fas fa-check-double"></i>
+                    <span>Mark All as Read</span>
+                </button>
             {% endif %}
         </div>
         {% if notifications and notifications|length > 0 %}
@@ -63,32 +466,280 @@
                     {% set sender_name = n[7] if n|length > 7 else None %}
                     
                     <li class="notification-item uiverse-card" data-notification-id="{{ id }}" data-type="{{ item_type }}" style="padding:1rem; border-radius:12px; border-left: 4px solid {% if item_type == 'personal_chat' %}#fc5c7d{% elif item_type == 'mention' %}#ff6b6b{% elif item_type == 'personal' %}#4ecdc4{% else %}#6a82fb{% endif %};">
-                        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem; flex-wrap:wrap;">
-                            <span class="uiverse-badge" style="background: {% if item_type == 'personal_chat' %}#fc5c7d{% elif item_type == 'mention' %}#ff6b6b{% elif item_type == 'personal' %}#4ecdc4{% else %}#6a82fb{% endif %};">
-                                {% if item_type == 'personal_chat' %}💬 Personal Chat
-                                {% elif item_type == 'mention' %}📢 Mention
-                                {% elif item_type == 'personal' %}👤 Personal
-                                {% else %}📢 General{% endif %}
-                            </span>
-                            {% if sender_name %}
-                                <span class="uiverse-stat-chip" style="background: rgba(255,255,255,0.1);">@{{ sender_name }}</span>
-                            {% endif %}
-                            <span class="uiverse-stat-chip">🕒 {{ created_at }}</span>
+                        <div class="notification-content">
+                            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem; flex-wrap:wrap;">
+                                <span class="notification-badge" style="background: {% if item_type == 'personal_chat' %}#fc5c7d{% elif item_type == 'mention' %}#ff6b6b{% elif item_type == 'personal' %}#4ecdc4{% else %}#6a82fb{% endif %};">
+                                    {% if item_type == 'personal_chat' %}💬 Personal Chat
+                                    {% elif item_type == 'mention' %}📢 Mention
+                                    {% elif item_type == 'personal' %}👤 Personal
+                                    {% else %}📢 General{% endif %}
+                                </span>
+                                {% if sender_name %}
+                                    <span class="notification-stat-chip" style="background: rgba(255,255,255,0.1);">@{{ sender_name }}</span>
+                                {% endif %}
+                                <span class="notification-stat-chip">🕒 {{ created_at }}</span>
+                            </div>
+                            <div style="word-wrap: break-word; color:#fff; margin-bottom:0.5rem;">{{ message }}</div>
                         </div>
-                        <div style="word-wrap: break-word; color:#fff; margin-bottom:0.5rem;">{{ message }}</div>
-                        <div style="margin-top:0.6rem; display:flex; gap:.5rem; flex-wrap:wrap;">
-                            <button class="uiverse-gradient-btn" onclick="markNotificationAsSeen('{{ id }}', '{{ item_type }}')">✅ Mark as seen</button>
-                            <button class="btn btn-secondary" onclick="deleteNotification('{{ id }}', '{{ item_type }}')">🗑️ Delete</button>
+                        <div class="notification-actions">
+                            <button class="notification-action-btn mark-read-btn" onclick="markNotificationAsSeen('{{ id }}', '{{ item_type }}')">
+                                <i class="fas fa-check"></i>
+                                <span>Mark as Read</span>
+                            </button>
+                            <button class="notification-action-btn clear-btn" onclick="deleteNotification('{{ id }}', '{{ item_type }}')">
+                                <i class="fas fa-trash"></i>
+                                <span>Delete</span>
+                            </button>
                         </div>
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p style="text-align:center; color:#888;">No new notifications.</p>
+            <div class="notification-empty-state">
+                <i class="fas fa-bell-slash"></i>
+                <p>No new notifications</p>
+                <small>You're all caught up! Check back later for updates.</small>
+            </div>
         {% endif %}
     </section>
 
     <script src="script.js"></script>
+    
+    <script>
+        // Enhanced notification functionality with proper API calls
+        function markNotificationAsSeen(notificationId, itemType) {
+            const notificationItem = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            const button = notificationItem.querySelector('.mark-read-btn');
+            
+            // Add loading state
+            button.classList.add('notification-loading');
+            button.disabled = true;
+            
+            // Call the actual API
+            fetch(`/api/mark-notification-seen/${notificationId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    type: itemType
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove loading state
+                button.classList.remove('notification-loading');
+                
+                if (data.success) {
+                    // Add success animation
+                    notificationItem.classList.add('notification-success');
+                    
+                    // Update button text and style
+                    button.innerHTML = '<i class="fas fa-check-circle"></i><span>Marked as Read</span>';
+                    button.classList.remove('mark-read-btn');
+                    button.classList.add('clear-btn');
+                    button.disabled = true;
+                    
+                    // Remove success animation after delay
+                    setTimeout(() => {
+                        notificationItem.classList.remove('notification-success');
+                    }, 600);
+                    
+                    // Optional: Hide the notification after a delay
+                    setTimeout(() => {
+                        notificationItem.style.opacity = '0.5';
+                        notificationItem.style.transform = 'scale(0.98)';
+                    }, 2000);
+                } else {
+                    // Handle error
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                    console.error('Failed to mark notification as seen:', data.error);
+                }
+            })
+            .catch(error => {
+                // Remove loading state and show error
+                button.classList.remove('notification-loading');
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                console.error('Error marking notification as seen:', error);
+            });
+        }
+        
+        function deleteNotification(notificationId, itemType) {
+            const notificationItem = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            const button = notificationItem.querySelector('.clear-btn');
+            
+            // Add loading state
+            button.classList.add('notification-loading');
+            button.disabled = true;
+            
+            // Call the actual API
+            fetch(`/api/delete-notification/${notificationId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    type: itemType
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Add delete animation
+                    notificationItem.classList.add('notification-delete');
+                    
+                    // Remove from DOM after animation
+                    setTimeout(() => {
+                        notificationItem.remove();
+                        
+                        // Check if no notifications left
+                        const remainingNotifications = document.querySelectorAll('.notification-item');
+                        if (remainingNotifications.length === 0) {
+                            // Show empty state
+                            const notificationList = document.querySelector('ul');
+                            if (notificationList) {
+                                notificationList.innerHTML = `
+                                    <div class="notification-empty-state">
+                                        <i class="fas fa-bell-slash"></i>
+                                        <p>No new notifications</p>
+                                        <small>You're all caught up! Check back later for updates.</small>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }, 500);
+                } else {
+                    // Handle error
+                    button.classList.remove('notification-loading');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                    console.error('Failed to delete notification:', data.error);
+                }
+            })
+            .catch(error => {
+                // Remove loading state and show error
+                button.classList.remove('notification-loading');
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                console.error('Error deleting notification:', error);
+            });
+        }
+        
+        function markAllAsRead() {
+            const markAllButton = document.querySelector('.mark-all-read-btn');
+            const notificationItems = document.querySelectorAll('.notification-item');
+            
+            // Add loading state to main button
+            markAllButton.classList.add('notification-loading');
+            markAllButton.disabled = true;
+            
+            // Call the API to mark all as read
+            fetch('/api/mark-all-notifications-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Process each notification with animation
+                    notificationItems.forEach((item, index) => {
+                        setTimeout(() => {
+                            const markReadBtn = item.querySelector('.mark-read-btn');
+                            if (markReadBtn && !markReadBtn.disabled) {
+                                // Add success animation
+                                item.classList.add('notification-success');
+                                
+                                // Update button
+                                markReadBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>Marked as Read</span>';
+                                markReadBtn.classList.remove('mark-read-btn');
+                                markReadBtn.classList.add('clear-btn');
+                                markReadBtn.disabled = true;
+                                
+                                // Remove success animation
+                                setTimeout(() => {
+                                    item.classList.remove('notification-success');
+                                }, 600);
+                            }
+                        }, index * 200); // Stagger the animations
+                    });
+                    
+                    // Update main button
+                    setTimeout(() => {
+                        markAllButton.classList.remove('notification-loading');
+                        markAllButton.disabled = false;
+                        markAllButton.innerHTML = '<i class="fas fa-check-double"></i><span>All Marked as Read</span>';
+                        markAllButton.style.opacity = '0.7';
+                    }, notificationItems.length * 200 + 1000);
+                } else {
+                    // Handle error
+                    markAllButton.classList.remove('notification-loading');
+                    markAllButton.disabled = false;
+                    markAllButton.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                    console.error('Failed to mark all notifications as read:', data.error);
+                }
+            })
+            .catch(error => {
+                // Remove loading state and show error
+                markAllButton.classList.remove('notification-loading');
+                markAllButton.disabled = false;
+                markAllButton.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                console.error('Error marking all notifications as read:', error);
+            });
+        }
+        
+        // Add hover effects to notification items
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationItems = document.querySelectorAll('.notification-item');
+            
+            notificationItems.forEach(item => {
+                // Add subtle entrance animation
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    item.style.transition = 'all 0.3s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, Math.random() * 300);
+            });
+        });
+        
+        // Add keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Close any open modals or dropdowns
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (modal.style.display !== 'none') {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+        });
+        
+        // Add touch support for mobile
+        if ('ontouchstart' in window) {
+            document.addEventListener('touchstart', function(e) {
+                const target = e.target.closest('.notification-action-btn');
+                if (target) {
+                    target.style.transform = 'scale(0.95)';
+                }
+            });
+            
+            document.addEventListener('touchend', function(e) {
+                const target = e.target.closest('.notification-action-btn');
+                if (target) {
+                    setTimeout(() => {
+                        target.style.transform = '';
+                    }, 150);
+                }
+            });
+        }
+    </script>
 
     <!-- Search Modal -->
     <div id="searchModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">

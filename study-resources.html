@@ -427,13 +427,36 @@
         }
       }
 
-      /* Resource Grid */
+      /* Resource Grid - Beautiful 4 Column Layout */
       .resource-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
         max-width: 1400px;
         margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      /* Responsive Grid */
+      @media (max-width: 1200px) {
+        .resource-grid {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.25rem;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .resource-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .resource-grid {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
       }
 
       .resource-card {
