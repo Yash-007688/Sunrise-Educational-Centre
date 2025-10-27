@@ -3468,9 +3468,23 @@ body.dark-mode #faq .faq-answer {
 body:not(.dark-mode) .navbar,
 body:not(.dark-mode) .navbar a,
 body:not(.dark-mode) .nav-logo span,
+body:not(.dark-mode) .floating-navbar,
+body:not(.dark-mode) .floating-navbar a,
+body:not(.dark-mode) .floating-navbar .nav-logo span,
+body:not(.dark-mode) .floating-navbar.black-glass .nav-links a,
+body:not(.dark-mode) .glassmorphic,
+body:not(.dark-mode) .glassmorphic a,
+body:not(.dark-mode) .glassmorphic span,
 body.dark-mode .navbar,
 body.dark-mode .navbar a,
-body.dark-mode .nav-logo span {
+body.dark-mode .nav-logo span,
+body.dark-mode .floating-navbar,
+body.dark-mode .floating-navbar a,
+body.dark-mode .floating-navbar .nav-logo span,
+body.dark-mode .floating-navbar.black-glass .nav-links a,
+body.dark-mode .glassmorphic,
+body.dark-mode .glassmorphic a,
+body.dark-mode .glassmorphic span {
   color: #fff !important;
 }
 
@@ -4057,4 +4071,102 @@ body.dark-mode .section-item h5 {
   body.dark-mode select {
     background: rgba(26, 26, 42, 0.95) !important;
   }
+}
+
+/* ===== Glass Design White Text for White Theme ===== */
+/* When theme is white (light mode) and section has glass design, make text white */
+body:not(.dark-mode) [style*="backdrop-filter"],
+body:not(.dark-mode) [style*="-webkit-backdrop-filter"],
+body:not(.dark-mode) .glassmorphic,
+body:not(.dark-mode) .black-glass,
+body:not(.dark-mode) .admin-card,
+body:not(.dark-mode) .create-user-section,
+body:not(.dark-mode) .admin-section,
+body:not(.dark-mode) .metric-card,
+body:not(.dark-mode) .resource-card,
+body:not(.dark-mode) .tab-content,
+body:not(.dark-mode) .modal-content,
+body:not(.dark-mode) .panel,
+body:not(.dark-mode) .file-upload-area,
+body:not(.dark-mode) .admin-table,
+body:not(.dark-mode) [class*="glass"],
+body:not(.dark-mode) [class*="glassmorphic"] {
+  color: #ffffff !important;
+}
+
+/* Ensure all text elements within glass sections are white in white theme */
+body:not(.dark-mode) [style*="backdrop-filter"] *,
+body:not(.dark-mode) [style*="-webkit-backdrop-filter"] *,
+body:not(.dark-mode) .glassmorphic *,
+body:not(.dark-mode) .black-glass *,
+body:not(.dark-mode) .admin-card *,
+body:not(.dark-mode) .create-user-section *,
+body:not(.dark-mode) .admin-section *,
+body:not(.dark-mode) .metric-card *,
+body:not(.dark-mode) .resource-card *,
+body:not(.dark-mode) .tab-content *,
+body:not(.dark-mode) .modal-content *,
+body:not(.dark-mode) .panel *,
+body:not(.dark-mode) .file-upload-area *,
+body:not(.dark-mode) .admin-table *,
+body:not(.dark-mode) [class*="glass"] *,
+body:not(.dark-mode) [class*="glassmorphic"] * {
+  color: #ffffff !important;
+}
+
+/* Specific text elements that need white color in glass sections for white theme */
+body:not(.dark-mode) [style*="backdrop-filter"] h1,
+body:not(.dark-mode) [style*="backdrop-filter"] h2,
+body:not(.dark-mode) [style*="backdrop-filter"] h3,
+body:not(.dark-mode) [style*="backdrop-filter"] h4,
+body:not(.dark-mode) [style*="backdrop-filter"] h5,
+body:not(.dark-mode) [style*="backdrop-filter"] h6,
+body:not(.dark-mode) [style*="backdrop-filter"] p,
+body:not(.dark-mode) [style*="backdrop-filter"] span,
+body:not(.dark-mode) [style*="backdrop-filter"] div,
+body:not(.dark-mode) [style*="backdrop-filter"] label,
+body:not(.dark-mode) [style*="backdrop-filter"] a,
+body:not(.dark-mode) [style*="backdrop-filter"] button,
+body:not(.dark-mode) [style*="backdrop-filter"] input,
+body:not(.dark-mode) [style*="backdrop-filter"] select,
+body:not(.dark-mode) [style*="backdrop-filter"] textarea,
+body:not(.dark-mode) .glassmorphic h1,
+body:not(.dark-mode) .glassmorphic h2,
+body:not(.dark-mode) .glassmorphic h3,
+body:not(.dark-mode) .glassmorphic h4,
+body:not(.dark-mode) .glassmorphic h5,
+body:not(.dark-mode) .glassmorphic h6,
+body:not(.dark-mode) .glassmorphic p,
+body:not(.dark-mode) .glassmorphic span,
+body:not(.dark-mode) .glassmorphic div,
+body:not(.dark-mode) .glassmorphic label,
+body:not(.dark-mode) .glassmorphic a,
+body:not(.dark-mode) .glassmorphic button,
+body:not(.dark-mode) .glassmorphic input,
+body:not(.dark-mode) .glassmorphic select,
+body:not(.dark-mode) .glassmorphic textarea,
+body:not(.dark-mode) .black-glass h1,
+body:not(.dark-mode) .black-glass h2,
+body:not(.dark-mode) .black-glass h3,
+body:not(.dark-mode) .black-glass h4,
+body:not(.dark-mode) .black-glass h5,
+body:not(.dark-mode) .black-glass h6,
+body:not(.dark-mode) .black-glass p,
+body:not(.dark-mode) .black-glass span,
+body:not(.dark-mode) .black-glass div,
+body:not(.dark-mode) .black-glass label,
+body:not(.dark-mode) .black-glass a,
+body:not(.dark-mode) .black-glass button,
+body:not(.dark-mode) .black-glass input,
+body:not(.dark-mode) .black-glass select,
+body:not(.dark-mode) .black-glass textarea {
+  color: #ffffff !important;
+}
+
+/* Override any inline styles that might set text color in glass sections for white theme */
+body:not(.dark-mode) [style*="backdrop-filter"][style*="color:"],
+body:not(.dark-mode) [style*="-webkit-backdrop-filter"][style*="color:"],
+body:not(.dark-mode) .glassmorphic[style*="color:"],
+body:not(.dark-mode) .black-glass[style*="color:"] {
+  color: #ffffff !important;
 }
