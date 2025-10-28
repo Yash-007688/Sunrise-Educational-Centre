@@ -206,6 +206,18 @@
         color: #fff !important;
       }
       
+      body.dark-mode .btn-logout {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+        color: #fff !important;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3) !important;
+      }
+      
+      body.dark-mode .btn-logout:hover {
+        background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4) !important;
+      }
+      
       /* Mobile Responsive Styles */
       @media (max-width: 768px) {
         .profile-container {
@@ -502,6 +514,18 @@
       color: #1e293b;
     }
     
+    .btn-logout {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+    }
+    
+    .btn-logout:hover {
+      background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+    
     .footer {
       background: linear-gradient(90deg, #e0e7ff 0%, #f8fafc 100%);
       padding: 2.2rem 0 1.2rem 0;
@@ -774,6 +798,7 @@
         <button onclick="showEditForm()" class="uiverse-gradient-btn">✏️ Edit Profile</button>
         <a href="/study-resources" class="btn btn-secondary">📚 My Resources</a>
         <a href="/forum" class="btn btn-secondary">💬 Forum</a>
+        <a href="/logout" class="btn btn-logout" onclick="return confirmLogout()">🚪 Logout</a>
       </div>
 
       <div style="margin-top:2rem; display:flex; gap:0.75rem; flex-wrap:wrap; justify-content:center;">
@@ -841,6 +866,10 @@
     function hideEditForm() {
       document.getElementById('editForm').style.display = 'none';
       document.querySelector('.profile-actions').style.display = 'block';
+    }
+    
+    function confirmLogout() {
+      return confirm('Are you sure you want to logout? You will need to login again to access your account.');
     }
     
     // Show form if there's an error or success message
