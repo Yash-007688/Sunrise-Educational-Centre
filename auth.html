@@ -102,6 +102,36 @@
             margin: 0 auto;
         }
 
+        .home-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 0.55rem 1rem;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.25s ease, background 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(255,255,255,0.18);
+            z-index: 2;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        body.dark-mode .home-btn {
+            background: linear-gradient(135deg, #6a82fb 0%, #5a6fd8 100%);
+            border-color: rgba(148, 163, 184, 0.35);
+        }
+
         /* Perfect centering for the auth form */
         .auth-container {
             position: absolute;
@@ -423,6 +453,7 @@
     <!-- Main Auth Container -->
     <div class="auth-container">
         <div class="auth-card">
+            <a href="/" class="home-btn"><span>🏠</span><span>Home</span></a>
             <!-- Auth Header -->
             <div class="auth-logo">
                 <div class="auth-logo-icon">🌅</div>
