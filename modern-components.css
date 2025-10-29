@@ -768,3 +768,8 @@ body.popup-open {
     display: none; /* Hide particles on very small screens for performance */
   }
 }
+
+.testimonial-card, .testimonial-card *, body:not(.dark-mode) .testimonial-card, body.dark-mode .testimonial-card {
+  color: #fff !important;
+  text-shadow: 0 1px 4px rgba(20,20,50,0.13);
+}
