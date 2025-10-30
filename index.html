@@ -2480,63 +2480,63 @@
         function populateReviewsGrid(container) {
             const reviews = [
                 {
-                    text: "The concepts finally clicked! The personalized attention and doubt-clearing sessions helped me jump from average to excellent.",
+                    videoUrl: "",
                     author: "Arjun Kumar",
                     class: "Class 10 • Scored 95% in Maths",
                     avatar: "AK",
                     rating: "⭐️⭐️⭐️⭐️⭐️"
                 },
                 {
-                    text: "Crisp notes, regular practice, and mock tests made all the difference. I improved my speed and accuracy a lot.",
+                    videoUrl: "",
                     author: "Priya Sharma",
                     class: "Class 12 • JEE Prep Batch",
                     avatar: "PS",
                     rating: "⭐️⭐️⭐️⭐️⭐️"
                 },
                 {
-                    text: "The teaching style is engaging and practical. Weekly targets kept me consistent and motivated.",
+                    videoUrl: "",
                     author: "Rahul Mehta",
                     class: "Class 11 • Applied Mathematics",
                     avatar: "RM",
                     rating: "⭐️⭐️⭐️⭐️⭐️"
                 },
                 {
-                    text: "Best institute for strong fundamentals. The teachers genuinely care about your progress.",
+                    videoUrl: "",
                     author: "Shreya Narang",
                     class: "Class 9 • Foundation Course",
                     avatar: "SN",
                     rating: "⭐️⭐️⭐️⭐️⭐️"
                 },
                 {
-                    text: "Amazing doubt clearing sessions! The teachers are always available and explain concepts in the simplest way possible.",
+                    videoUrl: "",
                     author: "Vikram Singh",
                     class: "Class 10 • Scored 92% in Maths",
                     avatar: "VS",
                     rating: "⭐️⭐️⭐️⭐️⭐️"
                 },
                 {
-                    text: "The study material is comprehensive and well-structured. It helped me understand complex topics easily.",
+                    videoUrl: "",
                     author: "Ananya Patel",
                     class: "Class 12 • JEE Advanced",
                     avatar: "AP",
                     rating: "⭐️⭐️⭐️⭐️⭐️"
                 },
                 {
-                    text: "Regular mock tests and feedback sessions helped me identify my weak areas and improve significantly.",
+                    videoUrl: "",
                     author: "Rohit Agarwal",
                     class: "Class 11 • Applied Mathematics",
                     avatar: "RA",
                     rating: "⭐️⭐️⭐️⭐️⭐️"
                 },
                 {
-                    text: "The teachers are very patient and supportive. They never give up on any student and ensure everyone understands.",
+                    videoUrl: "",
                     author: "Kavya Reddy",
                     class: "Class 9 • Foundation Course",
                     avatar: "KR",
                     rating: "⭐️⭐️⭐️⭐️⭐️"
                 },
                 {
-                    text: "Excellent coaching with personalized attention. The small batch size ensures individual focus on every student.",
+                    videoUrl: "",
                     author: "Siddharth Joshi",
                     class: "Class 10 • Scored 98% in Maths",
                     avatar: "SJ",
@@ -2550,13 +2550,15 @@
                 const reviewCard = document.createElement('div');
                 reviewCard.className = 'review-card';
                 reviewCard.innerHTML = `
-                    <p class="review-text">"${review.text}"</p>
                     <div class="review-author">
                         <div class="review-avatar">${review.avatar}</div>
                         <div class="review-info">
                             <h5>${review.author}</h5>
                             <p>${review.class}</p>
                         </div>
+                    </div>
+                    <div class="review-video" style="position:relative; width:100%; padding-top:56.25%; border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.3); margin-top:1rem;">
+                        <iframe src="${review.videoUrl || ''}" title="Student Review Video" style="position:absolute; inset:0; width:100%; height:100%; border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                     </div>
                     <div class="review-rating">${review.rating}</div>
                 `;
