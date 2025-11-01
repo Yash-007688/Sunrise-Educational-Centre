@@ -5,18 +5,17 @@ Place your student testimonial video files in this directory (`videos/student-te
 
 ## Required Video Files
 
-### Main Testimonials Section (Homepage):
-1. `arjun-kumar.mp4` - Arjun Kumar (Class 10)
-2. `priya-sharma.mp4` - Priya Sharma (Class 12)
-3. `rahul-mehta.mp4` - Rahul Mehta (Class 11)
-4. `shreya-narang.mp4` - Shreya Narang (Class 9)
+### Main Testimonials Section (Homepage) - 2023-24 Scholarship Winners:
+1. `rahul-sharma.mp4` - Rahul Sharma (Class 9 • 95% Scholarship Winner)
+2. `priya-verma.mp4` - Priya Verma (Class 10 • 100% Scholarship Winner)
+3. `amit-kumar.mp4` - Amit Kumar (Class 11 • 85% Scholarship Winner)
+4. `neha-singh.mp4` - Neha Singh (Class 12 • 90% Scholarship Winner)
 
-### Additional Reviews (Modal):
-5. `vikram-singh.mp4` - Vikram Singh (Class 10)
-6. `ananya-patel.mp4` - Ananya Patel (Class 12)
-7. `rohit-agarwal.mp4` - Rohit Agarwal (Class 11)
-8. `kavya-reddy.mp4` - Kavya Reddy (Class 9)
-9. `siddharth-joshi.mp4` - Siddharth Joshi (Class 10)
+### Additional Reviews (Modal) - 2024-25 Scholarship Winners:
+5. `arjun-mehta.mp4` - Arjun Mehta (Class 9 • 90% Scholarship Winner)
+6. `isha-jain.mp4` - Isha Jain (Class 10 • 100% Scholarship Winner)
+7. `karan-patel.mp4` - Karan Patel (Class 11 • 75% Scholarship Winner)
+8. `simran-k.mp4` - Simran K (Class 12 • 80% Scholarship Winner)
 
 ## Video Format Recommendations
 - **Format**: MP4 (recommended) or WebM
