@@ -83,7 +83,7 @@
 }
 
 .floating-navbar .nav-links a {
-    color: #ffffff;
+    color: #ffffff !important;
     text-decoration: none;
     font-weight: 600;
     font-size: 15px;
@@ -101,7 +101,7 @@
 
 .floating-navbar .nav-links a:hover { 
     background: rgba(255, 255, 255, 0.12); 
-    color: #ffffff; 
+    color: #ffffff !important; 
     border-color: rgba(255,255,255,0.16);
     /* Prevent any layout shifts on hover */
     transform: none;
@@ -109,7 +109,7 @@
 
 .floating-navbar .nav-links a.active { 
     background: rgba(255,255,255,0.14); 
-    color: #fff; 
+    color: #fff !important; 
     border-color: rgba(255,255,255,0.2);
     /* Prevent any layout shifts on active state */
     transform: none;
@@ -342,7 +342,7 @@
         box-sizing: border-box;
     }
     .floating-navbar .nav-links.active { display: flex; animation: navbarSlideDown 0.18s ease-out; }
-    .floating-navbar .nav-links a { font-size: 14px; padding: 8px 10px; color: #fff; }
+    .floating-navbar .nav-links a { font-size: 14px; padding: 8px 10px; color: #fff !important; }
     .floating-navbar .nav-links li { margin: 0; }
     /* Mobile dropdown adjustments (inside collapsed menu) */
     .floating-navbar .dropdown-menu {
