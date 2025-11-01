@@ -80,10 +80,12 @@ class YouTubeDownloader:
             
             # Configure download options
             ydl_opts = {
-                'format': 'best[ext=mp4]/best',  # Prefer MP4, fallback to best
+                'format': 'best[ext=mp4][height<=720]/best[height<=720]/best',  # Prefer MP4, 720p or lower
                 'outtmpl': filepath,
                 'quiet': False,
                 'progress_hooks': [self._progress_hook],
+                'noplaylist': True,
+                'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             }
             
             logger.info(f"Starting download: {title}")
