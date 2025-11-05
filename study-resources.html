@@ -1067,8 +1067,7 @@
     </script>
     <script src="navbar-functions.js"></script>
 
-    <!-- Modern Button Navbar (User Pages Only) -->
-    {% if username and role not in ['admin', 'teacher'] %}
+    <!-- Modern Button Navbar (Mobile Quick Access) -->
     <nav class="modern-navbar">
         <div class="button-container">
             <!-- Home Button -->
@@ -1108,7 +1107,6 @@
             </button>
         </div>
     </nav>
-    {% endif %}
 
     <script src="modern-navbar.js"></script>
 </body>

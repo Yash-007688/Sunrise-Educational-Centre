@@ -2200,8 +2200,7 @@
         </div>
     </footer>
 
-    <!-- Modern Button Navbar (User Pages Only) -->
-    {% if username and role not in ['admin', 'teacher'] %}
+    <!-- Modern Button Navbar (Mobile Quick Access) -->
     <nav class="modern-navbar">
         <div class="button-container">
             <!-- Home Button -->
@@ -2241,7 +2240,6 @@
             </button>
         </div>
     </nav>
-    {% endif %}
 
     <!-- Floating Action Button for Quick Actions -->
     <button class="fab" onclick="toggleQuickActions()" title="Quick Actions">

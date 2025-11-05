@@ -1125,8 +1125,7 @@
       });
     </script>
 
-    <!-- Modern Button Navbar (User Pages Only) -->
-    {% if username and role not in ['admin', 'teacher'] %}
+    <!-- Modern Button Navbar (Mobile Quick Access) -->
     <nav class="modern-navbar">
         <div class="button-container">
             <!-- Home Button -->
@@ -1166,7 +1165,6 @@
             </button>
         </div>
     </nav>
-    {% endif %}
   
     <!-- Search Modal -->
     <div id="searchModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
