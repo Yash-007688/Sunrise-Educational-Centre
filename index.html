@@ -258,6 +258,37 @@
             position: relative;
         }
 
+        /* Light theme: force white text and white buttons for hero and testimonials */
+        body:not(.dark-mode) .hero-content-modern .hero-title-modern,
+        body:not(.dark-mode) .hero-content-modern .hero-subtitle-modern,
+        body:not(.dark-mode) .hero-content-modern,
+        body:not(.dark-mode) .hero-content-modern * {
+            color: #ffffff !important;
+        }
+        body:not(.dark-mode) .hero-buttons .uiverse-btn {
+            background: transparent !important;
+            color: #ffffff !important;
+            border: 2px solid rgba(255,255,255,0.95) !important;
+            box-shadow: none !important;
+        }
+        body:not(.dark-mode) .hero-buttons .uiverse-btn:hover {
+            background: rgba(255,255,255,0.12) !important;
+        }
+        body:not(.dark-mode) #testimonials h2,
+        body:not(.dark-mode) #testimonials h4,
+        body:not(.dark-mode) #testimonials p,
+        body:not(.dark-mode) #testimonials .testimonial-avatar,
+        body:not(.dark-mode) #testimonials .review-rating {
+            color: #ffffff !important;
+        }
+        body:not(.dark-mode) .testimonial-nav-btn {
+            color: #ffffff !important;
+            border: 1px solid rgba(255,255,255,0.9) !important;
+            background: transparent !important;
+        }
+        body:not(.dark-mode) .testimonial-dot { background: rgba(255,255,255,0.5) !important; }
+        body:not(.dark-mode) .testimonial-dot.active { background: #ffffff !important; }
+
         .notification-bell:hover {
             background: rgba(255,255,255,0.1);
             transform: translateY(-2px);
