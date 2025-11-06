@@ -36,6 +36,23 @@
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
             </svg>
         </button>
+
+        <!-- Admission Button -->
+        <button class="button" data-tooltip="Admission" onclick="navigateTo('/admission')">
+            <svg class="icon" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20v2H6.5A2.5 2.5 0 0 1 4 19.5z"></path>
+                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                <path d="M2 7v5l10 5 10-5V7"></path>
+            </svg>
+        </button>
+
+        <!-- Notifications Button -->
+        <button class="button" data-tooltip="Notifications" onclick="navigateTo('/notifications')">
+            <svg class="icon" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+        </button>
     </div>
 </nav>
 
@@ -77,6 +94,10 @@ document.addEventListener('DOMContentLoaded', function() {
         buttons[3].classList.add('active'); // Resources
     } else if (currentPath.includes('/forum')) {
         buttons[4].classList.add('active'); // Forum
+    } else if (currentPath.includes('/admission')) {
+        buttons[5].classList.add('active'); // Admission
+    } else if (currentPath.includes('/notifications')) {
+        buttons[6].classList.add('active'); // Notifications
     }
 });
 
