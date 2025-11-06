@@ -1581,7 +1581,7 @@
 
             <div style="text-align:center; margin-top: .5rem; display:flex; gap:.75rem; justify-content:center; flex-wrap:wrap;">
                 <button onclick="showAllReviews()" class="uiverse-btn">💬 Read more reviews</button>
-                <a href="#contact" class="morph-btn" style="width:auto; padding:10px 16px; height:auto;">✍️ Write a review</a>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfXXFgySHPq5TaXr8jNQxkjQS5E_ml1iQUvwAKQ1qzVBLlzFg/viewform" target="_blank" rel="noopener" class="morph-btn" style="width:auto; padding:10px 16px; height:auto;">✍️ Write a review</a>
             </div>
 
             <!-- Features Comparison Section -->
@@ -2605,64 +2605,7 @@
         }
 
         function populateReviewsGrid(container) {
-            const reviews = [
-                {
-                    videoUrl: "./videos/student-testimonials/rahul-sharma.mp4",
-                    author: "Rahul Sharma",
-                    class: "Class 9 • 95% Scholarship Winner",
-                    avatar: "RS",
-                    rating: "⭐️⭐️⭐️⭐️⭐️"
-                },
-                {
-                    videoUrl: "./videos/student-testimonials/priya-verma.mp4",
-                    author: "Priya Verma",
-                    class: "Class 10 • 100% Scholarship Winner",
-                    avatar: "PV",
-                    rating: "⭐️⭐️⭐️⭐️⭐️"
-                },
-                {
-                    videoUrl: "./videos/student-testimonials/amit-kumar.mp4",
-                    author: "Amit Kumar",
-                    class: "Class 11 • 85% Scholarship Winner",
-                    avatar: "AK",
-                    rating: "⭐️⭐️⭐️⭐️⭐️"
-                },
-                {
-                    videoUrl: "./videos/student-testimonials/neha-singh.mp4",
-                    author: "Neha Singh",
-                    class: "Class 12 • 90% Scholarship Winner",
-                    avatar: "NS",
-                    rating: "⭐️⭐️⭐️⭐️⭐️"
-                },
-                {
-                    videoUrl: "./videos/student-testimonials/arjun-mehta.mp4",
-                    author: "Arjun Mehta",
-                    class: "Class 9 • 90% Scholarship Winner",
-                    avatar: "AM",
-                    rating: "⭐️⭐️⭐️⭐️⭐️"
-                },
-                {
-                    videoUrl: "./videos/student-testimonials/isha-jain.mp4",
-                    author: "Isha Jain",
-                    class: "Class 10 • 100% Scholarship Winner",
-                    avatar: "IJ",
-                    rating: "⭐️⭐️⭐️⭐️⭐️"
-                },
-                {
-                    videoUrl: "./videos/student-testimonials/karan-patel.mp4",
-                    author: "Karan Patel",
-                    class: "Class 11 • 75% Scholarship Winner",
-                    avatar: "KP",
-                    rating: "⭐️⭐️⭐️⭐️⭐️"
-                },
-                {
-                    videoUrl: "./videos/student-testimonials/simran-k.mp4",
-                    author: "Simran K",
-                    class: "Class 12 • 80% Scholarship Winner",
-                    avatar: "SK",
-                    rating: "⭐️⭐️⭐️⭐️⭐️"
-                }
-            ];
+            const reviews = window.__sheetTestimonials || [];
 
             container.innerHTML = '';
             
@@ -2689,6 +2632,93 @@
                 container.appendChild(reviewCard);
             });
         }
+
+        // --- Dynamic Testimonials via Google Sheet (fed by Google Form) ---
+        // Configure the Google Sheet ID here. Set the Sheet to: File -> Share -> Anyone with the link (Viewer)
+        // Then: File -> Share -> Publish to the web -> Entire document -> Web page
+        // The Form should write responses into the first sheet with headers: Name, Class, Rating, Message, PhotoURL, VideoURL
+        window.TESTIMONIAL_SHEET_ID = window.TESTIMONIAL_SHEET_ID || '';
+
+        async function fetchTestimonialsFromSheet(sheetId) {
+            if (!sheetId) return [];
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&tq=`;
+            try {
+                const res = await fetch(url, { cache: 'no-store' });
+                const text = await res.text();
+                const json = JSON.parse(text.replace(/^.*?\(/, '').replace(/\);?$/, ''));
+                const cols = json.table.cols.map(c => (c.label || c.id || '').trim().toLowerCase());
+                const idx = (name) => cols.findIndex(c => c.includes(name));
+                const nameIdx = idx('name');
+                const classIdx = idx('class');
+                const ratingIdx = idx('rating');
+                const msgIdx = idx('message');
+                const photoIdx = idx('photo');
+                const videoIdx = idx('video');
+                const rows = (json.table.rows || []).map(r => (r.c || []).map(c => (c && c.v) ? String(c.v).trim() : ''));
+                const items = rows.map(r => {
+                    const author = r[nameIdx] || 'Anonymous';
+                    const klass = r[classIdx] || '';
+                    const rating = r[ratingIdx] || '';
+                    const message = r[msgIdx] || '';
+                    const photoUrl = r[photoIdx] || '';
+                    const videoUrl = r[videoIdx] || '';
+                    const avatar = (author.split(' ').map(s => s[0]).join('').slice(0,2) || '?').toUpperCase();
+                    return { author, class: klass, rating, message, photoUrl, videoUrl, avatar };
+                }).filter(i => i.author || i.message || i.videoUrl || i.photoUrl);
+                return items;
+            } catch (e) {
+                console.warn('Failed to load testimonials from sheet', e);
+                return [];
+            }
+        }
+
+        function renderTestimonialsToSlider(items) {
+            const slider = document.getElementById('testimonialSlider');
+            if (!slider || !items.length) return;
+            slider.innerHTML = '';
+            items.slice(0, 4).forEach(item => {
+                const slide = document.createElement('div');
+                slide.className = 'testimonial-slide';
+                slide.innerHTML = `
+                    <div class="testimonial-card black-glass">
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">${item.avatar}</div>
+                            <div class="testimonial-info">
+                                <h4>${item.author}</h4>
+                                <p>${item.class || ''}</p>
+                            </div>
+                        </div>
+                        ${item.videoUrl ? `
+                        <div class="testimonial-video" style="position:relative; width:100%; padding-top:56.25%; border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.3); margin-top:1rem;">
+                            <video style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:#000;" controls preload="metadata" playsinline webkit-playsinline>
+                                <source src="${item.videoUrl}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>` : item.photoUrl ? `
+                        <div style="margin-top:1rem; border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,0.25);">
+                            <img src="${item.photoUrl}" alt="${item.author}" style="display:block; width:100%; height:auto; object-fit:cover;" />
+                        </div>` : item.message ? `
+                        <p style="margin-top:1rem; opacity:.9;">${item.message}</p>` : ''}
+                        <div style="margin-top:1rem;">${item.rating || ''}</div>
+                    </div>`;
+                slider.appendChild(slide);
+            });
+        }
+
+        function renderTestimonialsToGrid(items) {
+            const grid = document.getElementById('allReviewsGrid');
+            if (!grid || !items.length) return;
+            window.__sheetTestimonials = items;
+            populateReviewsGrid(grid);
+        }
+
+        (async () => {
+            const items = await fetchTestimonialsFromSheet(window.TESTIMONIAL_SHEET_ID);
+            if (items && items.length) {
+                renderTestimonialsToSlider(items);
+                renderTestimonialsToGrid(items);
+            }
+        })();
 
         // Close modal when clicking outside
         window.onclick = function(event) {
