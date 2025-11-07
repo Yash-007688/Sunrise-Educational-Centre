@@ -604,6 +604,15 @@
         body.dark-mode .footer a { color:#93c5fd; }
         body.dark-mode .footer a:hover { color:#bfdbfe; }
     </style>
+    <style>
+      .admission-tab { background:#fff; border:1px solid #e0e7ff; border-radius:10px; padding:0.5rem 0.8rem; color:#232946; font-weight:700; box-shadow:0 2px 10px rgba(100,100,255,0.10); }
+      .admission-tab.active { color:#6a82fb; border-color:#6a82fb; box-shadow:0 8px 24px rgba(106,130,251,0.28); background:linear-gradient(135deg,#f8f9ff 0%, #eef2ff 100%); }
+      .adm-creds code { background:#1f2937; color:#e5e7eb; padding:0.1rem 0.35rem; border-radius:6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    </style>
+    <style>
+	/* Page-specific override: place floating navbar at bottom center */
+	.floating-navbar-container { top: auto; bottom: 16px; }
+</style>
 </head>
 <body>
     <div id="navbar-container"></div>
@@ -964,13 +973,6 @@
             }
         });
     </script>
-
-    <style>
-      .admission-tab { background:#fff; border:1px solid #e0e7ff; border-radius:10px; padding:0.5rem 0.8rem; color:#232946; font-weight:700; box-shadow:0 2px 10px rgba(100,100,255,0.10); }
-      .admission-tab.active { color:#6a82fb; border-color:#6a82fb; box-shadow:0 8px 24px rgba(106,130,251,0.28); background:linear-gradient(135deg,#f8f9ff 0%, #eef2ff 100%); }
-      .adm-creds code { background:#1f2937; color:#e5e7eb; padding:0.1rem 0.35rem; border-radius:6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-    </style>
-
 
     <!-- Notification Panel -->
     <div id="notification-panel" class="notification-panel black-glass" style="display: none; position: fixed; top: 100px; right: 20px; width: 350px; max-height: 500px; overflow-y: auto; z-index: 999; border-radius: 16px; padding: 1rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);">
