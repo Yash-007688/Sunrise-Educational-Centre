@@ -31,28 +31,41 @@ function openSearch() {
 function setActiveNavButton() {
     const currentPath = window.location.pathname;
     const buttons = document.querySelectorAll('.modern-navbar .button');
-    
+
     if (buttons.length === 0) return; // No navbar present
-    
+
     // Remove active class from all buttons
     buttons.forEach(btn => btn.classList.remove('active'));
-    
+
     // Add active class based on current page
-    if (currentPath === '/' || currentPath === '/index' || currentPath === '/home') {
+    if (currentPath === '/' || currentPath.endsWith('/index.html') || currentPath.endsWith('/home')) {
         buttons[0].classList.add('active'); // Home
-    } else if (currentPath.includes('/profile') || currentPath.includes('/user')) {
+    } else if (currentPath.includes('/profile')) {
         buttons[2].classList.add('active'); // Profile
-    } else if (currentPath.includes('/study-resources') || currentPath.includes('/resources')) {
+    } else if (currentPath.includes('/study-resources')) {
         buttons[3].classList.add('active'); // Resources
     } else if (currentPath.includes('/forum')) {
         buttons[4].classList.add('active'); // Forum
-    } else if (currentPath.includes('/online-class') || currentPath.includes('/live-class')) {
-        // Find the live classes button (might be at different index depending on page)
-        const liveClassBtn = Array.from(buttons).find(btn => 
+    } else if (currentPath.includes('/online-class')) {
+        const liveClassBtn = Array.from(buttons).find(btn =>
             btn.getAttribute('data-tooltip') === 'Live Classes'
         );
         if (liveClassBtn) {
             liveClassBtn.classList.add('active');
+        }
+    } else if (currentPath.includes('/admission')) {
+        const admissionBtn = Array.from(buttons).find(btn =>
+            btn.getAttribute('data-tooltip') === 'Admission'
+        );
+        if (admissionBtn) {
+            admissionBtn.classList.add('active');
+        }
+    } else if (currentPath.includes('/notifications')) {
+        const notificationsBtn = Array.from(buttons).find(btn =>
+            btn.getAttribute('data-tooltip') === 'Notifications'
+        );
+        if (notificationsBtn) {
+            notificationsBtn.classList.add('active');
         }
     }
 }

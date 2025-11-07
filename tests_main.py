@@ -323,6 +323,58 @@ def test_webrtc_requirements():
     return https_ok and ssl_ok and port_ok
 
 
+def run_playwright_tests():
+    print("\n🎭 Running Playwright Frontend Tests...")
+    print("=" * 50)
+    try:
+        # Ensure Playwright is installed
+        subprocess.run([sys.executable, "-m", "pip", "install", "playwright"], check=True, capture_output=True, text=True)
+        subprocess.run([sys.executable, "-m", "playwright", "install"], check=True, capture_output=True, text=True)
+
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+
+            base_url = "http://localhost:10000"
+            pages_to_test = [
+                ("index.html", "index_screenshot.png"),
+                ("study-resources.html", "study_resources_screenshot.png"),
+                ("forum.html", "forum_screenshot.png"),
+                ("profile.html", "profile_screenshot.png"),
+                ("admission.html", "admission_screenshot.png"),
+                ("notifications.html", "notifications_screenshot.png"),
+                ("online-class.html", "online_class_screenshot.png"),
+            ]
+
+            all_passed = True
+            for url_path, screenshot_file in pages_to_test:
+                full_url = f"{base_url}/{url_path}"
+                try:
+                    print(f"  Navigating to {full_url}...")
+                    page.goto(full_url, wait_until="networkidle")
+                    page.wait_for_selector('#navbar-container .modern-navbar', timeout=5000)
+                    print(f"  ✅ Navbar loaded for {url_path}")
+                    page.screenshot(path=screenshot_file)
+                    print(f"  📸 Screenshot saved to {screenshot_file}")
+                except Exception as e:
+                    print(f"  ❌ FAILED to load or find navbar on {url_path}: {e}")
+                    all_passed = False
+
+            browser.close()
+
+            if all_passed:
+                print("  ✅ All frontend pages loaded successfully with the navbar.")
+            else:
+                print("  ❌ Some frontend tests failed.")
+            return all_passed
+
+    except Exception as e:
+        print(f"  ❌ An error occurred during Playwright tests: {e}")
+        return False
+
+
 def run_all_tests():
     print("🚀 Running All Tests")
     print("=" * 64)
@@ -356,6 +408,13 @@ def run_all_tests():
     except Exception as e:
         results['webrtc'] = False
         print(f"❌ webrtc tests failed: {e}")
+
+    try:
+        ok = run_playwright_tests()
+        results['frontend'] = ok
+    except Exception as e:
+        results['frontend'] = False
+        print(f"❌ frontend tests failed: {e}")
 
     print("\n" + "=" * 64)
     print("Summary:")
