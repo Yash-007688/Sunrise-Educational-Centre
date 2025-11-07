@@ -31,6 +31,30 @@
   --forum-scrollbar-thumb-hover: rgba(0,0,0,0.3);
 }
 
+/* Force white text for forum messages in light theme as requested */
+body:not(.dark-mode) .messages-area,
+body:not(.dark-mode) .messages-area .message-content,
+body:not(.dark-mode) .messages-area .message-text,
+body:not(.dark-mode) .messages-area .message-info strong,
+body:not(.dark-mode) .messages-area .message-info span,
+body:not(.dark-mode) .messages-area .reply-to,
+body:not(.dark-mode) .messages-area .poll-question,
+body:not(.dark-mode) .messages-area .poll-options,
+body:not(.dark-mode) .messages-area .poll-meta {
+  color: #ffffff !important;
+}
+
+body:not(.dark-mode) .messages-area .message-content,
+body:not(.dark-mode) .messages-area .reply-to {
+  border-color: rgba(255,255,255,0.22) !important;
+}
+
+body:not(.dark-mode) .messages-area .poll-vote-btn {
+  color: #ffffff !important;
+  background: rgba(255,255,255,0.08) !important;
+  border-color: rgba(255,255,255,0.2) !important;
+}
+
 /* Glassy backdrop for forum pages */
 body {
   background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%);
