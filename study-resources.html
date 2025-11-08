@@ -19,10 +19,10 @@
     <style>
       /* CSS Variables for Theme Support */
       :root {
-        --glass-bg: rgba(255, 255, 255, 0.9);
-        --glass-border: rgba(0, 0, 0, 0.1);
-        --glass-blur: blur(20px);
-        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        --glass-bg: rgba(10, 12, 18, 0.72);
+        --glass-border: rgba(255, 255, 255, 0.22);
+        --glass-blur: blur(18px) saturate(110%);
+        --glass-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
         --radius-xl: 20px;
       }
 
@@ -209,10 +209,11 @@
 
       /* Glass Card Styling */
       .glass-card {
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(20px);
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
         border-radius: 20px;
       }
 
