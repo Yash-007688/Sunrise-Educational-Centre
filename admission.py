@@ -142,58 +142,7 @@ def check_admission():
     return render_template('check_admission.html')
 
 
-# ========= Admin Endpoints =========
-@admission_bp.route('/admin/admissions')
-def admin_list_admissions():
-    if session.get('role') not in ['admin', 'teacher']:
-        return redirect(url_for('auth'))
-    conn = get_db()
-    c = conn.cursor()
-    c.execute('SELECT id, student_name, class, school_name, status, submitted_at FROM admissions ORDER BY submitted_at DESC')
-    pending = c.fetchall()
-    c.execute('SELECT original_admission_id, student_name, class, school_name, approved_at FROM approved_admissions ORDER BY approved_at DESC')
-    approved = c.fetchall()
-    c.execute('SELECT original_admission_id, student_name, class, school_name, disapproved_at FROM disapproved_admissions ORDER BY disapproved_at DESC')
-    rejected = c.fetchall()
-    conn.close()
-    return render_template('admin.html', pending=pending, approved=approved, rejected=rejected)
 
-
-@admission_bp.route('/admin/admissions/<int:admission_id>/approve', methods=['POST'])
-def admin_approve_admission(admission_id: int):
-    if session.get('role') not in ['admin', 'teacher']:
-        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
-    conn = get_db()
-    c = conn.cursor()
-    # Move to approved table
-    c.execute('SELECT student_name, class, school_name FROM admissions WHERE id=?', (admission_id,))
-    row = c.fetchone()
-    if not row:
-        conn.close()
-        return jsonify({'success': False, 'error': 'Not found'}), 404
-    c.execute('INSERT INTO approved_admissions (original_admission_id, student_name, class, school_name, approved_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)', (admission_id, row[0], row[1], row[2]))
-    c.execute('UPDATE admissions SET status="approved" WHERE id=?', (admission_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'success': True})
-
-
-@admission_bp.route('/admin/admissions/<int:admission_id>/reject', methods=['POST'])
-def admin_reject_admission(admission_id: int):
-    if session.get('role') not in ['admin', 'teacher']:
-        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
-    conn = get_db()
-    c = conn.cursor()
-    c.execute('SELECT student_name, class, school_name FROM admissions WHERE id=?', (admission_id,))
-    row = c.fetchone()
-    if not row:
-        conn.close()
-        return jsonify({'success': False, 'error': 'Not found'}), 404
-    c.execute('INSERT INTO disapproved_admissions (original_admission_id, student_name, class, school_name, disapproved_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)', (admission_id, row[0], row[1], row[2]))
-    c.execute('UPDATE admissions SET status="disapproved" WHERE id=?', (admission_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'success': True})
 
 
 # ========= Internal: credential check =========

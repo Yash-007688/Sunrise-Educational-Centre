@@ -35,10 +35,9 @@ from auth_handler import (
     init_db, register_user, authenticate_user,
     get_all_users, delete_user, search_users, get_user_by_id,
     update_user, add_notification, get_unread_notifications_for_user, get_all_notifications,
-    create_live_class, get_live_class, get_active_classes, deactivate_class,
     get_class_details_by_id, get_all_classes,
     mark_notification_as_seen, delete_notification,
-    save_forum_message, get_live_class_messages, save_live_class_message,
+    save_forum_message,
     create_topic, delete_topic, get_all_topics, get_topics_for_user, can_user_access_topic,
     update_user_with_password, add_personal_notification, get_forum_messages,
     format_datetime_for_display, mark_messages_as_read,
@@ -88,6 +87,14 @@ try:
     batch_bp = _batch_bp
 except Exception as _e:
     print(f"Batch blueprint not loaded: {_e}")
+
+# Import admission blueprint
+admission_bp = None
+try:
+    from admission import admission_bp as _admission_bp
+    admission_bp = _admission_bp
+except Exception as _e:
+    print(f"Admission blueprint not loaded: {_e}")
 
 # Initialize Flask-Compress for response compression
 try:
@@ -165,12 +172,6 @@ def _compute_site_last_updated():
 SITE_LAST_UPDATED_IST = _compute_site_last_updated()
 
 # Register blueprint(s)
-try:
-    from live_class_routes import live_classes_bp
-    app.register_blueprint(live_classes_bp)
-except Exception as _e:
-    # Blueprint may not exist during certain scripts/tests; ignore registration errors
-    pass
 
 
 def get_db_connection():
@@ -911,6 +912,8 @@ try:
         app.register_blueprint(bulk_upload_bp)
     if batch_bp is not None:
         app.register_blueprint(batch_bp)
+    if admission_bp is not None:
+        app.register_blueprint(admission_bp)
 except Exception as _e:
     print(f"Failed to register blueprints: {_e}")
 
@@ -1491,24 +1494,6 @@ def notifications_page():
                          today_count=today_count,
                          total_count=total_count)
 
-@app.route('/api/live-classes/status')
-def api_live_classes_status():
-    """Return active, upcoming, and completed live classes for client polling"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'error': 'Not logged in'}), 401
-    try:
-        from auth_handler import get_active_live_classes, get_upcoming_live_classes, get_completed_live_classes
-        active_classes = get_active_live_classes() or []
-        upcoming_classes = get_upcoming_live_classes() or []
-        completed_classes = get_completed_live_classes() or []
-        return jsonify({
-            'success': True,
-            'active': active_classes,
-            'upcoming': upcoming_classes,
-            'completed': completed_classes
-        })
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 # Route for study resources
 @app.route('/study-resources')
@@ -2409,114 +2394,6 @@ def admin_delete_forum_message(message_id):
     # For now, we'll just return success.
     return redirect(url_for('admin_panel', _anchor='forum'))
 
-@app.route('/create-live-class', methods=['GET', 'POST'])
-def create_live_class_page():
-    if session.get('role') not in ['admin', 'teacher']:
-        return redirect(url_for('auth'))
-    
-    if request.method == 'POST':
-        topic = request.form.get('topic')
-        description = request.form.get('description')
-        video_source = request.form.get('video_source', 'upload')
-        target_class = request.form.get('target_class', 'all')
-        class_type = request.form.get('class_type', 'lecture')
-        paid_status = request.form.get('paid_status', 'unpaid')
-        class_stream = request.form.get('class_stream')
-        subject = request.form.get('subject')
-        teacher_name = None
-        if (subject or '').strip().lower() == 'maths':
-            teacher_name = 'Mohit sir'
-        schedule_date_raw = request.form.get('schedule_date')
-        scheduled_time = None
-        if schedule_date_raw:
-            # Convert from HTML datetime-local (YYYY-MM-DDTHH:MM) to standard format (YYYY-MM-DD HH:MM:SS)
-            scheduled_time = schedule_date_raw.replace('T', ' ') + ':00' if 'T' in schedule_date_raw else schedule_date_raw
-        
-        meeting_url = None
-        
-        if video_source == 'upload':
-            # Handle uploaded video file
-            video_file = request.files.get('video_file')
-            if not video_file or video_file.filename == '':
-                flash('Video file is required when uploading.', 'error')
-                return render_template('create_class.html', class_details=None)
-            if not video_file.filename.lower().endswith(('.mp4', '.webm')):
-                flash('Only MP4 and WebM video files are allowed.', 'error')
-                return render_template('create_class.html', class_details=None)
-            filename = secure_filename(video_file.filename)
-            video_folder = os.path.join('uploads', 'videos')
-            os.makedirs(video_folder, exist_ok=True)
-            unique_name = f"{secrets.token_hex(8)}_{filename}"
-            video_path = os.path.join(video_folder, unique_name)
-            video_file.save(video_path)
-            meeting_url = f"/uploads/videos/{unique_name}"
-        elif video_source == 'youtube':
-            # Handle YouTube video download
-            youtube_url = request.form.get('youtube_url', '').strip()
-            if not youtube_url:
-                flash('YouTube URL is required when using YouTube link.', 'error')
-                return render_template('create_class.html', class_details=None)
-            try:
-                from youtube_downloader import download_youtube_video, validate_youtube_url
-                # Validate YouTube URL
-                if not validate_youtube_url(youtube_url):
-                    flash('Invalid YouTube URL. Please provide a valid YouTube video link.', 'error')
-                    return render_template('create_class.html', class_details=None)
-                # Download the video
-                flash('Downloading YouTube video... This may take a few minutes.', 'info')
-                download_result = download_youtube_video(youtube_url)
-                # Create meeting URL for the downloaded video
-                meeting_url = f"/uploads/videos/{download_result['filename']}"
-                flash(f'YouTube video "{download_result["title"]}" downloaded successfully!', 'success')
-            except Exception as e:
-                flash(f'Error downloading YouTube video: {str(e)}', 'error')
-                return render_template('create_class.html', class_details=None)
-        elif video_source == 'golive':
-            # Go Live: set meeting_url to a special route for live broadcast
-            class_code = ''.join(secrets.choice('0123456789') for i in range(6))
-            pin = ''.join(secrets.choice('0123456789') for i in range(4))
-            meeting_url = f"/join-class/{class_code}"
-            new_class_id = create_live_class(
-                class_code, pin, meeting_url, topic, description,
-                status='active', scheduled_time=scheduled_time, target_class=target_class,
-                class_stream=class_stream, class_type=class_type, paid_status=paid_status,
-                subject=subject, teacher_name=teacher_name
-            )
-            
-            # Add notification for the class
-            add_notification(
-                f'A new live class has been created: {topic}',
-                class_id=new_class_id,
-                target_paid_status='all',
-                status='active',
-                notification_type='live_class'
-            )
-            
-            # Redirect to Live Class Management dashboard after creation
-            return redirect(url_for('live_class_management') + '?tab=dashboard')
-        
-        if not meeting_url:
-            flash('No video source provided.', 'error')
-            return render_template('create_class.html', class_details=None)
-        
-        # Create the live class
-        class_code = ''.join(secrets.choice('0123456789') for i in range(6))
-        pin = ''.join(secrets.choice('0123456789') for i in range(4))
-        new_class_id = create_live_class(
-            class_code, pin, meeting_url, topic, description,
-            status='scheduled', scheduled_time=scheduled_time, target_class=target_class,
-            class_stream=class_stream, class_type=class_type, paid_status=paid_status,
-            subject=subject, teacher_name=teacher_name
-        )
-        details = get_class_details_by_id(new_class_id)
-        class_details = {
-            'topic': details[3], 'description': details[4],
-            'code': details[0], 'pin': details[1], 'url': details[2]
-        }
-        # After creating a class (upload/youtube), go to the Live Class Management dashboard
-        return redirect(url_for('live_class_management') + '?tab=dashboard')
-    
-    return render_template('create_class.html', class_details=None)
 
 # Upload resource route
 @app.route('/upload-resource', methods=['GET', 'POST'])
@@ -4157,232 +4034,22 @@ def check_admission_by_credentials(access_username, access_password):
         conn.close()
         return None
 
-@app.route('/admission', methods=['GET', 'POST'])
-def admission():
-    # Admission form is now accessible to everyone without login
-    user_id = session.get('user_id')  # This will be None for non-logged in users
-    
-    if request.method == 'GET':
-        last_creds = session.pop('last_admission_creds', None)
-        last_student = session.pop('last_admission_student', None)
-        last_status = session.pop('last_admission_status', None)
-        return render_template('admission.html', last_creds=last_creds, last_student=last_student, last_status=last_status)
-    
-    # Handle POST request (admission form submission)
-    print('--- Admission form submitted ---')
-    # Handle admission form submission
-    required_fields = [
-        'student_name', 'dob', 'student_phone', 'student_email', 'class',
-        'school_name', 'maths_marks', 'maths_rating', 'last_percentage',
-        'parent_name', 'parent_phone'
-    ]
-    for field in required_fields:
-        value = request.form.get(field)
-        print(f'Field {field}:', value)
-        if not value:
-            print(f'Missing required field: {field}')
-            flash(f"Missing required field: {field}", 'error')
-            return redirect(url_for('admission'))
 
-    # Handle file upload
-    photo = request.files.get('passport_photo')
-    print('Photo:', photo)
-    if not photo or photo.filename == '':
-        print('Passport photo is required.')
-        flash('Passport photo is required.', 'error')
-        return redirect(url_for('admission'))
-    if not ('.' in photo.filename and photo.filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}):
-        print('Invalid photo format:', photo.filename)
-        flash('Invalid photo format. Only PNG, JPG, JPEG allowed.', 'error')
-        return redirect(url_for('admission'))
-    filename = secure_filename(photo.filename)
-    unique_name = secrets.token_hex(8) + '_' + filename
-    photo_path = os.path.join('uploads', 'admission_photos', unique_name)
-    print('Saving photo to:', photo_path)
-    
-    # Ensure uploads directory exists
-    os.makedirs(os.path.dirname(photo_path), exist_ok=True)
-    
-    try:
-        photo.save(photo_path)
-    except Exception as e:
-        print('Error saving photo:', e)
-        flash('Error saving photo. Please try again.', 'error')
-        return redirect(url_for('admission'))
-
-    # Insert into DB
-    try:
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        print('Inserting into DB...')
-        
-        # Check if database connection is working
-        if not conn:
-            raise Exception("Database connection failed")
-        # Normalize class name to match database format
-        class_name = request.form['class']
-        class_mappings = {
-            '9': 'class 9',
-            '10': 'class 10',
-            '11': 'class 11 applied',
-            '12': 'class 12 applied'
-        }
-        normalized_class = class_mappings.get(class_name.lower(), class_name)
-        
-        c.execute('''INSERT INTO admissions (
-            student_name, dob, student_phone, student_email, class, school_name,
-            maths_marks, maths_rating, last_percentage, parent_name, parent_phone, passport_photo, status, submitted_at, user_id, submit_ip
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
-            request.form['student_name'],
-            request.form['dob'],
-            request.form['student_phone'],
-            request.form['student_email'],
-            normalized_class,
-            request.form['school_name'],
-            request.form['maths_marks'],
-            request.form['maths_rating'],
-            request.form['last_percentage'],
-            request.form['parent_name'],
-            request.form['parent_phone'],
-            unique_name,
-            'pending',
-            datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            user_id,
-            ((request.headers.get('X-Forwarded-For','').split(',')[0].strip()) or request.remote_addr or 'unknown')
-        ))
-        # Generate admission portal credentials immediately
-        new_admission_id = c.lastrowid
-        try:
-            # Generate secure admission username (non-guessable)
-            admission_username = generate_secure_admission_username(new_admission_id)
-            
-            # Use normalized student name as login username (lowercase, no spaces)
-            login_username = (request.form['student_name'] or '').strip().lower().replace(' ', '')
-            
-            # Generate complex password (12 characters for better security)
-            access_password = generate_complex_password(12)
-            hashed_pw = generate_password_hash(access_password)
-            
-            # Store admission portal credentials
-            c.execute('''INSERT OR IGNORE INTO admission_access (admission_id, access_username, access_password)
-                         VALUES (?, ?, ?)''', (new_admission_id, admission_username, hashed_pw))
-            
-            # Optionally store plain password for admin viewing only if fallback enabled
-            c.execute('''CREATE TABLE IF NOT EXISTS admission_access_plain (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                admission_id INTEGER NOT NULL UNIQUE,
-                access_username TEXT UNIQUE,
-                access_password_plain TEXT,
-                login_username TEXT,
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP
-            )''')
-            if not DISABLE_PLAIN_ADMISSION_FALLBACK:
-                c.execute('''INSERT OR REPLACE INTO admission_access_plain (admission_id, access_username, access_password_plain, login_username)
-                             VALUES (?, ?, ?, ?)''', (new_admission_id, admission_username, access_password, login_username))
-            
-            # Store credentials temporarily in session to display once (not persisted)
-            session['last_admission_creds'] = {
-                'admission_username': admission_username, 
-                'password': access_password,
-                'login_username': login_username
-            }
-            print(f'Generated credentials: Admission: {admission_username} / Login: {login_username} / Password: {access_password}')
-        except Exception as _e:
-            # Non-fatal: continue even if credential generation fails
-            print(f'Warning: Credential generation failed: {_e}')
-            admission_username = f"ADM{new_admission_id:06d}"
-            login_username = request.form['student_name'].strip()
-            access_password = generate_complex_password(12)
-            session['last_admission_creds'] = {
-                'admission_username': admission_username, 
-                'password': access_password,
-                'login_username': login_username
-            }
-        conn.commit()
-        print('Admission saved successfully!')
-        conn.close()
-        
-        # Add success message
-        flash('Admission submitted successfully! You can check status using your phone number.', 'success')
-        
-        # Build student summary and render success page
-        student = {
-            'student_name': request.form['student_name'],
-            'dob': request.form['dob'],
-            'student_phone': request.form['student_phone'],
-            'student_email': request.form['student_email'],
-            'class': normalized_class,
-            'school_name': request.form['school_name'],
-            'maths_marks': request.form['maths_marks'],
-            'maths_rating': request.form['maths_rating'],
-            'last_percentage': request.form['last_percentage'],
-            'parent_name': request.form['parent_name'],
-            'parent_phone': request.form['parent_phone'],
-            'submitted_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        creds = session.get('last_admission_creds') or {
-            'admission_username': admission_username, 
-            'password': access_password,
-            'login_username': login_username
-        }
-        try:
-            # Show success confirmation inline on admission page
-            session['last_admission_student'] = student
-            session['last_admission_creds'] = creds
-            return redirect(url_for('admission'))
-        except Exception as template_error:
-            print(f'Error redirecting to admission success inline: {template_error}')
-            flash('Admission submitted successfully!', 'success')
-            return redirect(url_for('admission'))
-    except Exception as e:
-        print('Error inserting admission:', e)
-        flash(f'Error saving admission: {e}', 'error')
-        return redirect(url_for('admission'))
 # Public admission check page (no login)
-@app.route('/check-admission', methods=['GET', 'POST'])
-def check_admission():
-    # This route now redirects results back to the admission page to show inline
-    if request.method == 'POST':
-        access_username = (request.form.get('access_username') or '').strip()
-        access_password = (request.form.get('access_password') or '').strip()
-        if not access_username and not access_password:
-            flash('Please provide username/password or phone number', 'error')
-            return redirect(url_for('admission'))
 
-        # If user typed a phone number in the username field, support phone-based check
-        result = None
-        if _looks_like_phone(access_username) and not access_password:
-            result = check_admission_by_phone(access_username)
-        else:
-            # Fall back to credential-based verification
-            if not access_username or not access_password:
-                flash('Please provide both username and password', 'error')
-                return redirect(url_for('admission'))
-            result = check_admission_by_credentials(access_username, access_password)
-        if result:
-            session['last_admission_status'] = {
-                'result': True,
-                'status': result.get('status'),
-                'paid_status': result.get('paid_status'),
-                'details': result.get('details'),
-                'access_username': access_username,
-                'access_password': access_password,
-            }
-        else:
-            flash('Invalid credentials. Please check your username and password.', 'error')
-        return redirect(url_for('admission'))
-
-    # GET: just bounce to admission where inline UI exists
-    return redirect(url_for('admission'))
-
-@app.route('/live-class-management')
-def live_class_management():
-    if session.get('role') not in ['admin', 'teacher']:
-        flash('Access denied. Only hosts can access this page.', 'error')
-        return redirect(url_for('admin_panel'))
+# Restore admission success route
+@app.route('/admission-success')
+def admission_success():
+    # Show admission success page with credentials
+    student = session.get('last_admission_student')
+    creds = session.get('last_admission_creds')
     
-    active_classes = get_active_classes()
-    return render_template('live_class_management.html', active_classes=active_classes)
+    if not student or not creds:
+        flash('No admission data found. Please submit an admission form first.', 'error')
+        return redirect(url_for('admission_bp.admission_form'))
+    
+    return render_template('admission_success.html', student=student, creds=creds)
+
 
 @app.route('/content-management')
 def content_management():
@@ -4431,47 +4098,6 @@ def content_management():
                          class_students_count=class_students_count,
                          class_resources_count=class_resources_count)
 
-@app.route('/api/live-class/<int:class_id>/messages', methods=['GET'])
-def get_live_class_messages_api(class_id):
-    if not session.get('user_id'):
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    messages = get_live_class_messages(class_id)
-    return jsonify([
-        {
-            'id': msg[0], 'user_id': msg[1], 'username': msg[2], 
-            'message': msg[3], 'media_url': msg[4], 'timestamp': msg[5]
-        } for msg in messages
-    ])
-
-@app.route('/api/live-class/<int:class_id>/messages', methods=['POST'])
-def send_live_class_message(class_id):
-    if not session.get('user_id'):
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    data = request.json
-    message = data.get('message')
-    if not message:
-        return jsonify({'error': 'Message required'}), 400
-    
-    user_id = session.get('user_id')
-    username = session.get('username')
-    
-    save_live_class_message(class_id, user_id, username, message)
-    
-    # Broadcast to all participants including host
-    try:
-        from flask_socketio import emit
-        socketio.emit('new_chat_message', {
-            'class_id': class_id,
-            'user_id': user_id,
-            'username': username,
-            'message': message
-        }, room=f'liveclass_{class_id}')
-    except Exception:
-        pass
-    
-    return jsonify({'success': True}), 201
 
 # ==============================================================================
 # Status Management Routes
@@ -4519,241 +4145,6 @@ def update_notification_status_route(notification_id):
     
     return jsonify({'success': True})
 
-@app.route('/admin/update-live-class-status/<int:class_id>', methods=['POST'])
-def update_live_class_status_route(class_id):
-    if session.get('role') not in ['admin', 'teacher']:
-        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
-    
-    data = request.get_json()
-    status = data.get('status')
-    
-    if status not in ['scheduled', 'active', 'completed', 'cancelled']:
-        return jsonify({'success': False, 'error': 'Invalid status'}), 400
-    
-    from auth_handler import update_live_class_status
-    update_live_class_status(class_id, status)
-    
-    return jsonify({'success': True})
-
-@app.route('/admin/delete-live-class/<int:class_id>', methods=['POST'])
-def delete_live_class_route(class_id):
-    if session.get('role') not in ['admin', 'teacher']:
-        return redirect(url_for('auth'))
-    
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('DELETE FROM live_class_messages WHERE live_class_id = ?', (class_id,))
-    c.execute('DELETE FROM live_classes WHERE id = ?', (class_id,))
-    conn.commit()
-    conn.close()
-    
-    return redirect(url_for('status_management'))
-
-# API routes for live class dashboard
-@app.route('/api/live-classes/dashboard')
-def api_live_classes_dashboard():
-    """Get all live classes organized by status for dashboard"""
-    if session.get('role') not in ['admin', 'teacher']:
-        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-    
-    try:
-        from auth_handler import get_live_classes_for_display
-        classes_data = get_live_classes_for_display()
-        
-        # Convert to JSON-serializable format
-        result = {}
-        for status, classes in classes_data.items():
-            result[status] = []
-            for class_item in classes:
-                result[status].append({
-                    'id': class_item[0],
-                    'class_code': class_item[1],
-                    'pin': class_item[2],
-                    'meeting_url': class_item[3],
-                    'topic': class_item[4],
-                    'description': class_item[5],
-                    'created_at': class_item[6],
-                    'status': class_item[7],
-                    'scheduled_time': class_item[8] if len(class_item) > 8 else None,
-                    'target_class': class_item[9] if len(class_item) > 9 else None,
-                    'class_stream': class_item[10] if len(class_item) > 10 else None,
-                    'class_type': class_item[11] if len(class_item) > 11 else None,
-                    'paid_status': class_item[12] if len(class_item) > 12 else None,
-                    'subject': class_item[13] if len(class_item) > 13 else None,
-                    'teacher_name': class_item[14] if len(class_item) > 14 else None,
-                })
-        
-        return jsonify({'success': True, 'data': result})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-@app.route('/api/live-classes/start', methods=['POST'])
-def api_start_live_class():
-    """Start a live class"""
-    if session.get('role') not in ['admin', 'teacher']:
-        return jsonify({'error': 'Unauthorized'}), 401
-    try:
-        data = request.get_json()
-        class_id = data.get('class_id')
-        if class_id is not None:
-            class_id = int(class_id)
-        if not class_id:
-            return jsonify({'success': False, 'message': 'Class ID is required'}), 400
-        from auth_handler import can_start_class, start_live_class, add_notification
-        if not can_start_class(class_id):
-            return jsonify({'success': False, 'message': 'Class cannot be started yet'}), 400
-        start_live_class(class_id)
-        add_notification('A live class has started! Join now.', class_id, 'all', 'active', notification_type='live_class')
-        return jsonify({'success': True, 'message': 'Class started successfully'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-@app.route('/api/live-classes/end', methods=['POST'])
-def api_end_live_class():
-    """End a live class"""
-    if session.get('role') not in ['admin', 'teacher']:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    try:
-        data = request.get_json()
-        class_id = data.get('class_id')
-        
-        if not class_id:
-            return jsonify({'success': False, 'message': 'Class ID is required'}), 400
-        
-        from auth_handler import can_end_class, end_live_class
-        
-        if not can_end_class(class_id):
-            return jsonify({'success': False, 'message': 'Class cannot be ended'}), 400
-        
-        end_live_class(class_id)
-        
-        return jsonify({'success': True, 'message': 'Class ended successfully'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-@app.route('/api/live-classes/cancel', methods=['POST'])
-def api_cancel_live_class():
-    """Cancel a live class"""
-    if session.get('role') not in ['admin', 'teacher']:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    try:
-        data = request.get_json()
-        class_id = data.get('class_id')
-        
-        if not class_id:
-            return jsonify({'success': False, 'message': 'Class ID is required'}), 400
-        
-        from auth_handler import cancel_live_class
-        
-        cancel_live_class(class_id)
-        
-        return jsonify({'success': True, 'message': 'Class cancelled successfully'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-@app.route('/api/live-classes/delete', methods=['POST'])
-def api_delete_live_class():
-    """Delete a completed live class"""
-    if session.get('role') not in ['admin', 'teacher']:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    try:
-        data = request.get_json()
-        class_id = data.get('class_id')
-        
-        if not class_id:
-            return jsonify({'success': False, 'message': 'Class ID is required'}), 400
-        
-        from auth_handler import delete_live_class_route
-        
-        # Use the existing delete function
-        delete_live_class_route(class_id)
-        
-        return jsonify({'success': True, 'message': 'Class deleted successfully'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-@app.route('/api/live-classes/completed')
-def api_get_completed_classes():
-    """Get all completed live classes"""
-    if session.get('role') != 'admin':
-        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-    
-    try:
-        # Get completed live classes using the correct function
-        from auth_handler import get_completed_live_classes
-        completed_classes_raw = get_completed_live_classes()
-        
-        completed_classes = []
-        for class_item in completed_classes_raw:
-            # Convert tuple to dictionary with proper field names
-            completed_class = {
-                'id': class_item[0],  # id
-                'class_code': class_item[1],  # class_code
-                'pin': class_item[2],  # pin
-                'meeting_url': class_item[3],  # meeting_url
-                'topic': class_item[4],  # topic
-                'description': class_item[5],  # description
-                'created_at': class_item[6],  # created_at
-                'status': class_item[7],  # status
-                'scheduled_time': class_item[8],  # scheduled_time
-                'class_type': class_item[11] if len(class_item) > 11 else None,
-                'target_class': class_item[9] if len(class_item) > 9 else None,
-                'class_stream': class_item[10] if len(class_item) > 10 else None,
-                'paid_status': class_item[12] if len(class_item) > 12 else None,
-                'subject': class_item[13] if len(class_item) > 13 else None,
-                'teacher_name': class_item[14] if len(class_item) > 14 else None,
-                'host': 'Unknown',  # default host
-                'duration': 'N/A',  # default duration
-                'participants': 0,  # default participants
-                'recording_available': False,  # default recording status
-                'completed_at': class_item[6]  # use created_at as completion date
-            }
-            completed_classes.append(completed_class)
-        
-        # Sort by completion date (most recent first)
-        completed_classes.sort(key=lambda x: x.get('completed_at', ''), reverse=True)
-        
-        return jsonify({
-            'success': True,
-            'data': completed_classes
-        })
-        
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-@app.route('/api/live-classes/delete-completed', methods=['POST'])
-def api_delete_completed_class():
-    """Delete a completed live class"""
-    if session.get('role') != 'admin':
-        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-    
-    try:
-        data = request.get_json()
-        class_id = data.get('class_id')
-        
-        if not class_id:
-            return jsonify({'success': False, 'message': 'Class ID is required'}), 400
-        
-        # Get class details
-        class_details = get_class_details_by_id(class_id)
-        if not class_details:
-            return jsonify({'success': False, 'message': 'Class not found'}), 404
-        
-        # Check if class is completed
-        if class_details.get('status') not in ['completed', 'ended']:
-            return jsonify({'success': False, 'message': 'Only completed classes can be deleted'}), 400
-        
-        # Delete the class using the existing function
-        from auth_handler import delete_live_class_route
-        delete_live_class_route(class_id)
-        
-        return jsonify({'success': True, 'message': 'Completed class deleted successfully'})
-            
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
 
 # Create category route
 @app.route('/create-category', methods=['POST'])
