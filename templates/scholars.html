@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scholars & Wall of Fame - Sunrise Educational Centre</title>
+  <meta name="description"
+    content="Wall of Fame and Scholarship Winners at Sunrise Educational Centre. Celebrating our top performers and achievers.">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='enhanced-aesthetic.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='modern-components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='modern-navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='uiverse-components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='pages-global.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <style>
+    /* Scholars Page Styles */
+    .scholars-hero {
+      text-align: center;
+      padding: var(--space-3xl) var(--space-xl) var(--space-2xl);
+      position: relative;
+    }
+
+    .scholars-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-full);
+      padding: 0.5rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #a5b4fc;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-lg);
+      backdrop-filter: var(--glass-blur);
+    }
+
+    .scholars-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: var(--space-md);
+    }
+
+    .scholars-hero p {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.7);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Year Section */
+    .year-section {
+      margin-bottom: var(--space-3xl);
+    }
+
+    .year-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+
+    .year-badge {
+      background: var(--primary-gradient);
+      color: white;
+      padding: 0.4rem 1.2rem;
+      border-radius: var(--radius-full);
+      font-size: 1rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .year-divider {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(165, 180, 252, 0.4), transparent);
+    }
+
+    /* Performance Cards */
+    .performance-section {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      backdrop-filter: var(--glass-blur);
+      margin-bottom: var(--space-xl);
+    }
+
+    .performance-section h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .placeholder-notice {
+      text-align: center;
+      padding: var(--space-2xl);
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .placeholder-notice .icon {
+      font-size: 3rem;
+      margin-bottom: var(--space-md);
+    }
+
+    .placeholder-notice p {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .placeholder-notice .sub {
+      font-size: 0.85rem;
+      opacity: 0.6;
+    }
+
+    /* Scholar Cards Grid */
+    .scholars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .scholar-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      text-align: center;
+      transition: all var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scholar-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--primary-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 0;
+    }
+
+    .scholar-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(165, 180, 252, 0.4);
+      box-shadow: 0 12px 32px rgba(106, 130, 251, 0.2);
+    }
+
+    .scholar-card:hover::before {
+      opacity: 0.05;
+    }
+
+    .scholar-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: white;
+      margin: 0 auto var(--space-md);
+      position: relative;
+      z-index: 1;
+    }
+
+    .scholar-name {
+      font-weight: 700;
+      color: white;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .scholar-detail {
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 0.85rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .scholarship-pct {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.2rem 0.75rem;
+      background: linear-gradient(135deg, rgba(106, 130, 251, 0.2), rgba(252, 92, 125, 0.2));
+      border: 1px solid rgba(165, 180, 252, 0.3);
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #a5b4fc;
+      position: relative;
+      z-index: 1;
+    }
+
+    .main-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl) var(--space-3xl);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <div id="navbar-container"></div>
+
+  <main>
+    <!-- Hero Section -->
+    <div class="scholars-hero">
+      <div class="scholars-hero-badge">
+        <i class="fas fa-trophy"></i>
+        Hall of Excellence
+      </div>
+      <h1>Wall of Fame</h1>
+      <p>Celebrating our top performers, scholarship achievers, and academic excellence across all batches.</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+      <!-- 2023-24 Academic Year -->
+      <div class="year-section">
+        <div class="year-header">
+          <span class="year-badge">2023–24</span>
+          <div class="year-divider"></div>
+        </div>
+
+        <!-- Top Performers Section -->
+        <div class="performance-section">
+          <h3><i class="fas fa-medal" style="color: #fbbf24;"></i> Top Performers</h3>
+          <div class="placeholder-notice">
+            <div class="icon">🏆</div>
+            <p>Achievement certificates and recognition will be displayed here</p>
+            <p class="sub">Student photos have been removed for privacy and security reasons</p>
+          </div>
+        </div>
+
+        <!-- Scholarship Winners Grid -->
+        <div class="performance-section">
+          <h3><i class="fas fa-graduation-cap" style="color: #a78bfa;"></i> Scholarship Winners</h3>
+          <div class="scholars-grid">
+            <div class="scholar-card">
+              <div class="scholar-avatar">R</div>
+              <div class="scholar-name">Rahul Sharma</div>
+              <div class="scholar-detail">Class 9</div>
+              <span class="scholarship-pct">95% Scholarship</span>
+            </div>
+            <div class="scholar-card">
+              <div class="scholar-avatar">P</div>
+              <div class="scholar-name">Priya Verma</div>
+              <div class="scholar-detail">Class 10</div>
+              <span class="scholarship-pct">100% Scholarship</span>
+            </div>
+            <div class="scholar-card">
+              <div class="scholar-avatar">A</div>
+              <div class="scholar-name">Amit Kumar</div>
+              <div class="scholar-detail">Class 11</div>
+              <span class="scholarship-pct">85% Scholarship</span>
+            </div>
+            <div class="scholar-card">
+              <div class="scholar-avatar">N</div>
+              <div class="scholar-name">Neha Singh</div>
+              <div class="scholar-detail">Class 12</div>
+              <span class="scholarship-pct">90% Scholarship</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2024-25 Academic Year -->
+      <div class="year-section">
+        <div class="year-header">
+          <span class="year-badge">2024–25</span>
+          <div class="year-divider"></div>
+        </div>
+
+        <!-- Top Performers Section -->
+        <div class="performance-section">
+          <h3><i class="fas fa-medal" style="color: #fbbf24;"></i> Top Performers</h3>
+          <div class="placeholder-notice">
+            <div class="icon">🏆</div>
+            <p>Achievement certificates and recognition will be displayed here</p>
+            <p class="sub">Student photos have been removed for privacy and security reasons</p>
+          </div>
+        </div>
+
+        <!-- Scholarship Winners Grid -->
+        <div class="performance-section">
+          <h3><i class="fas fa-graduation-cap" style="color: #a78bfa;"></i> Scholarship Winners</h3>
+          <div class="scholars-grid">
+            <div class="scholar-card">
+              <div class="scholar-avatar">A</div>
+              <div class="scholar-name">Arjun Mehta</div>
+              <div class="scholar-detail">Class 9</div>
+              <span class="scholarship-pct">90% Scholarship</span>
+            </div>
+            <div class="scholar-card">
+              <div class="scholar-avatar">I</div>
+              <div class="scholar-name">Isha Jain</div>
+              <div class="scholar-detail">Class 10</div>
+              <span class="scholarship-pct">100% Scholarship</span>
+            </div>
+            <div class="scholar-card">
+              <div class="scholar-avatar">K</div>
+              <div class="scholar-name">Karan Patel</div>
+              <div class="scholar-detail">Class 11</div>
+              <span class="scholarship-pct">75% Scholarship</span>
+            </div>
+            <div class="scholar-card">
+              <div class="scholar-avatar">S</div>
+              <div class="scholar-name">Simran K</div>
+              <div class="scholar-detail">Class 12</div>
+              <span class="scholarship-pct">80% Scholarship</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.main-content -->
+  </main>
+
+  <!-- Search Modal -->
+  <div id="searchModal" class="modal"
+    style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
+    <div class="modal-content black-glass"
+      style="margin: 10% auto; padding: 2rem; border-radius: 20px; width: 90%; max-width: 600px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="color: white; margin: 0;">🔍 Search</h2>
+        <button onclick="closeSearch()"
+          style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">✕</button>
+      </div>
+      <input type="text" id="searchInput" placeholder="Search courses, resources, or topics..."
+        style="width: 100%; padding: 15px; border: none; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem; margin-bottom: 1rem;">
+      <div id="searchResults" style="max-height: 300px; overflow-y: auto;"></div>
+    </div>
+  </div>
+
+  <!-- Notification Panel -->
+  <div id="notification-panel" class="notification-panel black-glass"
+    style="display: none; position: fixed; top: 100px; right: 20px; width: 350px; max-height: 500px; overflow-y: auto; z-index: 999; border-radius: 16px; padding: 1rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);">
+    <div
+      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.2);">
+      <h3 style="margin: 0; font-size: 1.2rem; color: white;">🔔 Notifications</h3>
+      <button onclick="toggleNotifications()"
+        style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 0.2rem;">✕</button>
+    </div>
+    <div class="notification-list">
+      <div class="notification-item"
+        style="padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;">
+        <div style="font-weight: 600; margin-bottom: 0.3rem; color: white;">📚 Latest Updates</div>
+        <div style="font-size: 0.9rem; opacity: 0.8; color: rgba(255,255,255,0.8);">Check out new features and content
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="{{ url_for('static', filename='navbar-functions.js') }}"></script>
+  <script src="{{ url_for('static', filename='loader.js') }}"></script>
+
+  <footer class="footer-modern" style="margin-top: 0;">
+    <div class="container">
+      <div class="footer-content-modern">
+        <div class="footer-section">
+          <h3>Scholars & Wall of Fame</h3>
+          <p>Celebrating our top performers, scholarship achievers, and academic excellence across all batches.</p>
+          <div class="uiverse-social-container">
+            <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank"
+              class="uiverse-social-btn instagram" title="Instagram">
+              <img src="{{ url_for('static', filename='footer/instagram-brands-solid-full.svg') }}" alt="Instagram"
+                style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+            </a>
+            <a href="https://www.youtube.com/@MohitNariyani" target="_blank" class="uiverse-social-btn youtube"
+              title="YouTube">
+              <img src="{{ url_for('static', filename='footer/youtube-brands-solid-full.svg') }}" alt="YouTube"
+                style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+            </a>
+            <a href="https://wa.me/917224860881" target="_blank" class="uiverse-social-btn whatsapp" title="WhatsApp">
+              <i class="fa-brands fa-whatsapp" style="font-size:24px; line-height:24px; color: #25D366;"></i>
+            </a>
+            <a href="/" class="uiverse-social-btn" title="Home">
+              <i class="fas fa-home"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <a href="/">Home</a>
+            <a href="/forum">Forum</a>
+            <a href="/admission">Admission</a>
+            <a href="/batch">Batches</a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h3>Contact Us</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span>📞</span>
+              <a href="tel:+917224860881">+91 72248 60881</a>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span>📍</span>
+              <span>Sunrise Educational Centre</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>&copy; 2024 Sunrise Educational Centre. All rights reserved.</div>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <span style="font-size: 0.9rem;">Excellence in Education</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+
+</html>

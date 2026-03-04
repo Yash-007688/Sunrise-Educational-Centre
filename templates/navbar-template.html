@@ -1,0 +1,312 @@
+<!-- Consistent Navbar Template with Coaching Logo -->
+<div class="floating-navbar-container">
+    <nav class="floating-navbar black-glass">
+        <button class="hamburger-btn" aria-label="Menu" aria-expanded="false">
+            <span class="hl-bar"></span>
+            <span class="hl-bar"></span>
+            <span class="hl-bar"></span>
+        </button>
+
+        <!-- Coaching Logo on the left -->
+        <div class="navbar-logo">
+            <a href="/">
+                <img src="{{ url_for('static', filename='attached_assets/image_1750584670920.png') }}"
+                    alt="Sunrise Educational Centre" class="coaching-logo">
+            </a>
+        </div>
+
+        <ul class="nav-links-modern-list">
+            <li><a href="/" class="n-link">Home</a></li>
+            <li><a href="/study-resources" class="n-link">Study Resources</a></li>
+            <li><a href="/forum" class="n-link">Forum</a></li>
+            <li><a href="/admission" class="n-link">Admission</a></li>
+
+            <!-- Admin Dropdown (for admin users) -->
+            {% if username and role == 'admin' %}
+            <li class="n-dropdown">
+                <a href="#" class="n-dropdown-toggle n-link">Admin <i class="fas fa-chevron-down"></i></a>
+                <div class="n-dropdown-menu">
+                    <a href="/admin" class="n-dropdown-item">Dashboard</a>
+                    <a href="/admin_create_user" class="n-dropdown-item">Create User</a>
+                    <a href="/admin_create_topic" class="n-dropdown-item">Create Topic</a>
+                    <a href="/content_management" class="n-dropdown-item">Content Management</a>
+                    <a href="/query_management" class="n-dropdown-item">Query Management</a>
+                    <a href="/notifications" class="n-dropdown-item">Notifications</a>
+                </div>
+            </li>
+            {% endif %}
+
+
+            <!-- User Dropdown -->
+            {% if username %}
+            <li class="profile-dropdown-container">
+                <a href="#" id="profileLink" class="n-link profile-n-link">{{ username }} <i
+                        class="fas fa-user-circle"></i></a>
+                <div class="profile-dropdown-menu" id="profileDropdown">
+                    <a href="/profile" class="dropdown-item">My Profile</a>
+                    <a href="/notifications" class="dropdown-item">Notifications</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="/logout" class="dropdown-item logout-item">Logout</a>
+                </div>
+            </li>
+            {% else %}
+            <li><a href="/auth" class="btn-login-header">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+<style>
+    /* Modern Navbar Styles */
+    .floating-navbar-container {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 1200px;
+        z-index: 1000;
+    }
+
+    .floating-navbar {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        gap: 2rem;
+        border-radius: var(--radius-full);
+    }
+
+    .navbar-logo {
+        display: flex;
+        align-items: center;
+    }
+
+    .coaching-logo {
+        height: 42px;
+        width: auto;
+        border-radius: var(--radius-sm);
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .coaching-logo:hover {
+        transform: scale(1.1) rotate(-3deg);
+    }
+
+    .nav-links-modern-list {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        margin-left: auto;
+        list-style: none;
+        padding: 0;
+        margin: 0 0 0 auto;
+    }
+
+    .n-link {
+        color: rgba(255, 255, 255, 0.85);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius-md);
+        transition: all 0.2s ease;
+    }
+
+    .n-link:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .profile-n-link {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-login-header {
+        background: var(--primary-gradient);
+        color: white;
+        text-decoration: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: var(--radius-full);
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-login-header:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Dropdown styling */
+    .n-dropdown,
+    .profile-dropdown-container {
+        position: relative;
+    }
+
+    .n-dropdown-menu,
+    .profile-dropdown-menu {
+        position: absolute;
+        top: calc(100% + 15px);
+        right: 0;
+        width: 200px;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-lg);
+        padding: 0.5rem;
+        display: none;
+        flex-direction: column;
+        box-shadow: var(--glass-shadow);
+        z-index: 1001;
+        animation: fadeInSlideUp 0.3s ease forwards;
+    }
+
+    .n-dropdown-menu.active,
+    .profile-dropdown-menu.active {
+        display: flex;
+    }
+
+    .n-dropdown-item,
+    .dropdown-item {
+        padding: 0.75rem 1rem;
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+        font-size: 0.9rem;
+        border-radius: var(--radius-md);
+        transition: background 0.2s ease;
+    }
+
+    .n-dropdown-item:hover,
+    .dropdown-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .logout-item {
+        color: #ff6b6b;
+    }
+
+    .logout-item:hover {
+        background: rgba(255, 107, 107, 0.1);
+        color: #ff8e8e;
+    }
+
+    @keyframes fadeInSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Mobile responsive */
+    .hamburger-btn {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+    }
+
+    .hl-bar {
+        width: 25px;
+        height: 3px;
+        background: white;
+        border-radius: 2px;
+        transition: 0.3s ease;
+    }
+
+    @media (max-width: 900px) {
+        .nav-links-modern-list {
+            display: none;
+            position: absolute;
+            top: calc(100% + 15px);
+            left: 0;
+            right: 0;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .nav-links-modern-list.active {
+            display: flex;
+        }
+
+        .hamburger-btn {
+            display: flex;
+        }
+
+        .hamburger-btn.active .hl-bar:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .hamburger-btn.active .hl-bar:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active .hl-bar:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        .n-link {
+            width: 100%;
+        }
+
+        .btn-login-header {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const hamburger = document.querySelector('.hamburger-btn');
+        const navLinks = document.querySelector('.nav-links-modern-list');
+
+        if (hamburger && navLinks) {
+            hamburger.addEventListener('click', function () {
+                navLinks.classList.toggle('active');
+                hamburger.classList.toggle('active');
+            });
+        }
+
+        // Toggle dropdowns
+        const dropdowns = document.querySelectorAll('.n-dropdown, .profile-dropdown-container');
+        dropdowns.forEach(dropdown => {
+            const toggle = dropdown.querySelector('.n-dropdown-toggle, #profileLink');
+            const menu = dropdown.querySelector('.n-dropdown-menu, .profile-dropdown-menu');
+
+            if (toggle && menu) {
+                toggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    menu.classList.toggle('active');
+                });
+            }
+        });
+
+        // Close dropdowns on outside click
+        document.addEventListener('click', function (e) {
+            dropdowns.forEach(dropdown => {
+                const menu = dropdown.querySelector('.n-dropdown-menu, .profile-dropdown-menu');
+                if (menu && !dropdown.contains(e.target)) {
+                    menu.classList.remove('active');
+                }
+            });
+        });
+    });
+</script>

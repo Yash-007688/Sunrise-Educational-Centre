@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Batch Management</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    /* Align with Admin permanent white theme */
+    body { background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%) !important; color:#232946 !important; }
+    .navbar, .glassmorphic { background: rgba(255,255,255,0.95) !important; border-bottom:1px solid rgba(106,130,251,0.2) !important; }
+    .nav-links a { color:#232946 !important; }
+    .nav-links a:hover, .nav-links .btn-primary { background: linear-gradient(90deg, #6a82fb 0%, #5a6fd8 100%) !important; color:#fff !important; }
+    .btn, .btn-primary { background:#6a82fb !important; color:#fff !important; border:1px solid #6a82fb !important; }
+    .btn:hover, .btn-primary:hover { background:#5a6fd8 !important; color:#fff !important; }
+    input, select, textarea { background:#fff !important; color:#232946 !important; border:1px solid #d1d5db !important; }
+    input:focus, select:focus, textarea:focus { border-color:#6a82fb !important; outline:none !important; box-shadow:0 0 0 2px rgba(106,130,251,0.2) !important; }
+    input::placeholder, textarea::placeholder { color:#6b7280 !important; }
+    .admin-section { margin: 2rem 2rem 2.5rem 2rem; background:#fff; border-radius:16px; box-shadow:0 2px 8px rgba(100,100,255,0.07); padding:2rem 1.5rem; }
+    @media (max-width: 900px) { .admin-section { margin: 1rem; } }
+
+    .grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap:1rem; }
+    .admin-card { background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:1rem; box-shadow:0 4px 16px rgba(100,100,255,0.08); }
+    .admin-card h3 { margin:0 0 0.6rem 0; color:#232946; }
+    .row { display:flex; gap:0.6rem; flex-wrap:wrap; }
+    .row > * { flex:1; min-width: 140px; }
+    .form { display:flex; flex-direction:column; gap:0.6rem; }
+    input[type="text"], input[type="date"], textarea { border:1px solid #e5e7eb; border-radius:10px; padding:0.6rem 0.8rem; font-size:0.95rem; }
+    textarea { min-height: 80px; resize:vertical; }
+    .btn { display:inline-block; border:1px solid #6a82fb; background:#6a82fb; color:#fff; padding:0.5rem 0.9rem; border-radius:10px; font-weight:600; cursor:pointer; transition:all .2s; text-decoration:none; }
+    .btn:hover { background:#5a6fd8; }
+    .btn-primary { background:#6a82fb; color:#fff; border-color:#6a82fb; }
+    .btn-primary:hover { background:#5a6fd8; }
+    .btn-danger { background:#ef4444; border-color:#ef4444; color:#fff; }
+    .toolbar { display:flex; gap:0.6rem; align-items:center; justify-content:space-between; margin-bottom:0.8rem; flex-wrap:wrap; }
+    .muted { color:#6b7280; font-size:0.92rem; }
+  </style>
+</head>
+<body>
+  <nav class="navbar glassmorphic">
+    <div class="container nav-content">
+      <div class="nav-logo">
+        <img src="{{ url_for('static', filename='attached_assets/image_1750584670920.png') }}" alt="Logo">
+        <span>Admin Panel</span>
+      </div>
+      <ul class="nav-links">
+        
+        <li><a href="#about-us">About</a></li>
+        <li><a href="/study-resources">Study Resources</a></li>
+        <li><a href="/study-resources">Study Resources</a></li>
+        <li><a href="/forum">Forum</a></li>
+        <li><a href="/admin/status-management">Status Management</a></li>
+        <li style="font-weight:600; color:#6a82fb; padding:0.4rem 1rem;">{{ username or 'Admin' }}</li>
+        <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+      </ul>
+      <button class="hamburger">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="container main-content">
+    <section class="admin-section">
+      <div class="toolbar">
+        <h2 style="margin:0;">Manage Batches</h2>
+        <form class="row" method="POST" action="/admin/batch/create">
+          <input type="text" name="name" placeholder="New class name (e.g., Class 9)" required />
+          <button class="btn btn-primary" type="submit">+ Create Class</button>
+        </form>
+      </div>
+      <p class="muted" style="margin:0.2rem 0 0;">Update metadata (image, dates, description) for each class. The public Batch page will use these if present.</p>
+    </section>
+
+    <section class="admin-section" style="padding:1.2rem;">
+      <div class="grid">
+      {% for cls in classes %}
+      <div class="admin-card">
+        <h3>{{ cls.name|title }} (ID: {{ cls.id }})</h3>
+        <form class="form" method="POST" action="/admin/batch/update/{{ cls.id }}">
+          <div class="row">
+            <input type="text" name="name" placeholder="Class name" value="{{ cls.name }}" />
+          </div>
+          <div class="row">
+            <input type="text" name="image" placeholder="Image URL" value="{{ cls.meta.image }}" />
+          </div>
+          <div class="row">
+            <input type="date" name="start_date" value="{{ cls.meta.start_date }}" />
+            <input type="date" name="end_date" value="{{ cls.meta.end_date }}" />
+          </div>
+          <textarea name="description" placeholder="Short description...">{{ cls.meta.description }}</textarea>
+          <div class="row" style="justify-content:flex-end;">
+            <button class="btn btn-primary" type="submit">Save</button>
+          </div>
+        </form>
+        <form method="POST" action="/admin/batch/delete/{{ cls.id }}" onsubmit="return confirm('Delete this class?');">
+          <button class="btn btn-danger" type="submit">Delete Class</button>
+        </form>
+      </div>
+      {% endfor %}
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script>
+    // Force light mode to keep admin theme consistent
+    function forceLightMode(){
+      document.body.classList.remove('dark-mode');
+      localStorage.removeItem('darkMode');
+      localStorage.removeItem('adminDarkMode');
+      document.body.classList.add('light-mode');
+    }
+    forceLightMode();
+    document.addEventListener('DOMContentLoaded', forceLightMode);
+    setInterval(forceLightMode, 1000);
+    // Hamburger menu and notif bell hookup (same as admin)
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    if (hamburger && navLinks) {
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+      });
+    }
+  </script>
+</body>
+</html>

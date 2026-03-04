@@ -70,41 +70,6 @@ def init_db():
             FOREIGN KEY (notification_id) REFERENCES notifications(id) ON DELETE CASCADE
         )
     ''')
-    # This table is from a previous step, ensuring it's still created.
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS live_classes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            class_code TEXT NOT NULL UNIQUE,
-            pin TEXT NOT NULL,
-            meeting_url TEXT NOT NULL,
-            topic TEXT,
-            description TEXT,
-            is_active INTEGER NOT NULL DEFAULT 1,
-            created_at TEXT NOT NULL,
-            status TEXT DEFAULT 'scheduled',
-            scheduled_time TEXT,
-            activated_at TEXT,
-            completed_at TEXT,
-            recording_url TEXT,
-            duration_minutes INTEGER,
-            attendance_count INTEGER
-        )
-    ''')
-    # Ensure optional columns for class variations exist
-    c.execute("PRAGMA table_info(live_classes)")
-    live_class_columns = [row[1] for row in c.fetchall()]
-    if 'target_class' not in live_class_columns:
-        c.execute("ALTER TABLE live_classes ADD COLUMN target_class TEXT DEFAULT 'all'")
-    if 'class_stream' not in live_class_columns:
-        c.execute("ALTER TABLE live_classes ADD COLUMN class_stream TEXT")
-    if 'class_type' not in live_class_columns:
-        c.execute("ALTER TABLE live_classes ADD COLUMN class_type TEXT DEFAULT 'lecture'")
-    if 'paid_status' not in live_class_columns:
-        c.execute("ALTER TABLE live_classes ADD COLUMN paid_status TEXT DEFAULT 'unpaid'")
-    if 'subject' not in live_class_columns:
-        c.execute("ALTER TABLE live_classes ADD COLUMN subject TEXT")
-    if 'teacher_name' not in live_class_columns:
-        c.execute("ALTER TABLE live_classes ADD COLUMN teacher_name TEXT")
     c.execute('''
         CREATE TABLE IF NOT EXISTS classes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -126,19 +91,6 @@ def init_db():
             FOREIGN KEY(user_id) REFERENCES users(id),
             FOREIGN KEY(parent_id) REFERENCES forum_messages(id),
             FOREIGN KEY(topic_id) REFERENCES forum_topics(id)
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS live_class_messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            live_class_id INTEGER NOT NULL,
-            user_id INTEGER,
-            username TEXT,
-            message TEXT,
-            media_url TEXT,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(live_class_id) REFERENCES live_classes(id),
-            FOREIGN KEY(user_id) REFERENCES users(id)
         )
     ''')
     c.execute('''
@@ -263,25 +215,6 @@ def init_db():
             if "duplicate column" not in str(e):
                 raise e
     
-    if db_version < 6:
-        # Migration V6: Add status/time/recording fields to live_classes
-        try:
-            cols = [r[1] for r in c.execute('PRAGMA table_info(live_classes)').fetchall()]
-            def addcol(name, type_sql):
-                if name not in cols:
-                    c.execute(f"ALTER TABLE live_classes ADD COLUMN {name} {type_sql}")
-            addcol('status', "TEXT DEFAULT 'scheduled'")
-            addcol('scheduled_time', 'TEXT')
-            addcol('activated_at', 'TEXT')
-            addcol('completed_at', 'TEXT')
-            addcol('recording_url', 'TEXT')
-            addcol('duration_minutes', 'INTEGER')
-            addcol('attendance_count', 'INTEGER')
-            c.execute('PRAGMA user_version = 6')
-            conn.commit()
-        except sqlite3.OperationalError as e:
-            if "duplicate column" not in str(e):
-                raise e
     
     # --- Seed Admin User ---
     # Ensure the default admin user 'yash' exists.
@@ -300,7 +233,7 @@ def init_db():
         pass
 
     conn.close()
-    # Note: init_resources_db and init_live_class_db are now integrated into init_db
+    # Note: resource initialization is integrated into init_db
 
 def init_classes_db():
     conn = sqlite3.connect(DATABASE)
@@ -322,31 +255,6 @@ def init_classes_db():
         c.executemany('INSERT INTO classes (name) VALUES (?)', [(c,) for c in classes_to_add])
     conn.commit()
     conn.close()
-
-def ensure_live_class_variant_columns():
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute("PRAGMA table_info(live_classes)")
-    cols = [row[1] for row in c.fetchall()]
-    if 'target_class' not in cols:
-        c.execute("ALTER TABLE live_classes ADD COLUMN target_class TEXT DEFAULT 'all'")
-    if 'class_stream' not in cols:
-        c.execute("ALTER TABLE live_classes ADD COLUMN class_stream TEXT")
-    if 'class_type' not in cols:
-        c.execute("ALTER TABLE live_classes ADD COLUMN class_type TEXT DEFAULT 'lecture'")
-    if 'paid_status' not in cols:
-        c.execute("ALTER TABLE live_classes ADD COLUMN paid_status TEXT DEFAULT 'unpaid'")
-    if 'subject' not in cols:
-        c.execute("ALTER TABLE live_classes ADD COLUMN subject TEXT")
-    if 'teacher_name' not in cols:
-        c.execute("ALTER TABLE live_classes ADD COLUMN teacher_name TEXT")
-    conn.commit()
-    conn.close()
-
-# ==============================================================================
-# Helper Functions for Classes
-# ==============================================================================
-
 def get_all_classes():
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
@@ -749,7 +657,7 @@ def add_personal_notification(message, user_id, notification_type='personal'):
 # Live Class and Other Functions (Remain Unchanged)
 # ==============================================================================
 
-# ... (delete_user, delete_resource, live_class functions, etc. are here) ...
+# ... (delete_user, delete_resource, and other helper functions are here) ...
 # Note: I have integrated the unchanged functions from the previous state of the file below.
 def delete_resource(filename):
     conn = sqlite3.connect(DATABASE)
@@ -764,82 +672,6 @@ def delete_user(user_id):
     c.execute('DELETE FROM users WHERE id=?', (user_id,))
     conn.commit()
     conn.close()
-
-def create_live_class(
-    class_code,
-    pin,
-    meeting_url,
-    topic,
-    description,
-    status='scheduled',
-    scheduled_time=None,
-    target_class='all',
-    class_stream=None,
-    class_type='lecture',
-    paid_status='unpaid',
-    subject=None,
-    teacher_name=None
-):
-    # Ensure variant columns exist even if init_db was not called
-    ensure_live_class_variant_columns()
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    created_at = format_ist_time(get_current_ist_time())
-    c.execute(
-        'INSERT INTO live_classes (class_code, pin, meeting_url, topic, description, created_at, status, scheduled_time, target_class, class_stream, class_type, paid_status, subject, teacher_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        (
-            class_code,
-            pin,
-            meeting_url,
-            topic,
-            description,
-            created_at,
-            status,
-            scheduled_time,
-            target_class,
-            class_stream,
-            class_type,
-            paid_status,
-            subject,
-            teacher_name,
-        ),
-    )
-    conn.commit()
-    new_class_id = c.lastrowid
-    conn.close()
-    return new_class_id
-
-def get_live_class(class_code, pin):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('SELECT meeting_url FROM live_classes WHERE class_code=? AND pin=? AND is_active=1', (class_code, pin))
-    result = c.fetchone()
-    conn.close()
-    return result[0] if result else None
-
-def get_active_classes():
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('SELECT id, class_code, pin, meeting_url, topic, description, created_at FROM live_classes WHERE is_active=1 ORDER BY created_at DESC')
-    classes = c.fetchall()
-    conn.close()
-    return classes
-
-def get_class_details_by_id(class_id):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('SELECT class_code, pin, meeting_url, topic, description FROM live_classes WHERE id=?', (class_id,))
-    details = c.fetchone()
-    conn.close()
-    return details
-
-def deactivate_class(class_id):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('UPDATE live_classes SET is_active=0 WHERE id=?', (class_id,))
-    conn.commit()
-    conn.close()
-
 def delete_notification(notification_id):
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
@@ -872,7 +704,7 @@ def get_notifications_by_status(status):
     return notifications
 
 def get_notifications_by_type(notification_type):
-    """Get notifications by type (general, live_class, study_resource)"""
+    """Get notifications by type (general, study_resource, etc.)"""
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute('''
@@ -1080,368 +912,6 @@ def delete_forum_message(message_id):
     c.execute("DELETE FROM forum_messages WHERE id = ? OR parent_id = ?", (message_id, message_id))
     conn.commit()
     conn.close()
-
-def save_live_class_message(live_class_id, user_id, username, message, media_url=None):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('INSERT INTO live_class_messages (live_class_id, user_id, username, message, media_url) VALUES (?, ?, ?, ?, ?)', (live_class_id, user_id, username, message, media_url))
-    conn.commit()
-    conn.close()
-
-def get_live_class_messages(live_class_id):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('SELECT id, user_id, username, message, media_url, timestamp FROM live_class_messages WHERE live_class_id=? ORDER BY timestamp ASC', (live_class_id,))
-    messages = c.fetchall()
-    conn.close()
-    return messages
-
-def delete_live_class_message(message_id):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('DELETE FROM live_class_messages WHERE id=?', (message_id,))
-    conn.commit()
-    conn.close()
-
-# ==============================================================================
-# Enhanced Live Class Management Functions
-# ==============================================================================
-
-def update_live_class_status(class_id, status):
-    """Update the status of a live class"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    
-    if status == 'active':
-        # Set activated_at when transitioning to active (store as formatted IST time for consistent comparisons)
-        from time_config import format_ist_time, get_current_ist_time
-        current_time = format_ist_time(get_current_ist_time())
-        c.execute('UPDATE live_classes SET status = ?, activated_at = ? WHERE id = ?', (status, current_time, class_id))
-    else:
-        c.execute('UPDATE live_classes SET status = ? WHERE id = ?', (status, class_id))
-    
-    conn.commit()
-    conn.close()
-
-def get_live_classes_by_status(status):
-    """Get live classes by status (scheduled, active, completed, cancelled)"""
-    # Ensure variant columns exist
-    ensure_live_class_variant_columns()
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('''
-        SELECT 
-            id, class_code, pin, meeting_url, topic, description, created_at, status, scheduled_time,
-            target_class, class_stream, class_type, paid_status, subject, teacher_name
-        FROM live_classes 
-        WHERE status = ?
-        ORDER BY created_at DESC
-    ''', (status,))
-    classes = c.fetchall()
-    conn.close()
-    return classes
-
-def get_scheduled_live_classes():
-    """Get all scheduled live classes"""
-    return get_live_classes_by_status('scheduled')
-
-def get_active_live_classes():
-    """Get all currently active live classes"""
-    return get_live_classes_by_status('active')
-
-def get_completed_live_classes():
-    """Get all completed live classes"""
-    return get_live_classes_by_status('completed')
-
-def get_upcoming_live_classes():
-    """Get upcoming scheduled live classes (scheduled for future or without specific time)"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    current_time = get_current_ist_time()
-    c.execute('''
-        SELECT 
-            id, class_code, pin, meeting_url, topic, description, created_at, status, scheduled_time,
-            target_class, class_stream, class_type, paid_status, subject, teacher_name
-        FROM live_classes 
-        WHERE status = 'scheduled' AND (scheduled_time > ? OR scheduled_time IS NULL)
-        ORDER BY scheduled_time ASC
-    ''', (format_ist_time(current_time),))
-    classes = c.fetchall()
-    conn.close()
-    return classes
-
-def schedule_live_class(class_code, pin, meeting_url, topic, description, scheduled_time):
-    """Schedule a live class for a specific time"""
-    return create_live_class(class_code, pin, meeting_url, topic, description, 'scheduled', scheduled_time)
-
-def start_live_class(class_id):
-    """Mark a live class as active"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    
-    # Update status to active and set activation time (store as formatted IST time)
-    from time_config import format_ist_time, get_current_ist_time
-    current_time = format_ist_time(get_current_ist_time())
-    c.execute('''
-        UPDATE live_classes 
-        SET status = 'active', activated_at = ? 
-        WHERE id = ?
-    ''', (current_time, class_id))
-    
-    conn.commit()
-    conn.close()
-
-def complete_live_class(class_id):
-    """Mark a live class as completed"""
-    update_live_class_status(class_id, 'completed')
-
-def cancel_live_class(class_id):
-    """Cancel a live class"""
-    update_live_class_status(class_id, 'cancelled')
-
-def get_live_class_with_status(class_id):
-    """Get live class details including status"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('''
-        SELECT id, class_code, pin, meeting_url, topic, description, created_at, status, scheduled_time, is_active
-        FROM live_classes WHERE id = ?
-    ''', (class_id,))
-    details = c.fetchone()
-    conn.close()
-    return details
-
-def auto_update_class_statuses():
-    """Automatically update class statuses based on current time"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    current_time = get_current_ist_time()
-    current_time_str = format_ist_time(current_time)
-    
-    # Update scheduled classes to active if their time has come
-    c.execute('''
-        UPDATE live_classes 
-        SET status = 'active' 
-        WHERE status = 'scheduled' 
-        AND scheduled_time <= ?
-    ''', (current_time_str,))
-    
-    # Update active classes to completed if they've been running for more than 2 hours
-    # (assuming class duration is 2 hours max)
-    from datetime import timedelta
-    two_hours_ago = current_time - timedelta(hours=2)
-    two_hours_ago_str = format_ist_time(two_hours_ago)
-    
-    # Only auto-complete classes that have been active for more than 2 hours
-    # Use activated_at field if available, otherwise fall back to created_at
-    two_hours_ago = current_time - timedelta(hours=2)
-    two_hours_ago_str = format_ist_time(two_hours_ago)
-    
-    c.execute('''
-        UPDATE live_classes 
-        SET status = 'completed' 
-        WHERE status = 'active' 
-        AND (activated_at <= ? OR (activated_at IS NULL AND created_at <= ?))
-    ''', (two_hours_ago_str, two_hours_ago_str))
-    
-    conn.commit()
-    conn.close()
-
-def end_live_class(class_id, recording_url=None):
-    """End a live class (mark as completed) - called when end button is clicked"""
-    # Mark completed
-    complete_live_class(class_id)
-    
-    # Also deactivate the class for backward compatibility and set timestamps/recording
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    from datetime import datetime
-    completed_time = format_ist_time(get_current_ist_time())
-    if recording_url:
-        c.execute('UPDATE live_classes SET is_active = 0, completed_at = ?, recording_url = ? WHERE id = ?', (completed_time, recording_url, class_id))
-    else:
-        c.execute('UPDATE live_classes SET is_active = 0, completed_at = ? WHERE id = ?', (completed_time, class_id))
-    conn.commit()
-    conn.close()
-
-def set_live_class_recording(class_id, recording_url):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('UPDATE live_classes SET recording_url = ? WHERE id = ?', (recording_url, class_id))
-    conn.commit()
-    conn.close()
-
-def get_live_classes_for_display():
-    """Get all live classes organized by status for display"""
-    auto_update_class_statuses()  # Auto-update statuses first
-    
-    return {
-        'upcoming': get_upcoming_live_classes(),
-        'active': get_active_live_classes(),
-        'completed': get_completed_live_classes()
-    }
-
-def is_class_time_to_start(class_id):
-    """Check if it's time for a scheduled class to start"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    current_time = get_current_ist_time()
-    current_time_str = format_ist_time(current_time)
-    
-    c.execute('''
-        SELECT scheduled_time 
-        FROM live_classes 
-        WHERE id = ? AND status = 'scheduled'
-    ''', (class_id,))
-    
-    result = c.fetchone()
-    conn.close()
-    
-    if result:
-        scheduled_time = result[0]
-        if scheduled_time is None:
-            return True  # Allow starting if no scheduled time
-        return scheduled_time <= current_time_str
-    
-    return False
-
-def can_start_class(class_id):
-    """Check if a class can be started (is scheduled and time has come)"""
-    return is_class_time_to_start(class_id)
-
-def can_end_class(class_id):
-    """Check if a class can be ended (is currently active)"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('SELECT status FROM live_classes WHERE id = ?', (class_id,))
-    result = c.fetchone()
-    conn.close()
-    
-    return result and result[0] == 'active'
-
-# Enhanced Live Class Helper Functions
-def record_attendance(class_id, user_id, username):
-    """Record user attendance in live class"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    now = get_ist_timestamp()
-    
-    try:
-        c.execute('''
-            INSERT INTO live_class_attendance (class_id, user_id, username, joined_at)
-            VALUES (?, ?, ?, ?)
-        ''', (class_id, user_id, username, now))
-        
-        # Update attendance count
-        c.execute('''
-            UPDATE live_classes 
-            SET attendance_count = attendance_count + 1 
-            WHERE id = ?
-        ''', (class_id,))
-        
-        conn.commit()
-        print(f"✅ Attendance recorded for user {username} in class {class_id}")
-    except sqlite3.IntegrityError:
-        print(f"ℹ️  User {username} already joined class {class_id}")
-    except Exception as e:
-        print(f"❌ Error recording attendance: {e}")
-    finally:
-        conn.close()
-
-def get_class_attendance(class_id):
-    """Get attendance list for a class"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('''
-        SELECT username, joined_at
-        FROM live_class_attendance
-        WHERE class_id = ?
-        ORDER BY joined_at
-    ''', (class_id,))
-    attendance = c.fetchall()
-    conn.close()
-    return attendance
-
-def get_live_class_analytics():
-    """Get basic analytics for live classes"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    
-    # Total classes by status
-    c.execute('''
-        SELECT status, COUNT(*) as count
-        FROM live_classes
-        GROUP BY status
-    ''')
-    status_counts = c.fetchall()
-    
-    # Total attendance
-    c.execute('SELECT COUNT(*) FROM live_class_attendance')
-    total_attendance = c.fetchone()[0]
-    
-    # Recent classes
-    c.execute('''
-        SELECT COUNT(*) 
-        FROM live_classes 
-        WHERE created_at >= datetime('now', '-7 days')
-    ''')
-    recent_classes = c.fetchone()[0]
-    
-    conn.close()
-    
-    return {
-        'status_counts': status_counts,
-        'total_attendance': total_attendance,
-        'recent_classes': recent_classes
-    }
-
-def cleanup_old_classes():
-    """Clean up old completed classes (older than 30 days)"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    
-    # Get old completed classes
-    c.execute('''
-        SELECT id FROM live_classes 
-        WHERE status = 'completed' 
-        AND created_at < datetime('now', '-30 days')
-    ''')
-    old_classes = c.fetchall()
-    
-    if old_classes:
-        class_ids = [str(c[0]) for c in old_classes]
-        placeholders = ','.join(['?' for _ in class_ids])
-        
-        # Delete related data
-        c.execute(f'DELETE FROM live_class_attendance WHERE class_id IN ({placeholders})', class_ids)
-        c.execute(f'DELETE FROM live_class_messages WHERE class_id IN ({placeholders})', class_ids)
-        c.execute(f'DELETE FROM live_classes WHERE id IN ({placeholders})', class_ids)
-        
-        conn.commit()
-        print(f"✅ Cleaned up {len(old_classes)} old classes")
-    else:
-        print("ℹ️  No old classes to clean up")
-    
-    conn.close()
-
-def validate_live_class_data():
-    """Validate and fix live class data integrity"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    
-    # Fix status inconsistencies
-    c.execute("UPDATE live_classes SET is_active = 0 WHERE status = 'completed' AND is_active = 1")
-    c.execute("UPDATE live_classes SET is_active = 0 WHERE status = 'cancelled' AND is_active = 1")
-    c.execute("UPDATE live_classes SET status = 'active' WHERE is_active = 1 AND status != 'active'")
-    
-    # Set default values
-    c.execute("UPDATE live_classes SET duration_minutes = 60 WHERE duration_minutes IS NULL")
-    c.execute("UPDATE live_classes SET attendance_count = 0 WHERE attendance_count IS NULL")
-    
-    conn.commit()
-    conn.close()
-    print("✅ Live class data validated and fixed")
-
 def format_datetime_for_display(datetime_str):
     """Format datetime string for display in notifications"""
     if not datetime_str:
@@ -1594,7 +1064,7 @@ def send_welcome_message(user_id):
     """Send a welcome message to a new user"""
     admin_user_id = get_admin_user_id()
     if admin_user_id:
-        welcome_message = "Welcome to your very own Sunrise-Educational-Classes! 🎉 We're excited to have you join our community. Feel free to explore our study resources, join live classes, and connect with other students. If you have any questions, don't hesitate to ask!"
+        welcome_message = "Welcome to your very own Sunrise-Educational-Classes! 🎉 We're excited to have you join our community. Feel free to explore our study resources, access all portal features, and connect with other students. If you have any questions, don't hesitate to ask!"
         return send_personal_message(admin_user_id, user_id, welcome_message)
     return False
 

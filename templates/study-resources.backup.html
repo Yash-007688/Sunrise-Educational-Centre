@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Study Resources - Sunrise Education Centre</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='floating-navbar.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='uiverse-components.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='enhanced-aesthetic.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-components.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-navbar.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='study-resources.css') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  </head>
+  <body class="hero-modern">
+    <!-- Enhanced Floating Particles Background -->
+    <div class="floating-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Floating Navbar -->
+    <div class="floating-navbar-container">
+    <nav class="floating-navbar black-glass">
+        <button class="hamburger" aria-label="Menu" aria-expanded="false">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            
+            <!-- Direct Page Links -->
+            <li><a href="/study-resources">Study Resources</a></li>
+            <li><a href="/batch">Batches</a></li>
+            <li><a href="/study-resources">Study Resources</a></li>
+            <li><a href="/forum">Forum</a></li>
+            
+            <!-- User Dropdown -->
+            {% if username %}
+            <li class="profile-dropdown">
+                <a href="#" id="profileLink">{{ username }} ▾</a>
+                <div class="profile-dropdown-menu" id="profileDropdown">
+                    <a href="/profile" class="dropdown-item">My Profile</a>
+                    <a href="/notifications" class="dropdown-item">Notifications</a>
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </li>
+            {% else %}
+            <li><a href="/auth" class="btn-primary">Login</a></li>
+            {% endif %}
+            
+            <!-- Notification Button -->
+            <li style="position:relative;">
+                <button id="notifBell" style="background:none; border:none; cursor:pointer; position:relative; color:#fff;">🔔
+                    <span id="notificationCount" style="position:absolute;top:0;right:0;width:18px;height:18px;background:#fc5c7d;border-radius:50%;color:white;font-size:10px;font-weight:bold;display:none;align-items:center;justify-content:center;">0</span>
+                </button>
+                <div id="notifDropdown" style="display:none;">
+                    <strong style="color:#6a82fb;">Notifications</strong>
+                    <ul style="list-style:none; padding:0; margin:0;"></ul>
+                </div>
+            </li>
+            
+            <!-- Theme toggle removed; use footer slider -->
+        </ul>
+    </nav>
+    </div>
+
+    <!-- ChatGPT-style Vertical Slider for Class & Status -->
+      <div class="vertical-slider" id="verticalSlider">
+      <div class="slider-header">
+        <p>Filter and browse your materials</p>
+        <button class="slider-toggle" id="sliderToggle">◀</button>
+      </div>
+      <div class="slider-content">
+        <div class="user-info-section">
+          <div class="info-item">
+            <span class="info-label">Class:</span>
+            <span class="class-chip">{{ class_name|title }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Status:</span>
+            {% if is_guest %}
+              <span class="status-chip guest">👤 Guest</span>
+            {% elif paid_status == 'paid' %}
+              <span class="status-chip">Premium Access</span>
+            {% else %}
+              <span class="status-chip unpaid">Basic Access</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="category-filters">
+          <h4>Categories</h4>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" checked> Notes
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" checked> Sample Papers
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" checked> Worksheets
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" checked> PYQs
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" checked> Case-Base
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" checked> Assertion/Reasoning
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" checked> Formula
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual Slider Toggle Button (for testing) -->
+    <button id="manualSliderToggle" style="position: fixed; top: 100px; left: 20px; z-index: 1002; background: #fc5c7d; color: white; border: none; padding: 15px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; box-shadow: 0 4px 12px rgba(252,92,125,0.3); transition: all 0.3s ease;">
+      🔧 Test Slider
+    </button>
+    
+    <!-- Debug Info -->
+    <div id="debugInfo" style="position: fixed; top: 150px; left: 20px; z-index: 1002; background: rgba(0,0,0,0.9); color: white; padding: 15px; border-radius: 8px; font-size: 12px; max-width: 250px; display: none; border: 1px solid rgba(255,255,255,0.2);">
+      Debug info will appear here
+    </div>
+    
+    <!-- Slider Overlay for Mobile -->
+    <div id="sliderOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease; pointer-events: none;"></div>
+
+    <!-- Enhanced Hero Section like home -->
+    <section class="hero-section hero-modern" style="min-height: 80vh; position: relative; background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('attached_assets/image_1750584670920.png') center/cover no-repeat;">
+      <div class="hero-content hero-content-modern" style="padding-top: 8rem;">
+        <h1 class="hero-title-modern" style="margin-bottom: 1rem;">Study Resources</h1>
+        
+        <p class="hero-subtitle-modern" style="font-size: clamp(1.1rem, 2.5vw, 1.5rem); margin-bottom: 2rem; max-width: 700px; margin-left: auto; margin-right: auto;">Access comprehensive notes, worksheets, practice problems, and solutions designed to help you excel in your studies</p>
+        
+        <!-- User Status Card -->
+        <div class="glass-card" style="max-width: 500px; margin: 0 auto 2rem; padding: 1.5rem; text-align: center;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: white;">{{ class_name[0]|upper if class_name else 'C' }}</div>
+              <div style="text-align: left;">
+                <div style="color: #fff; font-size: 1.1rem; font-weight: 600;">{{ class_name|title }}</div>
+                <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Your Class</div>
+              </div>
+            </div>
+            <div style="padding: 0.75rem 1.5rem; background: {{ 'rgba(0,200,140,0.2)' if paid_status == 'paid' else 'rgba(255,215,0,0.2)' }}; border: 1px solid {{ 'rgba(0,200,140,0.4)' if paid_status == 'paid' else 'rgba(255,215,0,0.4)' }}; border-radius: 25px; color: {{ '#aef9e4' if paid_status == 'paid' else '#ffd700' }}; font-weight: 600;">
+              {{ '💎 Premium Access' if paid_status == 'paid' else '🆓 Basic Access' }}
+            </div>
+          </div>
+        </div>
+        
+        
+      </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="stats-section scroll-reveal" style="margin: -10rem 0 4rem 0; position: relative; z-index: 20;">
+      <div class="container">
+        <h2 class="heading-modern heading-lg text-center" style="color: white; margin-bottom: 3rem;">Resource Library</h2>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-number">500+</span>
+            <span class="stat-label">Study Materials</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">50+</span>
+            <span class="stat-label">Practice Papers</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">100+</span>
+            <span class="stat-label">Worksheets</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">24/7</span>
+            <span class="stat-label">Access</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="container main-content study-resources-shell" style="position: relative; z-index: 15;">
+      
+      <!-- Guest User Notice -->
+      {% if is_guest %}
+      <section class="glass-card scroll-reveal" style="margin: 2rem 0; padding: 2rem; text-align: center; background: rgba(106, 130, 251, 0.1); border: 1px solid rgba(106, 130, 251, 0.3);">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
+          <span style="font-size: 2rem;">👋</span>
+          <h3 style="color: white; margin: 0;">Welcome, Guest!</h3>
+        </div>
+        <p style="color: rgba(255,255,255,0.9); margin-bottom: 1.5rem; font-size: 1.1rem;">
+          You're viewing study resources in preview mode. Some features are limited for guest users.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="/auth" class="uiverse-btn">🔐 Login for Full Access</a>
+          <a href="/admission" class="morph-btn">🎓 Get Admission</a>
+        </div>
+        <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 10px;">
+          <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin: 0;">
+            💡 <strong>Login Benefits:</strong> Access all resources, download materials, use all resources and participate in forums
+          </p>
+        </div>
+      </section>
+      {% endif %}
+      
+      <!-- Enhanced Search Section -->
+      <section class="glass-card scroll-reveal" style="margin: 2rem 0; padding: 2rem; text-align: center;">
+        <h3 style="color: white; font-size: 1.5rem; margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">🔍 Find Your Resources</h3>
+        <p style="color: rgba(255,255,255,0.8); margin-bottom: 1.5rem;">Search through our comprehensive collection of study materials</p>
+        <div style="max-width: 500px; margin: 0 auto;">
+          <input type="text" class="input-modern" placeholder="Search for notes, worksheets, papers..." id="searchInput" style="width: 100%; margin-bottom: 1rem;">
+          <button id="floatingSearchBtn" class="btn-modern btn-primary-modern" style="width: 100%;">
+            🔎 Search Resources
+          </button>
+        </div>
+      </section>
+
+      
+
+      <!-- Enhanced Resources Section -->
+      <section id="resources" class="resources-section">
+        <div class="glass-card scroll-reveal" style="margin: 2rem 0; padding: 2rem;">
+          <h2 class="heading-modern heading-md text-center" style="color: white; margin-bottom: 2rem;">📚 Resources for {{ class_name|title }}</h2>
+          
+          <!-- Enhanced Category Tabs -->
+          <div class="card-grid-modern" style="margin-bottom: 3rem;">
+            {% set template_categories = [
+                ('notes', 'Notes', '📝'),
+                ('sample_paper', 'Sample Papers', '📄'),
+                ('worksheet', 'Worksheets', '📋'),
+                ('pyq', 'PYQs', '🎯'),
+                ('case-base', 'Case-Base', '📚'),
+                ('assertion-reasoning', 'Assertion/Reasoning', '🤔'),
+                ('formula', 'Formula', '🧮')
+            ] %}
+            
+            {% for cat_key, cat_name, cat_icon in template_categories %}
+              <div class="subject-card-modern scroll-reveal" onclick="showCategory(event, 'cat-{{ cat_key }}')" style="cursor: pointer;">
+                <span class="subject-icon">{{ cat_icon }}</span>
+                <h3 class="subject-title">{{ cat_name }}</h3>
+                <p class="subject-description">Access {{ cat_name.lower() }} for your studies</p>
+                <button class="btn-modern btn-primary-modern" style="margin-top: 1rem;">View {{ cat_name }}</button>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Resources for each category -->
+          {% for cat_key, cat_name, cat_icon in template_categories %}
+            {% if (cat_key in ['worksheet', 'formula'] and paid_status == 'paid') or (cat_key not in ['worksheet', 'formula']) %}
+              <div id="cat-{{ cat_key }}" class="category-content">
+                <div class="resource-grid">
+                  {% set has_resources = false %}
+                  {% for resource in resources %}
+                    {% set filename = resource[1] %}
+                    {% set res_class_id = resource[2] %}
+                    {% set filepath = resource[3] %}
+                    {% set title = resource[4] %}
+                    {% set description = resource[5] %}
+                    {% set category = resource[6] %}
+                    {% if res_class_id == class_id and category == cat_key %}
+                      {% set has_resources = true %}
+                      <div class="resource-card uiverse-card">
+                        <div class="card-header">
+                          <div class="icon-chip">📄</div>
+                          <div class="title-block">
+                            <header>{{ title }}</header>
+                            {% if description %}
+                              <p class="description">{{ description }}</p>
+                            {% endif %}
+                          </div>
+                        </div>
+                        <div class="file-row">
+                          <span class="status-indicator status-free">File</span>
+                          <span class="file-name">{{ filename }}</span>
+                        </div>
+                        <div class="resource-actions">
+                          <a href="/preview/{{ filename }}" class="uiverse-btn preview-btn">📖 Preview</a>
+                          <span class="category-badge">{{ category|title }}</span>
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                  {% if not has_resources %}
+                    <div class="empty-state">
+                      <h3>📚 No {{ cat_name }} Available</h3>
+                      <p>No {{ cat_name.lower() }} have been uploaded for this class yet.</p>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% else %}
+              <div id="cat-{{ cat_key }}" class="category-content">
+                <div class="resource-grid">
+                  <div class="premium-notice">
+                    <h3>🔒 Premium Content</h3>
+                    <p>This category contains premium content that requires a paid subscription.</p>
+                    <p style="font-size: 0.9rem; margin-top: 1rem;">Contact your administrator to upgrade your account.</p>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </section>
+
+
+      <!-- Dark Mode Toggle -->
+      <div style="text-align:center; margin: 1.25rem 0;">
+        
+      </div>
+    </main>
+
+    <!-- Enhanced Modern Footer -->
+    <footer class="footer-modern">
+      <div class="container">
+        <div class="footer-content-modern">
+          <div class="footer-section">
+            <h3>Study Resources</h3>
+            <p>Comprehensive study materials designed to help you excel in your academic journey.</p>
+            <div class="uiverse-social-container">
+              <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank" class="uiverse-social-btn instagram" title="Instagram">
+                <img src="{{ url_for('static', filename='footer/instagram-brands-solid-full.svg') }}" alt="Instagram" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+              </a>
+              <a href="https://www.youtube.com/@MohitNariyani" target="_blank" class="uiverse-social-btn youtube" title="YouTube">
+                <img src="{{ url_for('static', filename='footer/youtube-brands-solid-full.svg') }}" alt="YouTube" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+              </a>
+              <a href="https://wa.me/917224860881" target="_blank" class="uiverse-social-btn whatsapp" title="WhatsApp">
+                <i class="fa-brands fa-whatsapp" style="font-size:24px; line-height:24px; color: #25D366;"></i>
+              </a>
+              <a href="/" class="uiverse-social-btn" title="Home">
+                <i class="fas fa-home"></i>
+              </a>
+            </div>
+          </div>
+          
+          <div class="footer-section">
+            <h3>Quick Links</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <a href="/">Home</a>
+              <a href="/forum">Forum</a>
+              <a href="/study-resources">Study Resources</a>
+              <a href="/admission">Admission</a>
+              <a href="/batch">Batches</a>
+            </div>
+          </div>
+          
+          <div class="footer-section">
+            <h3>Resource Types</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <span>📝 Notes & Summaries</span>
+              <span>📄 Sample Papers</span>
+              <span>📋 Practice Worksheets</span>
+              <span>🎯 Previous Year Questions</span>
+            </div>
+          </div>
+          
+          <div class="footer-section">
+            <h3>Support</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>📞</span>
+                <a href="tel:+917224860881">+91 72248 60881</a>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>⏰</span>
+                <span>24/7 Resource Access</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>💡</span>
+                <span>Study Support Available</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="footer-bottom">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>&copy; 2024 Sunrise Educational Centre. All rights reserved.</div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <div class="uiverse-theme-slider" title="Theme">
+                <label class="switch">
+                  <input id="footerThemeSlider" type="checkbox" />
+                  <span class="slider-round"></span>
+                </label>
+                <span id="footerThemeSliderLabel">Theme</span>
+              </div>
+              <button id="footerThemeToggle" class="btn-modern btn-glass" style="padding: 0.5rem 1rem; font-size: 0.9rem; display:none;">🌙 Theme</button>
+              <span style="font-size: 0.9rem;">Excellence in Education</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='modern-interactions.js') }}"></script>
+    <script src="{{ url_for('static', filename='study-resources.js') }}"></script>
+    <script>
+      // Search functionality
+      function openSearch() {
+          const searchTerm = prompt("Enter your search term:");
+          if (searchTerm) {
+              // Search through resources
+              const resourceCards = document.querySelectorAll('.resource-card');
+              let found = false;
+              
+              resourceCards.forEach(card => {
+                  const title = card.querySelector('header').textContent.toLowerCase();
+                  const description = card.querySelector('p') ? card.querySelector('p').textContent.toLowerCase() : '';
+                  const searchLower = searchTerm.toLowerCase();
+                  
+                  if (title.includes(searchLower) || description.includes(searchLower)) {
+                      card.style.display = 'block';
+                      card.style.border = '2px solid #667eea';
+                      found = true;
+                  } else {
+                      card.style.display = 'none';
+                  }
+              });
+              
+              if (!found) {
+                  alert('No resources found matching your search term.');
+              }
+          }
+      }
+
+      // Real-time search functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+          searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const resourceCards = document.querySelectorAll('.resource-card');
+            
+            resourceCards.forEach(card => {
+              const title = card.querySelector('header').textContent.toLowerCase();
+              const description = card.querySelector('p') ? card.querySelector('p').textContent.toLowerCase() : '';
+              
+              if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                card.style.display = 'block';
+                card.style.opacity = '1';
+              } else {
+                card.style.opacity = '0.3';
+              }
+            });
+          });
+        }
+
+        // Show the first category tab by default
+        const firstCategoryTab = document.querySelector('.sub-tab-button');
+        if (firstCategoryTab) {
+          firstCategoryTab.click();
+        }
+
+        // Add category switching functionality
+        function showCategory(event, categoryId) {
+          // Hide all category content
+          const categoryContents = document.querySelectorAll('.category-content');
+          categoryContents.forEach(content => {
+            content.style.display = 'none';
+          });
+
+          // Remove active class from all tabs
+          const tabButtons = document.querySelectorAll('.sub-tab-button');
+          tabButtons.forEach(button => {
+            button.classList.remove('active');
+          });
+
+          // Show selected category and activate tab
+          const selectedCategory = document.getElementById(categoryId);
+          if (selectedCategory) {
+            selectedCategory.style.display = 'block';
+            selectedCategory.classList.add('active');
+          }
+
+          // Add active class to clicked tab
+          if (event && event.target) {
+            event.target.classList.add('active');
+          }
+        }
+      });
+
+      // Dark Mode functionality
+      function setupDarkMode() {
+          const isDarkMode = localStorage.getItem('darkMode') === 'true';
+          if (isDarkMode) {
+              document.body.classList.add('dark-mode');
+              updateToggleButton();
+          }
+      }
+
+      function toggleDarkMode() {
+          document.body.classList.toggle('dark-mode');
+          const isDarkMode = document.body.classList.contains('dark-mode');
+          localStorage.setItem('darkMode', isDarkMode);
+          updateToggleButton();
+      }
+
+      function updateToggleButton() {
+          const button = document.getElementById('darkModeToggle');
+          if (button) {
+              const isDark = document.body.classList.contains('dark-mode');
+              button.innerHTML = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+              button.style.background = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(255, 255, 255, 0.1)';
+              button.style.color = '#ffffff';
+              button.style.borderColor = isDark ? 'rgba(255,255,255,0.3)' : 'rgba(255, 255, 255, 0.2)';
+          }
+      }
+
+      // Initialize dark mode on page load
+      document.addEventListener('DOMContentLoaded', function() {
+          setupDarkMode();
+          
+          const darkModeToggle = document.getElementById('darkModeToggle');
+          if (darkModeToggle) {
+              darkModeToggle.addEventListener('click', toggleDarkMode);
+          }
+      });
+    </script>
+
+    <!-- Modern Button Navbar (User Pages Only) -->
+    {% if username and role not in ['admin', 'teacher'] %}
+    <nav class="modern-navbar">
+        <div class="button-container">
+            <!-- Home Button -->
+            <button class="button" data-tooltip="Home" onclick="navigateTo('/')">
+                <svg class="icon" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z"></path>
+                </svg>
+            </button>
+            
+            <!-- Search Button -->
+            <button class="button" data-tooltip="Search" onclick="openSearch()">
+                <svg class="icon" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </button>
+            
+            <!-- Profile Button -->
+            <button class="button" data-tooltip="Profile" onclick="navigateTo('/profile')">
+                <svg class="icon" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2.5a5.5 5.5 0 0 1 3.096 10.047 9.005 9.005 0 0 1 5.9 8.181.75.75 0 1 1-1.499.044 7.5 7.5 0 0 0-14.993 0 .75.75 0 0 1-1.5-.045 9.005 9.005 0 0 1 5.9-8.18A5.5 5.5 0 0 1 12 2.5ZM8 8a4 4 0 1 0 8 0 4 4 0 0 0-8 0Z"></path>
+                </svg>
+            </button>
+            
+            <!-- Resources Button -->
+            <button class="button active" data-tooltip="Resources" onclick="navigateTo('/study-resources')">
+                <svg class="icon" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+            </button>
+            
+            <!-- Forum Button -->
+            <button class="button" data-tooltip="Forum" onclick="navigateTo('/forum')">
+                <svg class="icon" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path>
+                </svg>
+            </button>
+        </div>
+    </nav>
+    {% endif %}
+  
+    <!-- Search Modal -->
+    <div id="searchModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-content black-glass" style="margin: 10% auto; padding: 2rem; border-radius: 20px; width: 90%; max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="color: white; margin: 0;">🔍 Search</h2>
+                <button onclick="closeSearch()" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search courses, resources, or topics..." style="width: 100%; padding: 15px; border: none; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem; margin-bottom: 1rem;">
+            <div id="searchResults" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div id="notification-panel" class="notification-panel black-glass" style="display: none; position: fixed; top: 100px; right: 20px; width: 350px; max-height: 500px; overflow-y: auto; z-index: 999; border-radius: 16px; padding: 1rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <h3 style="margin: 0; font-size: 1.2rem; color: white;">🔔 Notifications</h3>
+            <button onclick="toggleNotifications()" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 0.2rem;">✕</button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item" style="padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;">
+                <div style="font-weight: 600; margin-bottom: 0.3rem; color: white;">📚 Latest Updates</div>
+                <div style="font-size: 0.9rem; opacity: 0.8; color: rgba(255,255,255,0.8);">Check out new features and content</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='navbar-functions.js') }}"></script>
+</body>
+  <script src="{{ url_for('static', filename='attached_assets/theme.js') }}"></script>
+  <script src="{{ url_for('static', filename='modern-navbar.js') }}"></script>
+</html>

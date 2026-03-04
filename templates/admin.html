@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='forum.css') }}" />
+  <style>
+    /* Admin panel - PERMANENT WHITE THEME */
+    body {
+      background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%) !important;
+      color: #232946 !important;
+    }
+    
+    .navbar,
+    .glassmorphic {
+      background: rgba(0,0,0,0.2) !important;
+      border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    
+    .nav-links a {
+      color: #fff !important;
+    }
+    
+    .nav-links a:hover, 
+    .nav-links .btn-primary {
+      background: linear-gradient(90deg, #6a82fb 0%, #5a6fd8 100%) !important;
+      color: #fff !important;
+    }
+    
+    .card {
+      background: #fff !important;
+      color: #232946 !important;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+    }
+    
+    .card h3, 
+    .card p {
+      color: #232946 !important;
+    }
+    
+    .btn,
+    .btn-primary,
+    .btn-cta {
+      background: #6a82fb !important;
+      color: #fff !important;
+      border: 1px solid #6a82fb !important;
+    }
+    
+    .btn:hover,
+    .btn-primary:hover,
+    .btn-cta:hover {
+      background: #5a6fd8 !important;
+      color: #fff !important;
+    }
+    
+    input,
+    select,
+    textarea {
+      background: #fff !important;
+      color: #232946 !important;
+      border: 1px solid #d1d5db !important;
+    }
+    
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #6a82fb !important;
+      outline: none !important;
+      box-shadow: 0 0 0 2px rgba(106,130,251,0.2) !important;
+    }
+    
+    input::placeholder,
+    textarea::placeholder {
+      color: #6b7280 !important;
+    }
+    
+    /* Admin panel - PERMANENT WHITE THEME specific styles */
+    .admin-layout {
+      background: #f8fafc !important;
+    }
+    
+    .admin-sidebar {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-sidebar .logo {
+      color: #6a82fb !important;
+    }
+    
+    .admin-sidebar nav a {
+      color: #232946 !important;
+    }
+    
+    .admin-sidebar nav a:hover {
+      background: #f3f4f6 !important;
+      color: #6a82fb !important;
+    }
+    
+    .admin-sidebar nav a.active {
+      background: #6a82fb !important;
+      color: #fff !important;
+    }
+    
+    .admin-main {
+      background: #f8fafc !important;
+      color: #232946 !important;
+    }
+    
+    .admin-header {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-header h1 {
+      color: #232946 !important;
+    }
+    
+    .admin-content {
+      background: #f8fafc !important;
+      color: #232946 !important;
+    }
+    
+    .stats-grid {
+      background: #fff !important;
+    }
+    
+    .stat-card {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    .stat-card h3 {
+      color: #232946 !important;
+    }
+    
+    .stat-card .stat-value {
+      color: #6a82fb !important;
+    }
+    
+    .stat-card .stat-label {
+      color: #6b7280 !important;
+    }
+    
+    .admin-table {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-table th {
+      background: #f9fafb !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    .admin-table td {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    .admin-table tr:hover {
+      background: #f9fafb !important;
+    }
+    
+    .admin-form {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-form label {
+      color: #232946 !important;
+    }
+    
+    .admin-form input,
+    .admin-form select,
+    .admin-form textarea {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #d1d5db !important;
+    }
+    
+    .admin-form input:focus,
+    .admin-form select:focus,
+    .admin-form textarea:focus {
+      border-color: #6a82fb !important;
+      box-shadow: 0 0 0 2px rgba(106,130,251,0.2) !important;
+    }
+    
+    .admin-form input::placeholder,
+    .admin-form textarea::placeholder {
+      color: #6b7280 !important;
+    }
+    
+    .admin-modal {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-modal-header {
+      background: #f9fafb !important;
+      color: #232946 !important;
+    }
+    
+    .admin-modal-title {
+      color: #232946 !important;
+    }
+    
+    .admin-modal-body {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    .admin-modal-footer {
+      background: #f9fafb !important;
+      border-top-color: #e5e7eb !important;
+    }
+    
+    .admin-alert {
+      color: #232946 !important;
+    }
+    
+    .admin-alert-success {
+      background: #48bb78 !important;
+      color: #fff !important;
+    }
+    
+    .admin-alert-error {
+      background: #fc5c7d !important;
+      color: #fff !important;
+    }
+    
+    .admin-alert-warning {
+      background: #ffa726 !important;
+      color: #fff !important;
+    }
+    
+    .admin-alert-info {
+      background: #6a82fb !important;
+      color: #fff !important;
+    }
+    
+    .admin-badge {
+      color: #232946 !important;
+    }
+    
+    .admin-badge-success {
+      background: #48bb78 !important;
+      color: #fff !important;
+    }
+    
+    .admin-badge-error {
+      background: #fc5c7d !important;
+      color: #fff !important;
+    }
+    
+    .admin-badge-warning {
+      background: #ffa726 !important;
+      color: #fff !important;
+    }
+    
+    .admin-badge-info {
+      background: #6a82fb !important;
+      color: #fff !important;
+    }
+    
+    .admin-dropdown {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    .admin-dropdown-item {
+      color: #232946 !important;
+    }
+    
+    .admin-dropdown-item:hover {
+      background: #f9fafb !important;
+    }
+    
+    .admin-tooltip {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    /* Override any inline styles in admin panel */
+    [style*="color: #232946"] {
+      color: #232946 !important;
+    }
+    
+    [style*="color: #666"] {
+      color: #6b7280 !important;
+    }
+    
+    [style*="color: #999"] {
+      color: #6b7280 !important;
+    }
+    
+    [style*="background: #fff"] {
+      background: #fff !important;
+    }
+    
+    [style*="background: #f8f9ff"] {
+      background: #f9fafb !important;
+    }
+    
+    [style*="background: #f8fafc"] {
+      background: #f8fafc !important;
+    }
+    
+    [style*="border-color: #e0e7ff"] {
+      border-color: #e5e7eb !important;
+    }
+    
+    [style*="border-color: #d1d5db"] {
+      border-color: #d1d5db !important;
+    }
+    
+    /* Additional admin panel permanent white styles */
+    h1, h2, h3, h4, h5, h6 {
+      color: #232946 !important;
+    }
+    
+    p, span, div, label {
+      color: #232946 !important;
+    }
+    
+    a {
+      color: #6a82fb !important;
+    }
+    
+    a:hover {
+      color: #5a6fd8 !important;
+    }
+    
+    /* Table styles */
+    table {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    th {
+      background: #f9fafb !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    td {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    tr:hover {
+      background: #f9fafb !important;
+    }
+    
+    /* Notification dropdown styles */
+    #notifDropdown {
+      background: #fff !important;
+      color: #232946 !important;
+      border: 1px solid #e5e7eb !important;
+    }
+    
+    .notification-item {
+      background: #f9fafb !important;
+      color: #232946 !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    .notification-item:hover {
+      background: #f3f4f6 !important;
+    }
+    
+    /* Override any dark mode styles from global CSS */
+    body.dark-mode {
+      background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%) !important;
+      color: #232946 !important;
+    }
+    
+    body.dark-mode * {
+      color: inherit !important;
+    }
+    
+    body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, 
+    body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
+      color: #232946 !important;
+    }
+    
+    body.dark-mode p, body.dark-mode span, body.dark-mode div, 
+    body.dark-mode label, body.dark-mode td, body.dark-mode th {
+      color: #232946 !important;
+    }
+    
+    body.dark-mode .card, body.dark-mode .admin-card {
+      background: #fff !important;
+      color: #232946 !important;
+    }
+    
+    body.dark-mode input, body.dark-mode select, body.dark-mode textarea {
+      background: #fff !important;
+      color: #232946 !important;
+      border-color: #d1d5db !important;
+    }
+    
+    /* Admin panel specific styles */
+    body { margin: 0; font-family: 'Inter', sans-serif; }
+    .admin-layout { display: flex; min-height: 100vh; background: var(--pico-primary-background, #f4f6fb); }
+    .admin-sidebar {
+      width: 240px;
+      background: #232946;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 1rem 1rem 1rem;
+      gap: 1.5rem;
+      min-height: 100vh;
+    }
+    .admin-sidebar .logo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #6a82fb;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .admin-sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .admin-sidebar nav a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.08rem;
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .admin-sidebar nav a.active, .admin-sidebar nav a:hover {
+      background: #6a82fb;
+      color: #fff;
+    }
+    .admin-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #f4f6fb;
+      min-height: 100vh;
+    }
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 2.5rem 1.2rem 2rem;
+      background: #fff;
+      border-bottom: 1px solid #e0e7ff;
+      min-height: 64px;
+    }
+    .admin-header .admin-user {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .admin-header .admin-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #6a82fb;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .admin-dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin: 2.5rem 2rem 1.5rem 2rem;
+    }
+    .admin-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(100,100,255,0.07);
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.7rem;
+      min-height: 120px;
+    }
+    .admin-card .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #6a82fb;
+    }
+    .admin-card .card-value {
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: #232946;
+    }
+    .admin-section {
+      margin: 2rem 2rem 2.5rem 2rem;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(100,100,255,0.07);
+      padding: 2rem 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    @media (max-width: 900px) {
+      .admin-layout { flex-direction: column; }
+      .admin-sidebar { width: 100%; flex-direction: row; gap: 0.5rem; min-height: unset; padding: 1rem; }
+      .admin-sidebar nav { flex-direction: row; gap: 0.5rem; }
+      .admin-main { padding: 0; }
+      .admin-header { padding: 1rem; }
+      .admin-dashboard-cards, .admin-section { margin: 1rem; }
+    }
+    @media (max-width: 600px) {
+      .admin-dashboard-cards { grid-template-columns: 1fr; }
+      .admin-section { padding: 1rem; }
+
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar glassmorphic">
+    <div class="container nav-content">
+      <div class="nav-logo">
+        <img src="{{ url_for('static', filename='attached_assets/image_1750584670920.png') }}" alt="Logo">
+        <span>Admin Panel</span>
+      </div>
+      <ul class="nav-links">
+        
+        <li><a href="#about-us">About</a></li>
+        <li><a href="/study-resources">Study Resources</a></li>
+        <li><a href="/forum">Forum</a></li>
+        <li><a href="/admin/status-management">Status Management</a></li>
+        <li style="font-weight:600; color:#6a82fb; padding:0.4rem 1rem;">{{ username or 'Admin' }}</li>
+        <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+      </ul>
+      <button class="hamburger">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
+  </nav>
+  <main class="container main-content">
+    <!-- Admin Navigation -->
+    <section class="admin-section" style="margin-top:1rem; padding:1rem 1.2rem; background:#fff; border:1px solid #e5e7eb; border-radius:8px;">
+      <h3 style="margin:0 0 1rem 0; color:#6a82fb;">Quick Navigation</h3>
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+        <a href="#analytics" class="btn btn-secondary" style="font-size:0.9em; padding:0.5rem 1rem;">📊 Analytics</a>
+        <a href="#users" class="btn btn-secondary" style="font-size:0.9em; padding:0.5rem 1rem;">👥 Users</a>
+        <a href="#forum" class="btn btn-secondary" style="font-size:0.9em; padding:0.5rem 1rem;">📝 Content</a>
+        <a href="#resources" class="btn btn-secondary" style="font-size:0.9em; padding:0.5rem 1rem;">📚 Resources</a>
+        
+        <a href="#notifications" class="btn btn-secondary" style="font-size:0.9em; padding:0.5rem 1rem;">🔔 Notifications</a>
+        <a href="#queries" class="btn btn-secondary" style="font-size:0.9em; padding:0.5rem 1rem;">❓ Queries</a>
+        <a href="#sessions" class="btn btn-primary" style="font-size:0.9em; padding:0.5rem 1rem;">🔄 Sessions</a>
+      </div>
+    </section>
+    
+    <!-- Traffic & Active Users Tracker -->
+    <section class="admin-section" style="margin-top:1rem; padding:1rem 1.2rem; display:flex; gap:0.8rem; align-items:center; justify-content:flex-start; background:#fff; border:1px solid #e5e7eb;">
+      <div style="font-weight:700; color:#6a82fb;">Traffic</div>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <div style="background:#f3f6fa; padding:0.5rem 0.8rem; border-radius:10px;">
+          <span style="color:#6b7280;">Active IPs (10m):</span>
+          <strong id="metricActiveIps">--</strong>
+        </div>
+        <div style="background:#f3f6fa; padding:0.5rem 0.8rem; border-radius:10px;">
+          <span style="color:#6b7280;">Active logins (10m):</span>
+          <strong id="metricActiveUsers">--</strong>
+        </div>
+        <div style="background:#f3f6fa; padding:0.5rem 0.8rem; border-radius:10px;">
+          <span style="color:#6b7280;">Unique IPs (today):</span>
+          <strong id="metricIpsToday">--</strong>
+        </div>
+        <div style="background:#f3f6fa; padding:0.5rem 0.8rem; border-radius:10px;">
+          <span style="color:#6b7280;">Unique IPs (all):</span>
+          <strong id="metricIpsAll">--</strong>
+        </div>
+      </div>
+    </section>
+    <section id="analytics" class="admin-section" aria-label="Analytics">
+      <h2>Analytics & Reports</h2>
+      <div class="admin-dashboard-cards" style="margin:0 0 2rem 0;">
+        <div class="admin-card"><div class="card-title">Total Users</div><div class="card-value">{{ total_users }}</div></div>
+        <div class="admin-card"><div class="card-title">Forum Posts</div><div class="card-value">{{ total_forum_posts }}</div></div>
+        <div class="admin-card"><div class="card-title">Resources</div><div class="card-value">{{ total_resources }}</div></div>
+        <div class="admin-card"><div class="card-title">Classes</div><div class="card-value">{{ total_classes }}</div></div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:2rem; margin-bottom:2rem;">
+        <div style="flex:1; min-width:260px;">
+          <h3 style="margin-bottom:0.7rem;">Most Active Users (Forum)</h3>
+          <table style="width:100%; border-collapse:collapse;">
+            <thead><tr style="background:#f3f6fa;"><th style="padding:0.5rem 1rem; text-align:left;">Username</th><th style="padding:0.5rem 1rem; text-align:left;">Posts</th></tr></thead>
+            <tbody>
+              {% for username, count in most_active_users %}
+              <tr><td style="padding:0.5rem 1rem;">{{ username }}</td><td style="padding:0.5rem 1rem;">{{ count }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div style="flex:1; min-width:260px;">
+          <h3 style="margin-bottom:0.7rem;">Most Resources by Class</h3>
+          <table style="width:100%; border-collapse:collapse;">
+            <thead><tr style="background:#f3f6fa;"><th style="padding:0.5rem 1rem; text-align:left;">Class</th><th style="padding:0.5rem 1rem; text-align:left;">Resources</th></tr></thead>
+            <tbody>
+              {% for cid, count in most_resource_classes %}
+              <tr><td style="padding:0.5rem 1rem;">{% for id, name in all_classes %}{% if id == cid %}{{ name|title }}{% endif %}{% endfor %}</td><td style="padding:0.5rem 1rem;">{{ count }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-bottom:1.5rem;">
+        <a href="/admin/download/users" class="btn btn-primary" style="margin-right:0.7rem;">Download Users CSV</a>
+        <a href="/admin/download/forum" class="btn btn-primary" style="margin-right:0.7rem;">Download Forum CSV</a>
+        <a href="/admin/download/resources" class="btn btn-primary">Download Resources CSV</a>
+      </div>
+    </section>
+    <section id="dashboard" class="admin-dashboard-cards" aria-label="Quick stats">
+      <div class="admin-card"><div class="card-title">Users</div><div class="card-value" id="adminUsersCount">--</div></div>
+      <div class="admin-card"><div class="card-title">Forum Posts</div><div class="card-value" id="adminForumCount">--</div></div>
+      <div class="admin-card"><div class="card-title">Classes</div><div class="card-value" id="adminClassesCount">--</div></div>
+      <div class="admin-card"><div class="card-title">Resources</div><div class="card-value" id="adminResourcesCount">--</div></div>
+      <div class="admin-card"><div class="card-title">Notifications</div><div class="card-value" id="adminNotifCount">--</div></div>
+    </section>
+    <section id="users" class="admin-section" aria-label="User management">
+      <h2>User Management</h2>
+      <p style="color: #666; margin-bottom: 1.5rem;">Create and manage user accounts with comprehensive tools and statistics.</p>
+      <a href="/admin/create-user" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">👥 User Management Dashboard</a>
+      <p style="color: #666; margin-bottom: 1rem;">Access the comprehensive user management interface with advanced search, filtering, and user statistics.</p>
+      
+      <!-- Quick User Stats -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Total Users</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ users|length }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Paid Users</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ paid_users|default(0) }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Admin Users</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ admin_users|default(0) }}</p>
+        </div>
+      </div>
+    </section>
+    <section id="forum" class="admin-section" aria-label="Forum moderation">
+      <h2>Content Management</h2>
+      <p style="color: #666; margin-bottom: 1.5rem;">Comprehensive management of forum topics, discussions, and content moderation.</p>
+      <a href="/content-management" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">📝 Content Management Dashboard</a>
+      <a href="/admin/home-editor" class="btn btn-secondary" style="margin-left:0.5rem; margin-bottom:1.2rem; display:inline-block;">🏠 Home Page Editor</a>
+      <p style="color: #666; margin-bottom: 1rem;">Access the new comprehensive content management interface with advanced filtering, analytics, and moderation tools.</p>
+      
+      <!-- Quick Overview -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Forum Topics</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ all_topics|length }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Forum Messages</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ forum_messages|length }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Active Classes</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ all_classes|length }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Countdown Page Management Section -->
+    <section id="countdown" class="admin-section" aria-label="Countdown page management">
+      <h2>🎯 Countdown Page Management</h2>
+      <p style="color: #666; margin-bottom: 1.5rem;">Customize your website launch countdown page and gate animation settings.</p>
+      <a href="/admin/countdown" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">⚙️ Manage Countdown</a>
+      <p style="color: #666; margin-bottom: 1rem;">Set launch date, customize messages, background colors, and enable/disable the gate opening animation.</p>
+      
+      <!-- Quick Countdown Stats -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Countdown Status</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;" id="countdownStatus">Loading...</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Launch Date</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;" id="launchDate">Loading...</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Gate Animation</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;" id="gateStatus">Loading...</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="resources" class="admin-section" aria-label="Resource management">
+      <h2>Resource Management</h2>
+      <a href="/upload-resource" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">📁 Resource Management</a>
+      <p style="color: #666; margin-bottom: 1rem;">Use Resource Management to upload individually or use the Bulk Upload tab for Excel-based uploads.</p>
+    </section>
+    
+    <section id="notifications" class="admin-section" aria-label="Notifications">
+      <h2>Notifications & Announcements</h2>
+      <a href="/send-notification" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">+ Send Notification</a>
+      <!-- Notification history table removed; now on send notification page -->
+    </section>
+    <!-- Query Management Section -->
+    <section id="queries" class="admin-section" aria-label="Query management">
+      <h2>Query Management</h2>
+      <p style="color: #666; margin-bottom: 1.5rem;">View and respond to user queries, support requests, and feedback submissions.</p>
+      <a href="/query-management" class="btn btn-primary" style="margin-bottom:1.2rem; display:inline-block;">📋 Query Management Dashboard</a>
+      <p style="color: #666; margin-bottom: 1rem;">Access the comprehensive query management interface to view, filter, and respond to user queries with advanced tools.</p>
+      
+      <!-- Quick Query Stats -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Total Queries</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ total_queries|default(0) }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Pending Queries</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ pending_queries|default(0) }}</p>
+        </div>
+        <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; border: 1px solid #e0e7ff;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #6a82fb;">Resolved Queries</h4>
+          <p style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #232946;">{{ resolved_queries|default(0) }}</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Session Management Section -->
+    <section id="sessions" class="admin-section" aria-label="Session management">
+      <h2>🔄 Active Sessions</h2>
+      <p style="color:#666; margin-bottom:2rem;">Monitor and manage active user sessions. Only one session per user is allowed.</p>
+      
+      <div style="margin-bottom: 1rem;">
+        <button onclick="refreshSessions()" class="btn btn-primary">🔄 Refresh Sessions</button>
+        <span id="sessionsCount" style="margin-left: 1rem; font-weight: 600; color: #6a82fb;">Loading...</span>
+      </div>
+      
+      <div id="sessionsTable" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <thead>
+            <tr style="background: #6a82fb; color: #fff;">
+              <th style="padding: 12px; text-align: left; border: none;">User</th>
+              <th style="padding: 12px; text-align: left; border: none;">IP Address</th>
+              <th style="padding: 12px; text-align: left; border: none;">User Agent</th>
+              <th style="padding: 12px; text-align: left; border: none;">Created</th>
+              <th style="padding: 12px; text-align: left; border: none;">Last Activity</th>
+              <th style="padding: 12px; text-align: center; border: none;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sessionsTableBody">
+            <tr>
+              <td colspan="6" style="padding: 20px; text-align: center; color: #666;">Loading sessions...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script>
+    // Admin traffic metrics fetcher
+    async function refreshTrafficMetrics(){
+      try {
+        const res = await fetch('/api/admin/metrics/traffic');
+        const json = await res.json();
+        if(json && json.success){
+          const d = json.data || {};
+          document.getElementById('metricActiveIps').textContent = d.active_ips_now ?? '--';
+          document.getElementById('metricActiveUsers').textContent = d.active_logged_in_users ?? '--';
+          document.getElementById('metricIpsToday').textContent = d.unique_ips_today ?? '--';
+          document.getElementById('metricIpsAll').textContent = d.total_unique_ips ?? '--';
+        }
+      } catch(e){ console.error('Traffic metrics error', e); }
+    }
+    
+    // Session management functions
+    async function refreshSessions() {
+      try {
+        const res = await fetch('/api/admin/sessions');
+        const json = await res.json();
+        
+        if (json && json.success) {
+          const sessions = json.data || [];
+          displaySessions(sessions);
+          document.getElementById('sessionsCount').textContent = `${sessions.length} Active Sessions`;
+        } else {
+          console.error('Failed to fetch sessions:', json.error);
+          document.getElementById('sessionsTableBody').innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: #ff4444;">Error loading sessions</td></tr>';
+        }
+      } catch (e) {
+        console.error('Sessions fetch error:', e);
+        document.getElementById('sessionsTableBody').innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: #ff4444;">Network error</td></tr>';
+      }
+    }
+    
+    function displaySessions(sessions) {
+      const tbody = document.getElementById('sessionsTableBody');
+      
+      if (sessions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: #666;">No active sessions</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = sessions.map(session => `
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 12px; border: none;">
+            <strong>${session.username}</strong><br>
+            <small style="color: #666;">ID: ${session.user_id}</small>
+          </td>
+          <td style="padding: 12px; border: none;">
+            <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 0.9em;">${session.ip_address}</code>
+          </td>
+          <td style="padding: 12px; border: none;">
+            <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${session.user_agent}">
+              ${session.user_agent || 'Unknown'}
+            </div>
+          </td>
+          <td style="padding: 12px; border: none;">
+            <small>${formatDateTime(session.created_at)}</small>
+          </td>
+          <td style="padding: 12px; border: none;">
+            <small>${formatDateTime(session.last_activity)}</small>
+          </td>
+          <td style="padding: 12px; border: none; text-align: center;">
+            <button onclick="forceLogout(${session.user_id}, '${session.username}')" 
+                    class="btn" 
+                    style="background: #ef4444; color: #fff; padding: 6px 12px; font-size: 0.9em; border: none; border-radius: 4px; cursor: pointer;">
+              🚪 Force Logout
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    async function forceLogout(userId, username) {
+      if (!confirm(`Are you sure you want to force logout ${username}?`)) {
+        return;
+      }
+      
+      try {
+        const res = await fetch(`/api/admin/sessions/force-logout/${userId}`, {
+          method: 'POST'
+        });
+        const json = await res.json();
+        
+        if (json && json.success) {
+          alert(`Successfully force logged out ${username}`);
+          refreshSessions(); // Refresh the table
+        } else {
+          alert(`Failed to force logout: ${json.error || 'Unknown error'}`);
+        }
+      } catch (e) {
+        console.error('Force logout error:', e);
+        alert('Network error while force logging out user');
+      }
+    }
+    
+    function formatDateTime(dateTimeStr) {
+      if (!dateTimeStr) return 'Unknown';
+      try {
+        const dt = new Date(dateTimeStr);
+        return dt.toLocaleString();
+      } catch {
+        return dateTimeStr;
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function(){
+      refreshTrafficMetrics();
+      setInterval(refreshTrafficMetrics, 30000); // refresh every 30s
+      
+      // Load sessions on page load
+      refreshSessions();
+      
+      // Load countdown stats
+      loadCountdownStats();
+    });
+    
+    // Load countdown statistics
+    async function loadCountdownStats() {
+      try {
+        const response = await fetch('/admin/countdown/settings');
+        if (response.ok) {
+          const settings = await response.json();
+          
+          // Update countdown status
+          const statusElement = document.getElementById('countdownStatus');
+          if (statusElement) {
+            const status = settings.is_active ? 'Active' : 'Inactive';
+            statusElement.textContent = status;
+            statusElement.style.color = settings.is_active ? '#059669' : '#dc2626';
+          }
+          
+          // Update launch date
+          const dateElement = document.getElementById('launchDate');
+          if (dateElement && settings.launch_date) {
+            const date = new Date(settings.launch_date);
+            dateElement.textContent = date.toLocaleDateString();
+          }
+          
+          // Update gate animation status
+          const gateElement = document.getElementById('gateStatus');
+          if (gateElement) {
+            const gateStatus = settings.gate_animation_enabled ? 'Enabled' : 'Disabled';
+            gateElement.textContent = gateStatus;
+            gateElement.style.color = settings.gate_animation_enabled ? '#059669' : '#dc2626';
+          }
+        }
+      } catch (error) {
+        console.error('Error loading countdown stats:', error);
+      }
+    }
+    
+    // Force light mode for admin panel - aggressive prevention
+    function forceLightMode() {
+      // Remove any dark mode class
+      document.body.classList.remove('dark-mode');
+      // Clear any dark mode preference
+      localStorage.removeItem('darkMode');
+      localStorage.removeItem('adminDarkMode');
+      // Ensure light mode is set
+      document.body.classList.add('light-mode');
+    }
+    
+    // Run immediately
+    forceLightMode();
+    
+    // Run on DOM content loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      forceLightMode();
+    });
+    
+    // Run periodically to prevent dark mode from being applied
+    setInterval(forceLightMode, 1000);
+    
+    // Override any dark mode toggle attempts
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'darkModeToggle' || e.target.closest('#darkModeToggle')) {
+        e.preventDefault();
+        e.stopPropagation();
+        forceLightMode();
+        return false;
+      }
+    });
+    
+    // Mega dropdown functionality (copied from homepage)
+
+    
+    
+    // Hamburger menu (copied from homepage)
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    if (hamburger && navLinks) {
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+      });
+    }
+    
+ 
+  </script>
+</body>
+</html> 

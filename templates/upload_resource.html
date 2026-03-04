@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Resource - Admin</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='bulk_upload/bulk_upload.css') }}">
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin-modern.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Upload Resource Page - Admin Light Theme */
+    body {
+      background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%) !important;
+      color: #232946 !important;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Beautiful 4-Column Resource Grid */
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Responsive Grid */
+    @media (max-width: 1200px) {
+      .resource-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .resource-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .resource-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+
+    /* Enhanced Resource Cards - Admin Theme */
+    .resource-card {
+      background: #fff !important;
+      border: 1px solid #e5e7eb !important;
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .resource-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(106, 130, 251, 0.1), transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    .resource-card:hover::before {
+      left: 100%;
+    }
+
+    .resource-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(106, 130, 251, 0.15) !important;
+      border-color: rgba(106, 130, 251, 0.3) !important;
+    }
+
+    .resource-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: #232946 !important;
+      line-height: 1.3;
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .resource-card p {
+      color: #6b7280 !important;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+
+    .resource-card p strong {
+      color: #232946 !important;
+      font-weight: 600;
+    }
+
+    /* Resource Status Badges */
+    .resource-status {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .resource-status.status-paid {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .resource-status.status-unpaid {
+      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+    }
+
+    /* Action Buttons */
+    .resource-card .btn-primary,
+    .resource-card .btn-secondary {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      margin: 0.25rem;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .resource-card .btn-primary {
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(106, 130, 251, 0.3);
+    }
+
+    .resource-card .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(106, 130, 251, 0.4);
+    }
+
+    .resource-card .btn-secondary {
+      background: rgba(255, 255, 255, 0.8);
+      color: #64748b;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .resource-card .btn-secondary:hover {
+      background: rgba(106, 130, 251, 0.1);
+      color: #6a82fb;
+      border-color: rgba(106, 130, 251, 0.3);
+    }
+
+    /* Glass Card Enhancements - Admin Theme */
+    .glass-card {
+      background: #fff !important;
+      border: 1px solid #e5e7eb !important;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+    }
+
+    /* Filter Controls Enhancement - Admin Theme */
+    .filter-controls {
+      background: #fff !important;
+      border: 1px solid #e5e7eb !important;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+    }
+
+    .filter-controls h3 {
+      color: #232946 !important;
+    }
+
+    .filter-controls label {
+      color: #232946 !important;
+    }
+
+    .filter-controls select,
+    .filter-controls input {
+      background: #fff !important;
+      border: 1px solid #d1d5db !important;
+      color: #232946 !important;
+    }
+
+    .filter-controls select:focus,
+    .filter-controls input:focus {
+      outline: none;
+      border-color: #6a82fb !important;
+      box-shadow: 0 0 0 2px rgba(106,130,251,0.2) !important;
+    }
+
+    /* Tab Styling Enhancement - Admin Theme */
+    .tab-btn {
+      background: #fff !important;
+      color: #232946 !important;
+      border: 1px solid #e5e7eb !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab-btn:hover,
+    .tab-btn.active {
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%) !important;
+      color: white !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(106, 130, 251, 0.3);
+    }
+
+    /* Tab Button Hover Effects - Admin Theme */
+    .tab-btn:hover:not(.active) {
+      background: #f9fafb !important;
+      color: #6a82fb !important;
+      border-color: rgba(106, 130, 251, 0.3) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(106, 130, 251, 0.2);
+    }
+
+    /* Additional Enhancements */
+    .resource-card {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .resource-card:nth-child(1) { animation-delay: 0.1s; }
+    .resource-card:nth-child(2) { animation-delay: 0.2s; }
+    .resource-card:nth-child(3) { animation-delay: 0.3s; }
+    .resource-card:nth-child(4) { animation-delay: 0.4s; }
+    .resource-card:nth-child(5) { animation-delay: 0.5s; }
+    .resource-card:nth-child(6) { animation-delay: 0.6s; }
+    .resource-card:nth-child(7) { animation-delay: 0.7s; }
+    .resource-card:nth-child(8) { animation-delay: 0.8s; }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Enhanced Header Section - Admin Theme */
+    .header-section {
+      background: #fff !important;
+      border: 1px solid #e5e7eb !important;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+    }
+
+    .header-section h1 {
+      color: #232946 !important;
+    }
+
+    .header-section p {
+      color: #6b7280 !important;
+    }
+
+    .uiverse-stat-chip {
+      background: rgba(106, 130, 251, 0.1) !important;
+      color: #6a82fb !important;
+      border: 1px solid rgba(106, 130, 251, 0.2) !important;
+    }
+
+    /* Tab Container Enhancement - Admin Theme */
+    .tab-container {
+      background: #fff !important;
+      border: 1px solid #e5e7eb !important;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07) !important;
+    }
+
+    /* Empty State Styling - Admin Theme */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: #6b7280;
+      background: #fff;
+      border-radius: 16px;
+      border: 2px dashed #e5e7eb;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.07);
+    }
+
+    .empty-state h3 {
+      color: #232946;
+      margin-bottom: 1rem;
+    }
+
+    /* Loading States */
+    .resource-card.loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .resource-card.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid rgba(106, 130, 251, 0.3);
+      border-top-color: #6a82fb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Success Animation */
+    .resource-card.success {
+      animation: successPulse 0.6s ease-out;
+    }
+
+    @keyframes successPulse {
+      0% {
+        transform: scale(1);
+        background: rgba(16, 185, 129, 0.1);
+      }
+      50% {
+        transform: scale(1.05);
+        background: rgba(16, 185, 129, 0.2);
+      }
+      100% {
+        transform: scale(1);
+        background: rgba(255, 255, 255, 0.95);
+      }
+    }
+
+    /* Enhanced Modal styles for Edit Resource Dialog */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      animation: modalFadeIn 0.3s ease-out;
+    }
+    
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    .modal-content {
+      background: #fff !important;
+      margin: 3% auto;
+      padding: 0;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+      animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid #e5e7eb !important;
+    }
+    
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-60px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    .modal-header {
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .modal-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .close {
+      color: white;
+      font-size: 2.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 1;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .close:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+    
+    .modal-content form {
+      padding: 2.5rem;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #232946 !important;
+      font-size: 0.95rem;
+    }
+    
+    .form-group label i {
+      margin-right: 0.5rem;
+      color: #6a82fb;
+      width: 16px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 2px solid #d1d5db !important;
+      border-radius: 12px;
+      font-size: 1rem;
+      background: #fff !important;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+      color: #232946 !important;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #6a82fb !important;
+      box-shadow: 0 0 0 2px rgba(106,130,251,0.2) !important;
+      background: #fff !important;
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-actions .btn-primary,
+    .modal-actions .btn-secondary {
+      padding: 0.8rem 2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+    
+    .modal-actions .btn-primary {
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(106, 130, 251, 0.3);
+    }
+    
+    .modal-actions .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(106, 130, 251, 0.4);
+    }
+    
+    .modal-actions .btn-secondary {
+      background: #fff !important;
+      color: #6b7280 !important;
+      border: 2px solid #e5e7eb !important;
+    }
+    
+    .modal-actions .btn-secondary:hover {
+      background: #f9fafb !important;
+      color: #6a82fb !important;
+      border-color: rgba(106, 130, 251, 0.3) !important;
+    }
+    
+    /* Flash message styles */
+    .flash-message {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      color: #fff;
+    }
+    
+    .flash-error {
+      background: #fc5c7d;
+    }
+    
+    .flash-success {
+      background: #28a745;
+    }
+    
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background: #1a1a2e;
+      color: #fff;
+    }
+    
+    body.dark-mode .upload-container {
+      background: #232946;
+    }
+    
+    body.dark-mode .header-section h1 {
+      color: #fff;
+    }
+    
+    body.dark-mode .header-section p {
+      color: #b8c5d6;
+    }
+    
+    body.dark-mode .tab-container {
+      background: #2a2a3a;
+    }
+    
+    body.dark-mode .tab-btn {
+      color: #b8c5d6;
+    }
+    
+    body.dark-mode .tab-btn.active {
+      background: #6a82fb;
+      color: #fff;
+    }
+    
+    body.dark-mode .tab-btn:hover:not(.active) {
+      background: rgba(106,130,251,0.2);
+    }
+    
+    body.dark-mode .tab-content {
+      background: #232946;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.15);
+    }
+    
+    body.dark-mode .form-group label {
+      color: #fff;
+    }
+    
+    body.dark-mode .form-group input,
+    body.dark-mode .form-group select,
+    body.dark-mode .form-group textarea {
+      background: #1a1a2e;
+      border-color: #3a3a4a;
+      color: #fff;
+    }
+    
+    body.dark-mode .form-group input:focus,
+    body.dark-mode .form-group select:focus,
+    body.dark-mode .form-group textarea:focus {
+      border-color: #6a82fb;
+    }
+    
+    body.dark-mode .resource-card {
+      background: #2a2a3a;
+      border-color: #3a3a4a;
+    }
+    
+    body.dark-mode .file-upload-area {
+      border-color: #3a3a4a;
+      background: #1a1a2e;
+    }
+    
+    body.dark-mode .file-upload-area:hover {
+      border-color: #6a82fb;
+      background: #2a2a3a;
+    }
+    
+    body.dark-mode .modal-content {
+      background: #232946;
+    }
+    
+    body.dark-mode .modal-content form {
+      background: #232946;
+    }
+
+    /* Enhanced Tab Button Styles */
+    .tab-btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .tab-btn:hover::before {
+      left: 100%;
+    }
+
+    .tab-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .tab-btn.active {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(106, 130, 251, 0.4);
+    }
+
+    /* Responsive tab buttons */
+    @media (max-width: 768px) {
+      .tab-container {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .tab-btn {
+        width: 100%;
+        text-align: center;
+        padding: 1rem;
+      }
+    }
+
+    /* Upload dialog modal improvements */
+    .upload-modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+    }
+
+    .upload-modal-content {
+      background: linear-gradient(135deg, #232946 0%, #1a1a2e 100%);
+      margin: 5% auto;
+      padding: 0;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      animation: modalSlideIn 0.4s ease-out;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .upload-modal-header {
+      background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .upload-modal-header h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .upload-close {
+      color: white;
+      font-size: 2.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0.5rem;
+      border-radius: 50%;
+    }
+
+    .upload-close:hover {
+      background: rgba(255,255,255,0.2);
+      transform: rotate(90deg);
+    }
+  </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='floating-navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='uiverse-components.css') }}">
+</head>
+<body>
+  <nav class="navbar glassmorphic">
+    <div class="container nav-content">
+      <div class="nav-logo">
+        <img src="{{ url_for('static', filename='attached_assets/image_1750584670920.png') }}" alt="Logo">
+        <span>Admin Panel</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/admin">Dashboard</a></li>
+        {% if username %}
+        <li class="profile-dropdown">
+          <a href="#" id="profileLink">{{ username }} ▾</a>
+          <div class="profile-dropdown-menu" id="profileDropdown">
+            <a href="/profile" class="dropdown-item">My Profile</a>
+            <a href="/notifications" class="dropdown-item">Notifications</a>
+            <a href="/logout" class="dropdown-item">Logout</a>
+          </div>
+        </li>
+        {% else %}
+        <li><a href="/auth" class="btn-primary">Login</a></li>
+        {% endif %}
+      </ul>
+      <button class="hamburger">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="container main-content">
+    <div class="upload-container">
+      <a href="/admin" class="back-link">&larr; Back to Admin Panel</a>
+      
+      <div class="header-section glass-card" style="border-radius:16px; padding:1.5rem; margin-bottom:1.2rem;">
+        <h1 style="margin:0; background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">📁 Resource Management</h1>
+        <p style="margin:0.5rem 0 0 0; color: var(--text-color); opacity:0.8;">Upload, schedule, and manage all your educational resources</p>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.8rem;">
+          <span class="uiverse-stat-chip">📦 Total: {{ resources|length if resources else 0 }}</span>
+          <span class="uiverse-stat-chip">🗂️ Categories: {{ categories|length if categories else 0 }}</span>
+          <span class="uiverse-stat-chip">🏫 Classes: {{ all_classes|length if all_classes else 0 }}</span>
+        </div>
+      </div>
+      
+      <div class="tab-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; padding: 1rem; background: #fff; border-radius: 16px; border: 1px solid #e5e7eb;">
+        <button class="tab-btn active" onclick="showTab('upload')" style="background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(106,130,251,0.3);">📤 Upload</button>
+        <button class="tab-btn" onclick="showTab('resources-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🗂️ Resources</button>
+        <button class="tab-btn" onclick="showTab('categories-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📁 Categories</button>
+        <button class="tab-btn" onclick="showTab('settings-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">⚙️ Settings</button>
+        <button class="tab-btn" onclick="showTab('bulk-upload')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🚀 Bulk Upload</button>
+        <button class="tab-btn" onclick="showTab('smart-upload-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">🤖 Smart Upload</button>
+        <button class="tab-btn" onclick="showTab('analytics-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📊 Analytics</button>
+        <button class="tab-btn" onclick="showTab('scheduled-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">⏰ Scheduled</button>
+        <button class="tab-btn" onclick="showTab('history-tab')" style="background: #fff; color: #232946; border: 1px solid #e5e7eb; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📚 History</button>
+      </div>
+      
+      <!-- Upload Resource Tab -->
+      <div id="upload-tab" class="tab-content active">
+      <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="margin:0;">Upload New Resource</h2>
+        <button onclick="openUploadModal()" class="btn btn-primary" style="background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(106,130,251,0.3);">
+          📤 Quick Upload
+        </button>
+      </div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+              <div class="flash-message flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+      {% endif %}
+      {% endwith %}
+      <form method="POST" action="/upload-resource" enctype="multipart/form-data" class="login-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="title">Resource Title *</label>
+              <input type="text" id="title" name="title" placeholder="e.g., Algebra Chapter 5 Notes" required>
+            </div>
+            <div class="form-group">
+              <label for="category">Category *</label>
+              <select id="category" name="category" required>
+                <option value="">Select Category</option>
+                <!-- Default Categories -->
+                <option value="notes">Notes</option>
+                <option value="worksheet">Worksheet</option>
+                <option value="formula">Formula Sheet</option>
+                <option value="practice_test">Practice Test</option>
+                <option value="reference_book">Reference Book</option>
+                <option value="video">Video</option>
+                <option value="other">Other</option>
+                <!-- Dynamic Categories -->
+                {% for category in categories %}
+                  <option value="{{ category[1] }}">{{ category[1] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="class_id">Target Class *</label>
+              <select id="class_id" name="class_id" required>
+                <option value="">Select Class</option>
+          {% for id, name in all_classes %}
+            <option value="{{ id }}">{{ name|title }}</option>
+          {% endfor %}
+        </select>
+            </div>
+            <div class="form-group">
+              <label for="paid_status">Paid Status</label>
+              <select id="paid_status" name="paid_status">
+                <option value="unpaid">Free</option>
+                <option value="paid">Paid</option>
+        </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Brief description of the resource content..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="schedule_date">Schedule Upload (Optional)</label>
+            <input type="datetime-local" id="schedule_date" name="schedule_date">
+            <small style="color: #666;">Leave empty to upload immediately</small>
+          </div>
+          
+          <div class="file-upload-area" id="fileUploadArea">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
+            <h3>Drop files here or click to upload</h3>
+            <p style="color: #666; margin-bottom: 1rem;">Supports PDF, DOC, PPT, MP4, and other educational formats</p>
+            <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.jpg,.jpeg,.png" required style="display: none;">
+            <button type="button" class="btn-primary" onclick="document.getElementById('file').click()">Choose File</button>
+          </div>
+          
+          <div id="fileInfo" style="display: none; background: #f8f9ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+            <strong>Selected File:</strong> <span id="fileName"></span>
+          </div>
+          
+        <div style="margin:1rem 0; display:flex; align-items:center; gap:0.6rem; color:#9ca3af;">
+          <span style="height:1px; background:#e5e7eb; flex:1;"></span>
+          <span>or</span>
+          <span style="height:1px; background:#e5e7eb; flex:1;"></span>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="resource_url">Upload via URL / Google Drive Link</label>
+            <input type="url" id="resource_url" name="resource_url" placeholder="Paste public URL or Google Drive share link here">
+            <small style="color:#6b7280;">Make sure the link is publicly accessible. For Google Drive, set sharing to "Anyone with the link".</small>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top:1rem;">Upload Resource</button>
+      </form>
+      </div>
+      </div>
+
+      <!-- Resources Tab -->
+      <div id="resources-tab" class="tab-content">
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+          <h2 style="margin-top:0;">Resources</h2>
+          <div class="filter-controls" style="background: #f8f9ff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #e0e7ff;">
+            <h3 style="margin-bottom: 1rem; color: #232946;">Sort & Filter Resources</h3>
+            <div class="filter-controls" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+              <div>
+                <label for="sortBy" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Sort By:</label>
+                <select id="sortBy" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
+                  <option value="filename">File Name</option>
+                  <option value="title">Title</option>
+                  <option value="class">Class</option>
+                  <option value="category">Category</option>
+                  <option value="date">Upload Date</option>
+                </select>
+              </div>
+              <div>
+                <label for="filterClass" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Filter by Class:</label>
+                <select id="filterClass" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
+                  <option value="">All Classes</option>
+                  {% for cid, cname in all_classes %}
+                  <option value="{{ cid }}">{{ cname|title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div>
+                <label for="filterCategory" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Filter by Category:</label>
+                <select id="filterCategory" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
+                  <option value="">All Categories</option>
+                  <option value="notes">Notes</option>
+                  <option value="worksheet">Worksheet</option>
+                  <option value="formula">Formula Sheet</option>
+                  <option value="practice_test">Practice Test</option>
+                  <option value="reference_book">Reference Book</option>
+                  <option value="video">Video</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label for="searchText" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #232946;">Search:</label>
+                <input type="text" id="searchText" placeholder="Search by title, filename, or description..." style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e7ff; border-radius: 8px; font-size: 1rem;">
+              </div>
+            </div>
+            <div class="filter-buttons" style="margin-top:1rem; display:flex; gap:.5rem; flex-wrap:wrap;">
+              <button onclick="applyFilters()" class="btn-primary">Apply Filters</button>
+              <button onclick="clearFilters()" class="btn-secondary">Clear Filters</button>
+              <button onclick="exportFilteredResults()" class="export-btn">Export Results</button>
+            </div>
+            <div id="filterResults" style="margin-top: 1rem; padding: 0.8rem; background: #e8f5e8; border-radius: 8px; display: none;">
+              <span id="resultCount" style="font-weight: 600; color: #155724;"></span>
+            </div>
+          </div>
+          <div class="resource-grid" id="resourcesGrid">
+            {% for r in resources %}
+            {% set filename = r[1] %}
+            {% set class_id = r[2] %}
+            {% set filepath = r[3] %}
+            {% set title = r[4] %}
+            {% set description = r[5] %}
+            {% set category = r[6] %}
+            <div class="resource-card" 
+                 data-filename="{{ filename }}" 
+                 data-title="{{ title or filename }}" 
+                 data-class="{{ class_id }}" 
+                 data-category="{{ category }}"
+                 data-description="{{ description or '' }}"
+                 data-class-name="{% for cid, cname in all_classes %}{% if cid == class_id %}{{ cname|title }}{% endif %}{% endfor %}">
+              <span class="resource-status {% if category in ['worksheet', 'formula'] %}status-paid{% else %}status-unpaid{% endif %}">
+                {% if category in ['worksheet', 'formula'] %}Paid{% else %}Free{% endif %}
+              </span>
+              <h3>{{ title or filename }}</h3>
+              <p><strong>File:</strong> {{ filename }}</p>
+              <p><strong>Category:</strong> {{ category|title }}</p>
+              <p><strong>Class:</strong> 
+                {% for cid, cname in all_classes %}{% if cid == class_id %}{{ cname|title }}{% endif %}{% endfor %}
+              </p>
+              {% if description %}
+              <p><strong>Description:</strong> {{ description[:100] }}{% if description|length > 100 %}...{% endif %}</p>
+              {% endif %}
+              <div style="margin-top: 1rem;">
+                <a href="/preview/{{ filename }}" class="btn-primary">Preview Document</a>
+                <button class="btn-secondary edit-resource-btn" 
+                        data-filename="{{ filename }}" 
+                        data-class-id="{{ class_id }}" 
+                        data-category="{{ category }}" 
+                        data-title="{{ title or filename }}" 
+                        data-description="{{ description or '' }}">Edit</button>
+                <form method="POST" action="/admin/delete-resource/{{ filename }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this resource?');">
+                  <button type="submit" class="btn-secondary">Delete</button>
+                </form>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      
+
+      
+      <!-- Bulk Upload Tab -->
+      <div id="bulk-upload-tab" class="tab-content">
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+        <h2 style="margin-top:0;">Bulk Upload Study Resources</h2>
+        <div class="bulk-upload-container">
+          <!-- Excel Upload Section -->
+          <div class="excel-upload-section">
+            <div class="upload-area" id="excel-upload-area">
+              <input type="file" id="excel-input" accept=".xlsx,.xls" style="display:none">
+              <div class="upload-icon" style="font-size:2rem;margin-bottom:0.5rem;">📄</div>
+              <h3>Bulk Upload from xlsx Folder or Drag & Drop Excel</h3>
+              <p>Place your Excel file in the <b>xlsx</b> folder in the project directory, or drag and drop it here.</p>
+              <button class="btn btn-secondary" id="scan-xlsx-btn">Scan xlsx Folder</button>
+              <div id="xlsx-file-list" style="margin-top:1rem;"></div>
+            </div>
+
+            <div class="template-download" style="margin-top:1rem;">
+              <h4>Download Template</h4>
+              <p>Use our Excel template to ensure correct format for study resources</p>
+              <button class="btn btn-outline" id="download-template-btn">Download Study Resources Template</button>
+            </div>
+          </div>
+
+          <!-- File Preview Section -->
+          <div class="file-preview" id="file-preview" style="display: none;">
+            <h4>Study Resources to Upload</h4>
+            <div class="preview-info" id="preview-info"></div>
+            <div class="preview-filters" style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center; margin: 0 0 1rem 0;">
+              <input id="filter-search" type="text" placeholder="Search title or class..." style="flex:1; min-width:220px; padding:0.6rem 0.8rem; border:1px solid #e2e8f0; border-radius:8px;" />
+              <label style="display:flex; gap:0.4rem; align-items:center;"><input type="checkbox" id="filter-duplicates"> Show duplicates only</label>
+              <label style="display:flex; gap:0.4rem; align-items:center;"><input type="checkbox" id="filter-missing"> Show missing files only</label>
+              <button class="btn btn-secondary" id="recheck-duplicates-btn">Recheck</button>
+            </div>
+            <div class="preview-table-container">
+              <table class="preview-table" id="preview-table">
+                <thead>
+                  <tr>
+                    <th>File Name</th>
+                    <th>Title</th>
+                    <th>Class</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="preview-tbody"></tbody>
+              </table>
+            </div>
+            <div class="upload-actions" style="flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="opt-skip-duplicates" checked> Skip duplicates</label>
+              <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="opt-skip-missing" checked> Skip missing files</label>
+              <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="opt-dry-run"> Dry run (no save)</label>
+              <button class="btn btn-secondary" id="export-errors-btn">⬇️ Export Errors CSV</button>
+              <button class="btn btn-primary" id="confirm-upload-btn">✅ Confirm & Upload</button>
+              <button class="btn btn-outline" id="cancel-upload-btn">❌ Cancel</button>
+            </div>
+          </div>
+
+          <!-- Progress Section -->
+          <div class="upload-progress" id="upload-progress" style="display: none;">
+            <div class="progress-header">
+              <h4>Upload Progress</h4>
+              <span class="progress-text" id="progress-text">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-details" id="progress-details"></div>
+          </div>
+
+          <!-- Results Section -->
+          <div class="upload-results" id="upload-results" style="display: none;">
+            <div class="results-header">
+              <h4>Upload Results</h4>
+              <button class="btn btn-outline" id="close-results-btn">Close</button>
+            </div>
+            <div class="results-content" id="results-content"></div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      
+      <!-- Manage Categories Tab -->
+      <div id="categories-tab" class="tab-content">
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+        <h2 style="margin-top:0;">Manage Categories</h2>
+        <p style="color: var(--text-color); opacity:0.8; margin-bottom: 2rem;">Create and manage categories for organizing your educational resources</p>
+        
+        <!-- Create New Category Form -->
+        <div style="background: #f8f9ff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #e0e7ff;">
+          <h3 style="margin-bottom: 1rem; color: #232946;">➕ Create New Category</h3>
+          <form method="POST" action="/create-category" class="login-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="category_name">Category Name *</label>
+                <input type="text" id="category_name" name="category_name" placeholder="e.g., Advanced Mathematics" required>
+              </div>
+              <div class="form-group">
+                <label for="category_type">Category Type</label>
+                <select id="category_type" name="category_type">
+                  <option value="general">General</option>
+                  <option value="subject_specific">Subject Specific</option>
+                  <option value="exam_prep">Exam Preparation</option>
+                  <option value="skill_based">Skill Based</option>
+                  <option value="project_based">Project Based</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="target_class">Target Class</label>
+                <select id="target_class" name="target_class">
+                  <option value="all">All Classes</option>
+                  {% for id, name in all_classes %}
+                    <option value="{{ id }}">{{ name|title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="paid_status">Access Level</label>
+                <select id="paid_status" name="paid_status">
+                  <option value="unpaid">Free for All</option>
+                  <option value="paid">Paid Access</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="category_description">Description</label>
+              <textarea id="category_description" name="category_description" placeholder="Describe what types of resources belong in this category..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Category</button>
+          </form>
+        </div>
+        
+        <!-- Existing Categories -->
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+          <h3 style="margin-bottom: 1rem; color: #232946;">📋 Existing Categories</h3>
+          <div class="resource-grid" id="categoriesGrid">
+            <!-- Default Categories -->
+            <div class="resource-card">
+              <span class="resource-status status-paid">Default</span>
+              <h3>Notes</h3>
+              <p><strong>Type:</strong> General</p>
+              <p><strong>Target:</strong> All Classes</p>
+              <p><strong>Access:</strong> Free</p>
+              <p><strong>Description:</strong> Study notes and summaries</p>
+            </div>
+            
+            <div class="resource-card">
+              <span class="resource-status status-paid">Default</span>
+              <h3>Worksheets</h3>
+              <p><strong>Type:</strong> Skill Based</p>
+              <p><strong>Target:</strong> All Classes</p>
+              <p><strong>Access:</strong> Free</p>
+              <p><strong>Description:</strong> Practice worksheets and exercises</p>
+            </div>
+            
+            <div class="resource-card">
+              <span class="resource-status status-paid">Default</span>
+              <h3>Formula Sheets</h3>
+              <p><strong>Type:</strong> Subject Specific</p>
+              <p><strong>Target:</strong> All Classes</p>
+              <p><strong>Access:</strong> Free</p>
+              <p><strong>Description:</strong> Mathematical formulas and concepts</p>
+            </div>
+            
+            <div class="resource-card">
+              <span class="resource-status status-paid">Default</span>
+              <h3>Practice Tests</h3>
+              <p><strong>Type:</strong> Exam Preparation</p>
+              <p><strong>Target:</strong> All Classes</p>
+              <p><strong>Access:</strong> Free</p>
+              <p><strong>Description:</strong> Mock tests and practice exams</p>
+            </div>
+            
+            <div class="resource-card">
+              <span class="resource-status status-paid">Default</span>
+              <h3>Reference Books</h3>
+              <p><strong>Type:</strong> General</p>
+              <p><strong>Target:</strong> All Classes</p>
+              <p><strong>Access:</strong> Free</p>
+              <p><strong>Description:</strong> Reference materials and textbooks</p>
+            </div>
+            
+            <div class="resource-card">
+              <span class="resource-status status-paid">Default</span>
+              <h3>Videos</h3>
+              <p><strong>Type:</strong> General</p>
+              <p><strong>Target:</strong> All Classes</p>
+              <p><strong>Access:</strong> Free</p>
+              <p><strong>Description:</strong> Educational videos and tutorials</p>
+            </div>
+            
+            <div class="resource-card">
+              <span class="resource-status status-paid">Default</span>
+              <h3>Other</h3>
+              <p><strong>Type:</strong> General</p>
+              <p><strong>Target:</strong> All Classes</p>
+              <p><strong>Access:</strong> Free</p>
+              <p><strong>Description:</strong> Miscellaneous educational resources</p>
+            </div>
+            
+            <!-- Dynamic Categories will be loaded here -->
+            {% for category in categories %}
+            <div class="resource-card">
+              <span class="resource-status {% if category[5] == 'paid' %}status-paid{% else %}status-unpaid{% endif %}">
+                {{ category[5]|title }}
+              </span>
+              <h3>{{ category[1] }}</h3>
+              <p><strong>Type:</strong> {{ category[3]|replace('_', ' ')|title }}</p>
+              <p><strong>Target:</strong> {% if category[4] == 'all' %}All Classes{% else %}{{ category[4] }}{% endif %}</p>
+              <p><strong>Access:</strong> {{ category[5]|title }}</p>
+              <p><strong>Description:</strong> {{ category[2] or 'No description' }}</p>
+              <div style="margin-top: 1rem;">
+                <button class="btn-secondary" onclick="editCategory('{{ category[0] }}')">Edit</button>
+                <button class="btn-secondary" onclick="deleteCategory('{{ category[0] }}')">Delete</button>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        </div>
+      </div>
+      
+      <!-- Scheduled Resources Tab -->
+      <div id="scheduled-tab" class="tab-content">
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+        <h2 style="margin-top:0;">Scheduled Resources</h2>
+        <div class="resource-grid">
+          <div class="resource-card">
+            <span class="resource-status status-scheduled">Scheduled</span>
+            <h3>Physics Lab Manual</h3>
+            <p><strong>Category:</strong> Notes</p>
+            <p><strong>Target Class:</strong> Class 11</p>
+            <p><strong>Scheduled:</strong> Tomorrow, 9:00 AM</p>
+            <p><strong>Status:</strong> Paid</p>
+            <div style="margin-top: 1rem;">
+              <button class="btn-primary" onclick="uploadNow(1)">Upload Now</button>
+              <button class="btn-secondary" onclick="editSchedule(1)">Edit</button>
+              <button class="btn-secondary" onclick="deleteSchedule(1)">Delete</button>
+            </div>
+          </div>
+          
+          <div class="resource-card">
+            <span class="resource-status status-scheduled">Scheduled</span>
+            <h3>Chemistry Quiz</h3>
+            <p><strong>Category:</strong> Practice Test</p>
+            <p><strong>Target Class:</strong> Class 12</p>
+            <p><strong>Scheduled:</strong> Friday, 2:00 PM</p>
+            <p><strong>Status:</strong> Free</p>
+            <div style="margin-top: 1rem;">
+              <button class="btn-primary" onclick="uploadNow(2)">Upload Now</button>
+              <button class="btn-secondary" onclick="editSchedule(2)">Edit</button>
+              <button class="btn-secondary" onclick="deleteSchedule(2)">Delete</button>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      
+      <!-- Upload History Tab -->
+      <div id="history-tab" class="tab-content">
+        <div class="glass-card" style="border-radius:16px; padding:1.2rem;">
+          <h2 style="margin-top:0;">Upload History</h2>
+          <p style="color: var(--text-color); opacity:0.8;">View recent uploads and system actions here. (Detailed resource listing has moved to the Resources tab.)</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Enhanced Edit Resource Dialog -->
+  <div id="editResourceDialog" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-edit"></i> Edit Resource</h2>
+        <span class="close" onclick="closeEditDialog()">&times;</span>
+      </div>
+      <form id="editResourceForm" method="POST" action="/edit-resource">
+        <input type="hidden" id="editFilename" name="filename">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="editTitle"><i class="fas fa-file-alt"></i> Resource Title</label>
+            <input type="text" id="editTitle" name="title" required placeholder="Enter resource title...">
+          </div>
+          <div class="form-group">
+            <label for="editCategory"><i class="fas fa-tags"></i> Category</label>
+            <select id="editCategory" name="category" required>
+              <option value="">Select Category</option>
+              <!-- Default Categories -->
+              <option value="notes">📚 Notes</option>
+              <option value="worksheet">📝 Worksheet</option>
+              <option value="formula">📐 Formula Sheet</option>
+              <option value="practice_test">📄 Practice Test</option>
+              <option value="reference_book">📖 Reference Book</option>
+              <option value="video">🎥 Video</option>
+              <option value="other">📁 Other</option>
+              <!-- Dynamic Categories -->
+              {% for category in categories %}
+                <option value="{{ category[1] }}">📁 {{ category[1] }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editClass"><i class="fas fa-graduation-cap"></i> Target Class</label>
+            <select id="editClass" name="class_id" required>
+              <option value="">Select Class</option>
+              {% for id, name in all_classes %}
+                <option value="{{ id }}">🎓 {{ name|title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editPaidStatus"><i class="fas fa-lock"></i> Access Level</label>
+            <select id="editPaidStatus" name="paid_status">
+              <option value="unpaid">🆓 Free</option>
+              <option value="paid">💎 Paid</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="editDescription"><i class="fas fa-align-left"></i> Description</label>
+          <textarea id="editDescription" name="description" placeholder="Brief description of the resource content..." rows="4"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+          <button type="button" class="btn-secondary" onclick="closeEditDialog()">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="uiverse-social-container">
+        <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank" class="uiverse-social-btn instagram" title="Instagram">
+          <img src="{{ url_for('static', filename='footer/instagram-brands-solid-full.svg') }}" alt="Instagram" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+        </a>
+        <a href="https://www.youtube.com/@MohitNariyani" target="_blank" class="uiverse-social-btn youtube" title="YouTube">
+          <img src="{{ url_for('static', filename='footer/youtube-brands-solid-full.svg') }}" alt="YouTube" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+        </a>
+        <a href="https://wa.me/917224860881" target="_blank" class="uiverse-social-btn whatsapp" title="WhatsApp">
+          <i class="fa-brands fa-whatsapp" style="font-size:24px; line-height:24px; color: #25D366;"></i>
+        </a>
+      </div>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Contact Us</a>
+      </div>
+      <div class="footer-copy">&copy; 2024 Sunrise Education Centre</div>
+      <div class="footer-theme-toggle">
+        <div class="uiverse-theme-slider" title="Theme">
+          <label class="switch">
+            <input id="footerThemeSlider" type="checkbox" />
+            <span class="slider-round"></span>
+          </label>
+          <span id="footerThemeSliderLabel">Theme</span>
+        </div>
+        <button id="footerThemeToggle" type="button" aria-pressed="false" style="display:none;">🌙 Dark Mode</button>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="{{ url_for('static', filename='bulk_upload/bulk_upload.js') }}"></script>
+  <script>
+    function showTab(tabName) {
+      // Add loading animation to all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.opacity = '0.5';
+        tab.style.transition = 'opacity 0.3s ease';
+      });
+      
+      // Hide all tab contents with fade out
+      setTimeout(() => {
+        document.querySelectorAll('.tab-content').forEach(tab => {
+          tab.classList.remove('active');
+          tab.style.display = 'none';
+        });
+        
+        // Reset all button styles for light theme
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.classList.remove('active');
+          btn.style.background = 'rgba(255, 255, 255, 0.8)';
+          btn.style.color = '#1e293b';
+          btn.style.border = '1px solid rgba(0, 0, 0, 0.1)';
+          btn.style.transform = 'translateY(0)';
+          btn.style.boxShadow = 'none';
+        });
+        
+        // Resolve id: accept both 'upload' and 'upload-tab'
+        const targetId = tabName.endsWith('-tab') ? tabName : (tabName + '-tab');
+        const target = document.getElementById(targetId);
+        
+        if (target) {
+          target.classList.add('active');
+          target.style.display = 'block';
+          target.style.opacity = '0';
+          
+          // Fade in the target tab
+          setTimeout(() => {
+            target.style.transition = 'opacity 0.5s ease';
+            target.style.opacity = '1';
+          }, 50);
+        }
+        
+        // Update clicked button styles with animation
+        if (window.event && window.event.target) {
+          const clickedBtn = window.event.target;
+          clickedBtn.classList.add('active');
+          
+          // Animate button activation
+          clickedBtn.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+          clickedBtn.style.background = 'linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%)';
+          clickedBtn.style.color = 'white';
+          clickedBtn.style.border = 'none';
+          clickedBtn.style.transform = 'translateY(-2px)';
+          clickedBtn.style.boxShadow = '0 8px 25px rgba(106,130,251,0.3)';
+          
+          // Add ripple effect
+          const ripple = document.createElement('span');
+          ripple.style.position = 'absolute';
+          ripple.style.borderRadius = '50%';
+          ripple.style.background = 'rgba(255, 255, 255, 0.3)';
+          ripple.style.transform = 'scale(0)';
+          ripple.style.animation = 'ripple 0.6s linear';
+          ripple.style.left = '50%';
+          ripple.style.top = '50%';
+          ripple.style.width = '20px';
+          ripple.style.height = '20px';
+          ripple.style.marginLeft = '-10px';
+          ripple.style.marginTop = '-10px';
+          
+          clickedBtn.style.position = 'relative';
+          clickedBtn.style.overflow = 'hidden';
+          clickedBtn.appendChild(ripple);
+          
+          // Remove ripple after animation
+          setTimeout(() => {
+            if (ripple.parentNode) {
+              ripple.parentNode.removeChild(ripple);
+            }
+          }, 600);
+        }
+        
+      }, 150);
+    }
+    
+    // Add ripple animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Upload modal functions
+    function openUploadModal() {
+      document.getElementById('uploadModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeUploadModal() {
+      document.getElementById('uploadModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const uploadModal = document.getElementById('uploadModal');
+      const editModal = document.getElementById('editResourceDialog');
+      
+      if (event.target === uploadModal) {
+        closeUploadModal();
+      }
+      if (event.target === editModal) {
+        closeEditDialog();
+      }
+    }
+    
+    // File upload handling
+    const fileInput = document.getElementById('file');
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+
+    // Modal file upload handling
+    const modalFileInput = document.getElementById('modal_file');
+    const modalFileUploadArea = document.getElementById('modalFileUploadArea');
+    const modalFileInfo = document.getElementById('modalFileInfo');
+    const modalFileName = document.getElementById('modalFileName');
+    
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        fileName.textContent = file.name;
+        fileInfo.style.display = 'block';
+      } else {
+        fileInfo.style.display = 'none';
+      }
+    });
+    
+    // Drag and drop functionality
+    fileUploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      fileUploadArea.classList.add('dragover');
+    });
+    
+    fileUploadArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      fileUploadArea.classList.remove('dragover');
+    });
+    
+    fileUploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      fileUploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        fileName.textContent = files[0].name;
+        fileInfo.style.display = 'block';
+      }
+    });
+
+    // Modal file upload handling
+    modalFileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        modalFileName.textContent = file.name;
+        modalFileInfo.style.display = 'block';
+      } else {
+        modalFileInfo.style.display = 'none';
+      }
+    });
+    
+    // Modal drag and drop functionality
+    modalFileUploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      modalFileUploadArea.classList.add('dragover');
+    });
+    
+    modalFileUploadArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      modalFileUploadArea.classList.remove('dragover');
+    });
+    
+    modalFileUploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      modalFileUploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        modalFileInput.files = files;
+        modalFileName.textContent = files[0].name;
+        modalFileInfo.style.display = 'block';
+      }
+    });
+    
+    // Scheduled resource functions
+    function uploadNow(id) {
+      if (confirm('Upload this resource now?')) {
+        alert('Resource uploaded successfully!');
+      }
+    }
+    
+    function editSchedule(id) {
+      alert('Edit functionality coming soon!');
+    }
+    
+    function deleteSchedule(id) {
+      if (confirm('Are you sure you want to delete this scheduled resource?')) {
+        alert('Scheduled resource deleted successfully!');
+      }
+    }
+    
+    // Sorting and Filtering Functions
+    function applyFilters() {
+      const sortBy = document.getElementById('sortBy').value;
+      const filterClass = document.getElementById('filterClass').value;
+      const filterCategory = document.getElementById('filterCategory').value;
+      const searchText = document.getElementById('searchText').value.toLowerCase();
+      
+      const resourceCards = document.querySelectorAll('#resourcesGrid .resource-card');
+      let visibleCount = 0;
+      
+      resourceCards.forEach(card => {
+        const filename = card.dataset.filename.toLowerCase();
+        const title = card.dataset.title.toLowerCase();
+        const classId = card.dataset.class;
+        const category = card.dataset.category;
+        const description = card.dataset.description.toLowerCase();
+        const className = card.dataset.className.toLowerCase();
+        
+        // Apply filters
+        let shouldShow = true;
+        
+        // Filter by class
+        if (filterClass && classId !== filterClass) {
+          shouldShow = false;
+        }
+        
+        // Filter by category
+        if (filterCategory && category !== filterCategory) {
+          shouldShow = false;
+        }
+        
+        // Filter by search text
+        if (searchText) {
+          const searchableText = `${filename} ${title} ${description} ${className}`;
+          if (!searchableText.includes(searchText)) {
+            shouldShow = false;
+          }
+        }
+        
+        // Show/hide card
+        if (shouldShow) {
+          card.style.display = 'block';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Sort visible cards
+      const visibleCards = Array.from(resourceCards).filter(card => card.style.display !== 'none');
+      visibleCards.sort((a, b) => {
+        let aValue, bValue;
+        
+        switch (sortBy) {
+          case 'filename':
+            aValue = a.dataset.filename.toLowerCase();
+            bValue = b.dataset.filename.toLowerCase();
+            break;
+          case 'title':
+            aValue = a.dataset.title.toLowerCase();
+            bValue = b.dataset.title.toLowerCase();
+            break;
+          case 'class':
+            aValue = a.dataset.className.toLowerCase();
+            bValue = b.dataset.className.toLowerCase();
+            break;
+          case 'category':
+            aValue = a.dataset.category.toLowerCase();
+            bValue = b.dataset.category.toLowerCase();
+            break;
+          default:
+            return 0;
+        }
+        
+        return aValue.localeCompare(bValue);
+      });
+      
+      // Reorder cards in DOM
+      const grid = document.getElementById('resourcesGrid');
+      visibleCards.forEach(card => grid.appendChild(card));
+      
+      // Show result count
+      const resultDiv = document.getElementById('filterResults');
+      const resultCount = document.getElementById('resultCount');
+      resultDiv.style.display = 'block';
+      resultCount.textContent = `Showing ${visibleCount} of ${resourceCards.length} resources`;
+      
+      // Add visual feedback
+      if (visibleCount === 0) {
+        resultCount.textContent = 'No resources match your filters';
+        resultDiv.style.background = '#fef2f2';
+        resultCount.style.color = '#dc2626';
+      } else {
+        resultDiv.style.background = '#e8f5e8';
+        resultCount.style.color = '#155724';
+      }
+    }
+    
+    function clearFilters() {
+      // Reset all filter inputs
+      document.getElementById('sortBy').value = 'filename';
+      document.getElementById('filterClass').value = '';
+      document.getElementById('filterCategory').value = '';
+      document.getElementById('searchText').value = '';
+      
+      // Show all cards
+      const resourceCards = document.querySelectorAll('#resourcesGrid .resource-card');
+      resourceCards.forEach(card => {
+        card.style.display = 'block';
+      });
+      
+      // Hide result count
+      document.getElementById('filterResults').style.display = 'none';
+      
+      // Reset to original order (filename sort)
+      applyFilters();
+    }
+    
+    function exportFilteredResults() {
+      const visibleCards = document.querySelectorAll('#resourcesGrid .resource-card[style*="display: block"], #resourcesGrid .resource-card:not([style*="display: none"])');
+      
+      if (visibleCards.length === 0) {
+        alert('No resources to export. Please adjust your filters.');
+        return;
+      }
+      
+      const exportData = Array.from(visibleCards).map(card => ({
+        filename: card.dataset.filename,
+        title: card.dataset.title,
+        class: card.dataset.className,
+        category: card.dataset.category,
+        description: card.dataset.description,
+        status: card.querySelector('.resource-status').textContent.trim()
+      }));
+      
+      // Create CSV content
+      const headers = ['Filename', 'Title', 'Class', 'Category', 'Description', 'Status'];
+      const csvContent = [
+        headers.join(','),
+        ...exportData.map(row => [
+          `"${row.filename}"`,
+          `"${row.title}"`,
+          `"${row.class}"`,
+          `"${row.category}"`,
+          `"${row.description}"`,
+          `"${row.status}"`
+        ].join(','))
+      ].join('\n');
+      
+      // Create and download file
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `resource_export_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      alert(`Exported ${exportData.length} resources successfully!`);
+    }
+    
+    // Add event listeners for real-time filtering
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('searchText');
+      const filterClass = document.getElementById('filterClass');
+      const filterCategory = document.getElementById('filterCategory');
+      
+      // Debounce function for search
+      let searchTimeout;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(applyFilters, 300);
+      });
+      
+      // Apply filters when dropdowns change
+      filterClass.addEventListener('change', applyFilters);
+      filterCategory.addEventListener('change', applyFilters);
+      
+      // Initialize with default sort
+      applyFilters();
+      
+      // Initialize create resource file handling
+      setupCreateResourceFileHandling();
+    });
+    
+    // Create Resource Functions
+    function showResourceFields() {
+      const resourceType = document.getElementById('resource_type').value;
+      
+      // Hide all specific fields first
+      document.getElementById('worksheet-fields').style.display = 'none';
+      document.getElementById('pyq-fields').style.display = 'none';
+      document.getElementById('cbq-fields').style.display = 'none';
+      
+      // Show relevant fields based on resource type
+      switch(resourceType) {
+        case 'worksheet':
+          document.getElementById('worksheet-fields').style.display = 'block';
+          break;
+        case 'pyq':
+          document.getElementById('pyq-fields').style.display = 'block';
+          break;
+        case 'cbq':
+          document.getElementById('cbq-fields').style.display = 'block';
+          break;
+      }
+    }
+    
+    function setupCreateResourceFileHandling() {
+      const createFileInput = document.getElementById('create_file');
+      const createFileUploadArea = document.getElementById('createFileUploadArea');
+      const createFileInfo = document.getElementById('createFileInfo');
+      const createFileName = document.getElementById('createFileName');
+      
+      if (createFileInput) {
+        createFileInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            createFileName.textContent = file.name;
+            createFileInfo.style.display = 'block';
+          } else {
+            createFileInfo.style.display = 'none';
+          }
+        });
+      }
+      
+      if (createFileUploadArea) {
+        // Drag and drop functionality for create resource
+        createFileUploadArea.addEventListener('dragover', function(e) {
+          e.preventDefault();
+          createFileUploadArea.classList.add('dragover');
+        });
+        
+        createFileUploadArea.addEventListener('dragleave', function(e) {
+          e.preventDefault();
+          createFileUploadArea.classList.remove('dragover');
+        });
+        
+        createFileUploadArea.addEventListener('drop', function(e) {
+          e.preventDefault();
+          createFileUploadArea.classList.remove('dragover');
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            createFileInput.files = files;
+            createFileName.textContent = files[0].name;
+            createFileInfo.style.display = 'block';
+          }
+        });
+      }
+    }
+    
+    // Category management functions
+    function editCategory(categoryId) {
+        // TODO: Implement edit category modal/form
+        alert('Edit category functionality will be implemented soon!');
+    }
+    
+    function deleteCategory(categoryId) {
+        if (confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/delete-category/${categoryId}`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+    
+    // Enhanced Resource edit functions
+    function editResource(filename, classId, category, title, description) {
+        // Add loading animation to the button that was clicked
+        const clickedButton = window.event.target;
+        const originalContent = clickedButton.innerHTML;
+        clickedButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        clickedButton.disabled = true;
+        
+        // Populate the edit form
+        document.getElementById('editFilename').value = filename;
+        document.getElementById('editTitle').value = title;
+        document.getElementById('editCategory').value = category;
+        document.getElementById('editClass').value = classId;
+        document.getElementById('editDescription').value = description;
+        
+        // Determine paid status based on category
+        const paidStatus = (category === 'worksheet' || category === 'formula') ? 'paid' : 'unpaid';
+        document.getElementById('editPaidStatus').value = paidStatus;
+        
+        // Show the modal with animation
+        const modal = document.getElementById('editResourceDialog');
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // Reset button after modal opens
+        setTimeout(() => {
+            clickedButton.innerHTML = originalContent;
+            clickedButton.disabled = false;
+        }, 500);
+        
+        // Add focus to first input
+        setTimeout(() => {
+            document.getElementById('editTitle').focus();
+        }, 100);
+    }
+    
+    function closeEditDialog() {
+        const modal = document.getElementById('editResourceDialog');
+        
+        // Add closing animation
+        modal.style.opacity = '0';
+        modal.style.transform = 'translateY(-60px) scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Reset modal styles for next opening
+            modal.style.opacity = '1';
+            modal.style.transform = 'translateY(0) scale(1)';
+        }, 300);
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const uploadModal = document.getElementById('uploadModal');
+        const editModal = document.getElementById('editResourceDialog');
+        
+        if (event.target === uploadModal) {
+            closeUploadModal();
+        } else if (event.target === editModal) {
+            closeEditDialog();
+        }
+    }
+    
+    // Add keyboard support for modal
+    document.addEventListener('keydown', function(event) {
+        const editModal = document.getElementById('editResourceDialog');
+        if (editModal.style.display === 'block') {
+            if (event.key === 'Escape') {
+                closeEditDialog();
+            }
+        }
+    });
+    
+    // Form validation for create resource
+    function validateCreateResourceForm() {
+      const resourceType = document.getElementById('resource_type').value;
+      const classId = document.getElementById('create_class_id').value;
+      const subject = document.getElementById('subject').value;
+      const file = document.getElementById('create_file').files[0];
+      
+      if (!resourceType) {
+        alert('Please select a resource type');
+        return false;
+      }
+      
+      if (!classId) {
+        alert('Please select a target class');
+        return false;
+      }
+      
+      if (!subject) {
+        alert('Please select a subject');
+        return false;
+      }
+      
+      if (!file) {
+        alert('Please upload a file');
+        return false;
+      }
+      
+      // Validate file type
+      const allowedTypes = ['.pdf', '.doc', '.docx', '.ppt', '.pptx'];
+      const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+      if (!allowedTypes.includes(fileExtension)) {
+        alert('Please upload a valid file type (PDF, DOC, DOCX, PPT, PPTX)');
+        return false;
+      }
+      
+      return true;
+    }
+    
+    // Add form validation to create resource form
+    document.addEventListener('DOMContentLoaded', function() {
+      const createForm = document.querySelector('form[action="/create-resource"]');
+      if (createForm) {
+        createForm.addEventListener('submit', function(e) {
+          if (!validateCreateResourceForm()) {
+            e.preventDefault();
+          }
+        });
+      }
+
+      // Add event listeners for edit resource buttons
+      document.querySelectorAll('.edit-resource-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const filename = this.dataset.filename;
+          const classId = this.dataset.classId;
+          const category = this.dataset.category;
+          const title = this.dataset.title;
+          const description = this.dataset.description;
+          editResource(filename, classId, category, title, description);
+        });
+      });
+    });
+  </script>
+
+    <!-- Search Modal -->
+    <div id="searchModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-content black-glass" style="margin: 10% auto; padding: 2rem; border-radius: 20px; width: 90%; max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="color: white; margin: 0;">🔍 Search</h2>
+                <button onclick="closeSearch()" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search courses, resources, or topics..." style="width: 100%; padding: 15px; border: none; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem; margin-bottom: 1rem;">
+            <div id="searchResults" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div id="notification-panel" class="notification-panel black-glass" style="display: none; position: fixed; top: 100px; right: 20px; width: 350px; max-height: 500px; overflow-y: auto; z-index: 999; border-radius: 16px; padding: 1rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <h3 style="margin: 0; font-size: 1.2rem; color: white;">🔔 Notifications</h3>
+            <button onclick="toggleNotifications()" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 0.2rem;">✕</button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item" style="padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;">
+                <div style="font-weight: 600; margin-bottom: 0.3rem; color: white;">📚 Latest Updates</div>
+                <div style="font-size: 0.9rem; opacity: 0.8; color: rgba(255,255,255,0.8);">Check out new features and content</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="upload-modal">
+      <div class="upload-modal-content">
+        <div class="upload-modal-header">
+          <h2>📤 Quick Upload Resource</h2>
+          <span class="upload-close" onclick="closeUploadModal()">&times;</span>
+        </div>
+        <div style="padding: 2rem;">
+          <form method="POST" action="/upload-resource" enctype="multipart/form-data" class="login-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="modal_title">Resource Title *</label>
+                <input type="text" id="modal_title" name="title" placeholder="e.g., Algebra Chapter 5 Notes" required>
+              </div>
+              <div class="form-group">
+                <label for="modal_category">Category *</label>
+                <select id="modal_category" name="category" required>
+                  <option value="">Select Category</option>
+                  <option value="notes">Notes</option>
+                  <option value="worksheet">Worksheet</option>
+                  <option value="formula">Formula Sheet</option>
+                  <option value="practice_test">Practice Test</option>
+                  <option value="reference_book">Reference Book</option>
+                  <option value="video">Video</option>
+                  <option value="other">Other</option>
+                  {% for category in categories %}
+                    <option value="{{ category[1] }}">{{ category[1] }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="modal_class_id">Target Class *</label>
+                <select id="modal_class_id" name="class_id" required>
+                  <option value="">Select Class</option>
+                  {% for id, name in all_classes %}
+                    <option value="{{ id }}">{{ name|title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="modal_paid_status">Paid Status</label>
+                <select id="modal_paid_status" name="paid_status">
+                  <option value="unpaid">Free</option>
+                  <option value="paid">Paid</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="modal_description">Description</label>
+              <textarea id="modal_description" name="description" placeholder="Brief description of the resource content..."></textarea>
+            </div>
+            
+            <div class="file-upload-area" id="modalFileUploadArea">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
+              <h3>Drop files here or click to upload</h3>
+              <p style="color: #666; margin-bottom: 1rem;">Supports PDF, DOC, PPT, MP4, and other educational formats</p>
+              <input type="file" id="modal_file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.jpg,.jpeg,.png" required style="display: none;">
+              <button type="button" class="btn-primary" onclick="document.getElementById('modal_file').click()">Choose File</button>
+            </div>
+            
+            <div id="modalFileInfo" style="display: none; background: #f8f9ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+              <strong>Selected File:</strong> <span id="modalFileName"></span>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+              <button type="button" class="btn-secondary" onclick="closeUploadModal()">Cancel</button>
+              <button type="submit" class="btn-primary">Upload Resource</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='navbar-functions.js') }}"></script>
+</body>
+<script src="{{ url_for('static', filename='attached_assets/theme.js') }}"></script>
+</html> 

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Study Resources - Sunrise Education Centre</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='pages-global.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='uiverse-components.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='enhanced-aesthetic.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='modern-components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='modern-navbar.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <style>
+    body:not(.dark-mode) .category-card,
+    body:not(.dark-mode) .category-card *,
+    body:not(.dark-mode) .category-name,
+    body:not(.dark-mode) .category-description {
+      color: #ffffff !important;
+    }
+  </style>
+
+</head>
+
+<body class="study-resources-page">
+  <!-- Enhanced Floating Particles Background -->
+  <div class="floating-particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div id="navbar-container"></div>
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Enhanced Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1 class="hero-title">Study Resources</h1>
+        <p class="hero-subtitle">Access comprehensive notes, worksheets, practice problems, and solutions designed to
+          help you excel in your studies</p>
+
+        <!-- User Status Card -->
+        <div class="glass-card" style="max-width: 500px; margin: 0 auto; padding: 1.5rem; text-align: center;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div
+                style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: white;">
+                {{ class_name[0]|upper if class_name else 'C' }}</div>
+              <div style="text-align: left;">
+                <div class="user-class-name" style="color: #1e293b; font-size: 1.1rem; font-weight: 600;">{{
+                  class_name|title }}</div>
+                <div class="user-class-label" style="color: rgba(30, 41, 59, 0.7); font-size: 0.9rem;">Your Class</div>
+              </div>
+            </div>
+            {% if paid_status == 'paid' %}
+            <div class="status-chip paid">🔓 Premium Access - All Resources (Paid + Free)</div>
+            {% else %}
+            <div class="status-chip unpaid">🔒 Basic Access - Free Resources Only</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Enhanced Category Section -->
+    <section class="category-section">
+      <div class="category-section-header">
+        <h2 class="category-section-title">Choose Your Category</h2>
+        <p class="category-section-subtitle">Select a category to explore our comprehensive study materials</p>
+      </div>
+
+      <!-- Category Cards -->
+      <div class="category-cards-grid">
+        {% set template_categories = [
+        ('pdfs', '📑', 'PDFs', 'All PDF documents'),
+        ('notes', '📚', 'Notes', 'Comprehensive study notes and summaries'),
+        ('sample_paper', '📄', 'Sample Papers', 'Practice papers and mock tests'),
+        ('worksheet', '📝', 'Worksheets', 'Interactive practice worksheets'),
+        ('pyq', '🎯', 'PYQs', 'Previous year question papers'),
+        ('case-base', '📋', 'Case-Base', 'Case study based questions'),
+        ('assertion-reasoning', '⚖️', 'Assertion/Reasoning', 'Logical reasoning questions'),
+        ('formula', '📐', 'Formula', 'Important formulas and equations')
+        ] %}
+
+        {# Add any categories from database that aren't in the hardcoded list #}
+        {% if categories %}
+        {% for category in categories %}
+        {% set category_exists = false %}
+        {% for cat in template_categories %}
+        {% if cat[0] == category[1] %}
+        {% set category_exists = true %}
+        {% endif %}
+        {% endfor %}
+        {% if not category_exists %}
+        {% set _ = template_categories.append((category[1], '📁', category[1], 'Additional study materials')) %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        {% for cat_key, cat_icon, cat_name, cat_description in template_categories %}
+        <div class="category-card" onclick="showCategory(event, 'cat-{{ cat_key }}')">
+          <span class="category-icon">{{ cat_icon }}</span>
+          <h3 class="category-name">{{ cat_name }}</h3>
+          <p class="category-description">{{ cat_description }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Enhanced Resources Section -->
+    <section class="resources-section">
+      <div class="resources-section-header">
+        <h2 class="resources-section-title">Study Materials</h2>
+        <p class="section-subtitle">Browse through our collection of educational resources. Click on any category above
+          to filter resources.</p>
+        <div
+          style="background: rgba(106, 130, 251, 0.1); border: 1px solid rgba(106, 130, 251, 0.3); border-radius: 10px; padding: 1rem; margin: 1rem auto; max-width: 600px; text-align: center;">
+          <p style="margin: 0; color: rgba(255,255,255,0.9); font-size: 0.9rem;">
+            💡 <strong>Tip:</strong> Click on any category card above to see resources for that specific type.
+            {% if paid_status == 'paid' %}
+            You have premium access to all resources (both paid and free)!
+            {% else %}
+            You can access free resources. Upgrade to premium to unlock paid resources!
+            {% endif %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Resources for each category -->
+      {% for cat_key, cat_icon, cat_name, cat_description in template_categories %}
+      <div id="cat-{{ cat_key }}" class="category-content">
+        <div class="resource-grid">
+          {% set has_resources = false %}
+          {% set has_accessible_resources = false %}
+
+          {% for resource in resources %}
+          {% set resource_id, filename, res_class_id, filepath, title, description, category, resource_paid_status,
+          schedule_date, uploaded_by, uploaded_at, download_count, is_active, file_size, file_type, class_name,
+          uploaded_by_name = resource %}
+          {% set cat = (category or '')|lower %}
+          {% set fname = (filename or '')|lower %}
+          {% set matches = (cat == cat_key)
+          or (cat_key == 'sample_paper' and ('sample' in cat))
+          or (cat_key == 'pyq' and ('pyq' in cat or 'previous' in cat))
+          or (cat_key == 'worksheet' and ('worksheet' in cat))
+          or (cat_key == 'formula' and ('formula' in cat))
+          or (cat_key == 'case-base' and ('case' in cat and ('base' in cat or 'based' in cat)))
+          or (cat_key == 'assertion-reasoning' and ('assertion' in cat or 'reason' in cat))
+          or (cat_key == 'notes' and ('note' in cat or 'study material' in cat or 'others' in cat or 'imp' in cat))
+          or (cat_key == 'pdfs' and ('.pdf' in fname))
+          %}
+          {% if res_class_id == class_id and matches %}
+          {% set has_resources = true %}
+
+          {# Check if user has access to this resource #}
+          {% if resource_paid_status == 'paid' and paid_status != 'paid' %}
+          {# For unpaid users, don't show paid resources at all #}
+          {# This resource is hidden from unpaid users #}
+          {% else %}
+          {# User has access to this resource (either free resource or paid user accessing paid resource) #}
+          <div class="resource-card">
+            {% if resource_paid_status == 'paid' %}
+            <div class="resource-badge premium">Premium</div>
+            {% else %}
+            <div class="resource-badge free">Free</div>
+            {% endif %}
+            <h3>{{ title }}</h3>
+            {% if description %}
+            <div class="description">{{ description }}</div>
+            {% endif %}
+            <div class="filename">{{ filename }}</div>
+            <a href="/preview/{{ filename }}" class="btn-preview">📖 Preview Document</a>
+          </div>
+          {% set has_accessible_resources = true %}
+          {% endif %}
+          {% endif %}
+          {% endfor %}
+
+          {% if not has_accessible_resources %}
+          <div class="empty-state">
+            <h3>No resources found</h3>
+            <p>We're working on adding content to this category. Check back soon!</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+      </div>
+    </section>
+  </main>
+
+  <div class="section-divider"></div>
+
+  <!-- Enhanced Modern Footer - Below PDF Cards -->
+  <footer class="footer-modern" style="margin-top: 0;">
+    <div class="container">
+      <div class="footer-content-modern">
+        <div class="footer-section">
+          <h3>Study Resources</h3>
+          <p>Comprehensive study materials designed to help you excel in your academic journey.</p>
+          <div class="uiverse-social-container">
+            <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank"
+              class="uiverse-social-btn instagram" title="Instagram">
+              <img src="{{ url_for('static', filename='footer/instagram-brands-solid-full.svg') }}" alt="Instagram"
+                style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+            </a>
+            <a href="https://www.youtube.com/@MohitNariyani" target="_blank" class="uiverse-social-btn youtube"
+              title="YouTube">
+              <img src="{{ url_for('static', filename='footer/youtube-brands-solid-full.svg') }}" alt="YouTube"
+                style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+            </a>
+            <a href="https://wa.me/917224860881" target="_blank" class="uiverse-social-btn whatsapp" title="WhatsApp">
+              <i class="fa-brands fa-whatsapp" style="font-size:24px; line-height:24px; color: #25D366;"></i>
+            </a>
+            <a href="/" class="uiverse-social-btn" title="Home">
+              <i class="fas fa-home"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <a href="/">Home</a>
+            <a href="/forum">Forum</a>
+            <a href="/admission">Admission</a>
+            <a href="/batch">Batches</a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h3>Resource Types</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <span>📚 Notes & Summaries</span>
+            <span>📄 Sample Papers</span>
+            <span>📝 Practice Worksheets</span>
+            <span>🎯 Previous Year Questions</span>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h3>Support</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span>📞</span>
+              <a href="tel:+917224860881">+91 72248 60881</a>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span>🕒</span>
+              <span>24/7 Resource Access</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span>💬</span>
+              <span>Study Support Available</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>&copy; 2024 Sunrise Educational Centre. All rights reserved.</div>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <span style="font-size: 0.9rem;">Excellence in Education</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="{{ url_for('static', filename='modern-interactions.js') }}"></script>
+  <script src="{{ url_for('static', filename='study-resources.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Show resources section by default
+      const resSection = document.querySelector('.resources-section');
+      if (resSection) {
+        resSection.classList.add('show');
+      }
+
+      // Show the first category by default
+      const firstCategory = document.querySelector('.category-card');
+      if (firstCategory) {
+        firstCategory.classList.add('active');
+        const firstCategoryId = firstCategory.getAttribute('onclick').match(/'([^']+)'/)[1];
+        const firstCategoryContent = document.getElementById(firstCategoryId);
+        if (firstCategoryContent) {
+          firstCategoryContent.classList.add('active');
+        }
+      }
+    });
+  </script>
+  <script src="{{ url_for('static', filename='loader.js') }}"></script>
+</body>
+
+</html>

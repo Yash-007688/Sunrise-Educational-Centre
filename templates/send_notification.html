@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Send Notification - Admin</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    body {
+      background: #f6f8fa;
+      font-family: 'Inter', sans-serif;
+    }
+    .dark-mode-toggle { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+    .notification-container {
+      max-width: 650px;
+      margin: 2.5rem auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(100,100,255,0.08);
+      padding: 2.5rem 2rem 2rem 2rem;
+    }
+    .notification-container h1 {
+      font-size: 2.1rem;
+      color: #232946;
+      margin-bottom: 1.2rem;
+      text-align: center;
+    }
+    .notification-container h2 {
+      font-size: 1.3rem;
+      color: #6a82fb;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    .login-form {
+      margin-bottom: 2.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.3rem;
+    }
+    .form-group label {
+      font-weight: 600;
+      color: #232946;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid #e0e7ff;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s;
+      background: #f8f9ff;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #6a82fb;
+      box-shadow: 0 0 0 3px rgba(106,130,251,0.1);
+    }
+    .btn-primary, .btn-secondary {
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #6a82fb 0%, #5a6fd8 100%);
+      color: #fff;
+      margin-right: 0.5rem;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #5a6fd8 0%, #6a82fb 100%);
+      box-shadow: 0 4px 12px rgba(106,130,251,0.18);
+    }
+    .btn-secondary {
+      background: linear-gradient(135deg, #fc5c7d 0%, #e74c3c 100%);
+      color: #fff;
+    }
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, #e74c3c 0%, #fc5c7d 100%);
+      box-shadow: 0 4px 12px rgba(252,92,125,0.18);
+    }
+    .login-error {
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 500;
+      padding: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #f8f9ff;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-size: 1rem;
+    }
+    thead tr {
+      background: #e0e7ff;
+    }
+    tbody tr {
+      border-bottom: 1px solid #e0e7ff;
+      transition: background 0.2s;
+    }
+    tbody tr:hover {
+      background: #f3f6fa;
+    }
+    @media (max-width: 700px) {
+      .notification-container {
+        padding: 1.2rem 0.5rem;
+      }
+      th, td {
+        padding: 0.7rem 0.5rem;
+        font-size: 0.97rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Dark Mode Toggle Button -->
+  <div class="dark-mode-toggle">
+    <button id="darkModeToggle" class="btn btn-primary" style="min-width:160px;">Toggle Dark Mode</button>
+  </div>
+
+  <nav class="navbar glassmorphic">
+    <div class="container nav-content">
+      <div class="nav-logo">
+        <img src="{{ url_for('static', filename='attached_assets/image_1750584670920.png') }}" alt="Logo">
+      </div>
+      <ul class="nav-links">
+        <li><a href="/admin">Admin Panel</a></li>
+
+        <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main class="container main-content">
+    <div class="notification-container">
+      <h1>Send Notification</h1>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="login-error" style="margin-bottom:1rem; background: {% if category == 'error' %}#fc5c7d{% else %}#28a745{% endif %}; color: #fff; padding: 1rem; border-radius: 8px;">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <form method="POST" action="/send-notification" class="login-form">
+        <div class="form-group" style="position:relative;">
+          <label for="message">Notification Message *</label>
+          <div style="position:relative;">
+            <textarea id="message" name="message" required placeholder="Type your notification... Use @ to mention users" maxlength="500" rows="4" style="width:100%; resize:vertical;"></textarea>
+            <div id="mentionIndicator" style="position:absolute; top:0.5rem; right:0.5rem; background:#6a82fb; color:white; padding:0.2rem 0.4rem; border-radius:8px; font-size:0.7rem; font-weight:600; display:none;">@</div>
+            <div id="mentionSuggestions" style="display:none; position:absolute; background:white; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); max-height:220px; overflow-y:auto; z-index:1000; min-width:260px; margin-top:6px;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+            <small style="color: #666;">Maximum 500 characters</small>
+            <small id="charCount" style="color: #6a82fb; font-weight: 500;">0/500</small>
+          </div>
+          <div id="mentionHelp" style="display:none; margin-top:0.5rem; padding:0.5rem; background:#f0f4ff; border:1px solid #6a82fb; border-radius:8px; font-size:0.8rem; color:#6a82fb;">
+            <strong>Tip:</strong> Type @ to mention users by username, class, email, or mobile. Use arrow keys and Enter to select.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="class_id">Target Class *</label>
+          <select id="class_id" name="class_id" required>
+            <option value="">Select Class</option>
+            <optgroup label="Class 9">
+              <option value="1">Class 9</option>
+            </optgroup>
+            <optgroup label="Class 10">
+              <option value="2">Class 10</option>
+            </optgroup>
+            <optgroup label="Class 11">
+              <option value="4">Class 11 Applied</option>
+              <option value="5">Class 11 Core</option>
+            </optgroup>
+            <optgroup label="Class 12">
+              <option value="6">Class 12 Applied</option>
+              <option value="7">Class 12 Core</option>
+            </optgroup>
+            <optgroup label="Staff">
+              <option value="8">Admin</option>
+              <option value="9">Teacher</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="target_paid_status">Target Users *</label>
+          <select id="target_paid_status" name="target_paid_status" required>
+            <option value="all">All Users (Paid & Unpaid)</option>
+            <option value="paid">Paid Users Only</option>
+            <option value="not paid">Unpaid Users Only</option>
+          </select>
+          <small style="color: #666;">Choose which users should receive this notification</small>
+        </div>
+        <div class="form-group">
+          <label for="schedule_date">Schedule Notification (Optional)</label>
+          <input type="datetime-local" id="schedule_date" name="schedule_date">
+          <small style="color: #666;">Leave empty to send immediately</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Send Now</button>
+        <button type="submit" name="schedule" value="1" class="btn btn-secondary" style="margin-left:1rem;">Schedule Notification</button>
+      </form>
+
+      <!-- Personal Chat Section -->
+      <h2 style="margin-top:2.5rem;">💬 Personal Chat</h2>
+      <div style="background:#f8fafc; border-radius:12px; padding:1.5rem; margin-bottom:2rem; border:1px solid #e2e8f0;">
+        <h3 style="color:#6a82fb; margin-bottom:1rem;">Send Personal Message</h3>
+        <p style="color:#64748b; margin-bottom:1.5rem;">Send a direct message to specific users using @ mentions or select multiple users.</p>
+        
+        <div class="form-group">
+          <label for="chat_users">Select Users:</label>
+          
+          <!-- User Search by Name -->
+          <div style="margin-bottom:1rem;">
+            <label for="userSearchInput" style="display:block; margin-bottom:0.5rem; color:#374151; font-weight:500;">Search Users by Name:</label>
+            <div style="position:relative;">
+              <input type="text" id="userSearchInput" placeholder="Type @username (e.g., @yash) or search by name..." style="width:100%; padding:0.8rem; border:1px solid #e0e7ff; border-radius:8px; font-size:1rem; border-right:none; border-top-right-radius:0; border-bottom-right-radius:0;" onkeypress="if(event.key==='Enter'){event.preventDefault();searchUsers();}">
+              <button type="button" onclick="searchUsers()" style="padding:0.8rem 1rem; background:#6a82fb; color:white; border:none; border-radius:0 8px 8px 0; cursor:pointer; font-size:1rem;">Search</button>
+            </div>
+            <div id="userSearchResults" style="margin-top:0.5rem; max-height:200px; overflow-y:auto; border:1px solid #e0e7ff; border-radius:8px; display:none;"></div>
+          </div>
+          
+          <!-- Quick Selection Buttons -->
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
+            <button type="button" class="user-tag" onclick="toggleUserSelection('all')" data-user="all">@All Users</button>
+            <button type="button" class="user-tag" onclick="toggleUserSelection('paid')" data-user="paid">@Paid Users</button>
+            <button type="button" class="user-tag" onclick="toggleUserSelection('unpaid')" data-user="unpaid">@Unpaid Users</button>
+          </div>
+          
+          <div id="selectedUsersContainer" style="margin-bottom:1rem;">
+            <label>Selected Users:</label>
+            <div id="selectedUsersList" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem;"></div>
+          </div>
+          
+          <div class="form-group">
+            <label for="chat_message">Message:</label>
+            <textarea id="chat_message" name="chat_message" rows="4" placeholder="Type your personal message here..." style="width:100%; padding:0.8rem; border:1px solid #e0e7ff; border-radius:8px; font-size:1rem; resize:vertical;"></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem;">
+              <small style="color:#666;">Personal messages will be sent as direct chats to selected users</small>
+              <span id="chatCharCount" style="color:#6a82fb; font-size:0.9rem;">0/500</span>
+            </div>
+          </div>
+          
+          <button type="button" onclick="sendPersonalMessages()" class="btn btn-primary" style="margin-top:1rem;">Send Personal Messages</button>
+        </div>
+      </div>
+
+      <h2 style="margin-top:2.5rem;">Past Notifications</h2>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f3f6fa;">
+              <th style="padding:0.7rem 1rem; text-align:left;">Message</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Class</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Target Users</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Created At</th>
+              <th style="padding:0.7rem 1rem; text-align:left;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for n in notifications %}
+            <tr style="border-bottom:1px solid #eee;">
+              <td style="padding:0.7rem 1rem; max-width:300px; word-wrap:break-word;">{{ n[1] }}</td>
+              <td style="padding:0.7rem 1rem;">{{ n[2] or 'All Classes' }}</td>
+              <td style="padding:0.7rem 1rem;">
+                {% if n[4] == 'all' %}
+                  <span style="background:#e3f2fd; color:#1976d2; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.85rem;">All Users</span>
+                {% elif n[4] == 'paid' %}
+                  <span style="background:#e8f5e8; color:#2e7d32; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.85rem;">Paid Only</span>
+                {% elif n[4] == 'not paid' %}
+                  <span style="background:#fff3e0; color:#f57c00; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.85rem;">Unpaid Only</span>
+                {% else %}
+                  <span style="background:#f3e5f5; color:#7b1fa2; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.85rem;">{{ n[4]|title }}</span>
+                {% endif %}
+              </td>
+              <td style="padding:0.7rem 1rem;">{{ n[3][:19].replace('T', ' ') if n[3] else '-' }}</td>
+              <td style="padding:0.7rem 1rem;">
+                <form method="POST" action="/admin/delete-notification/{{ n[0] }}" style="display:inline;" onsubmit="return confirm('Delete this notification?');">
+                  <button type="submit" class="btn btn-secondary" style="padding:0.3rem 0.8rem; font-size:0.9rem;">Delete</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  
+  <script>
+    // Character counter for message
+    const messageTextarea = document.getElementById('message');
+    const charCount = document.getElementById('charCount');
+    
+    if (messageTextarea && charCount) {
+      messageTextarea.addEventListener('input', function() {
+        const currentLength = this.value.length;
+        const maxLength = this.maxLength;
+        charCount.textContent = `${currentLength}/${maxLength}`;
+        
+        // Change color when approaching limit
+        if (currentLength > maxLength * 0.9) {
+          charCount.style.color = '#fc5c7d';
+        } else if (currentLength > maxLength * 0.7) {
+          charCount.style.color = '#f6ad55';
+        } else {
+          charCount.style.color = '#6a82fb';
+        }
+      });
+    }
+    
+    // Form validation
+    const form = document.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        const message = document.getElementById('message').value.trim();
+        const classId = document.getElementById('class_id').value;
+        const targetPaidStatus = document.getElementById('target_paid_status').value;
+        
+        if (!message) {
+          e.preventDefault();
+          alert('Please enter a notification message.');
+          return false;
+        }
+        
+        if (!classId) {
+          e.preventDefault();
+          alert('Please select a target class.');
+          return false;
+        }
+        
+        if (!targetPaidStatus) {
+          e.preventDefault();
+          alert('Please select target users.');
+          return false;
+        }
+        
+        // Show confirmation for scheduling
+        if (e.submitter && e.submitter.name === 'schedule') {
+          const scheduleDate = document.getElementById('schedule_date').value;
+          if (!scheduleDate) {
+            e.preventDefault();
+            alert('Please select a schedule date and time.');
+            return false;
+          }
+          
+          if (!confirm('Are you sure you want to schedule this notification?')) {
+            e.preventDefault();
+            return false;
+          }
+        }
+      });
+    }
+    
+    // Auto-resize textarea
+    if (messageTextarea) {
+      messageTextarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+      });
+    }
+    
+    // Personal Chat Functionality
+    let selectedUsers = new Set();
+    
+    function toggleUserSelection(userType) {
+      const userTag = event.target;
+      
+      if (selectedUsers.has(userType)) {
+        selectedUsers.delete(userType);
+        userTag.classList.remove('selected');
+      } else {
+        selectedUsers.add(userType);
+        userTag.classList.add('selected');
+      }
+      
+      updateSelectedUsersDisplay();
+    }
+    
+    function updateSelectedUsersDisplay() {
+      const container = document.getElementById('selectedUsersList');
+      container.innerHTML = '';
+      
+      selectedUsers.forEach(userType => {
+        const tag = document.createElement('span');
+        tag.className = 'selected-user-tag';
+        tag.textContent = `@${userType}`;
+        tag.onclick = () => removeUser(userType);
+        container.appendChild(tag);
+      });
+    }
+    
+    function removeUser(userType) {
+      selectedUsers.delete(userType);
+      document.querySelector(`[data-user="${userType}"]`).classList.remove('selected');
+      updateSelectedUsersDisplay();
+    }
+    
+    function sendPersonalMessages() {
+      const message = document.getElementById('chat_message').value.trim();
+      
+      if (selectedUsers.size === 0) {
+        alert('Please select at least one user group');
+        return;
+      }
+      
+      if (!message) {
+        alert('Please enter a message');
+        return;
+      }
+      
+      if (!confirm(`Send this message to ${selectedUsers.size} user group(s)?`)) {
+        return;
+      }
+      
+      // Send personal messages to selected user groups
+      const promises = Array.from(selectedUsers).map(userType => {
+        return fetch('/api/send-personal-messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_type: userType,
+            message: message
+          })
+        });
+      });
+      
+      Promise.all(promises)
+        .then(responses => {
+          alert('Personal messages sent successfully!');
+          document.getElementById('chat_message').value = '';
+          selectedUsers.clear();
+          updateSelectedUsersDisplay();
+          document.querySelectorAll('.user-tag').forEach(tag => tag.classList.remove('selected'));
+        })
+        .catch(error => {
+          console.error('Error sending personal messages:', error);
+          alert('Error sending personal messages');
+        });
+    }
+    
+    // User search functionality
+    function searchUsers() {
+      const searchInput = document.getElementById('userSearchInput').value.trim();
+      const resultsContainer = document.getElementById('userSearchResults');
+      
+      if (!searchInput) {
+        alert('Please enter a username or name to search');
+        return;
+      }
+      
+      // Remove @ symbol if present
+      const searchTerm = searchInput.startsWith('@') ? searchInput.slice(1) : searchInput;
+      
+      fetch(`/api/search-users?q=${encodeURIComponent(searchTerm)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.users.length > 0) {
+            displayUserSearchResults(data.users);
+          } else {
+            resultsContainer.innerHTML = '<div style="padding:1rem; color:#666; text-align:center;">No users found</div>';
+            resultsContainer.style.display = 'block';
+          }
+        })
+        .catch(error => {
+          console.error('Error searching users:', error);
+          resultsContainer.innerHTML = '<div style="padding:1rem; color:#fc5c7d; text-align:center;">Error searching users</div>';
+          resultsContainer.style.display = 'block';
+        });
+    }
+    
+    function displayUserSearchResults(users) {
+      const resultsContainer = document.getElementById('userSearchResults');
+      resultsContainer.innerHTML = '';
+      
+      users.forEach(user => {
+        const userDiv = document.createElement('div');
+        userDiv.style.cssText = 'padding:0.8rem; border-bottom:1px solid #e0e7ff; cursor:pointer; transition:background 0.2s ease; display:flex; justify-content:space-between; align-items:center;';
+        userDiv.innerHTML = `
+          <div>
+            <strong style="color:#374151;">@${user.username}</strong>
+            <div style="color:#6b7280; font-size:0.9rem;">${user.paid_status || 'Unknown'} • Class: ${user.class_name || 'Unknown'}</div>
+          </div>
+          <button type="button" onclick="selectUserFromSearch('${user.username}', ${user.id})" style="background:#6a82fb; color:white; border:none; padding:0.4rem 0.8rem; border-radius:6px; cursor:pointer; font-size:0.85rem;">Select</button>
+        `;
+        
+        userDiv.onmouseover = () => userDiv.style.background = '#f8fafc';
+        userDiv.onmouseout = () => userDiv.style.background = 'transparent';
+        
+        resultsContainer.appendChild(userDiv);
+      });
+      
+      resultsContainer.style.display = 'block';
+    }
+    
+    function selectUserFromSearch(username, userId) {
+      selectedUsers.set(userId, username);
+      updateSelectedUsersDisplay();
+      document.getElementById('userSearchInput').value = '';
+      document.getElementById('userSearchResults').style.display = 'none';
+    }
+    
+    // Character counter for chat message
+    const chatMessageTextarea = document.getElementById('chat_message');
+    const chatCharCount = document.getElementById('chatCharCount');
+    
+    if (chatMessageTextarea && chatCharCount) {
+      chatMessageTextarea.addEventListener('input', function() {
+        const currentLength = this.value.length;
+        const maxLength = 500;
+        chatCharCount.textContent = `${currentLength}/${maxLength}`;
+        
+        // Change color when approaching limit
+        if (currentLength > maxLength * 0.9) {
+          chatCharCount.style.color = '#fc5c7d';
+        } else if (currentLength > maxLength * 0.7) {
+          chatCharCount.style.color = '#f6ad55';
+        } else {
+          chatCharCount.style.color = '#6a82fb';
+        }
+      });
+    }
+
+    // Mention system for admin send notification page
+    (function setupAdminMentions(){
+      const textarea = document.getElementById('message');
+      const suggestions = document.getElementById('mentionSuggestions');
+      const indicator = document.getElementById('mentionIndicator');
+      const help = document.getElementById('mentionHelp');
+      if (!textarea || !suggestions) return;
+
+      let isMentionMode = false;
+      let mentionStartIndex = -1;
+      let currentSelectionIndex = -1;
+
+      textarea.addEventListener('input', onInput);
+      textarea.addEventListener('keydown', onKeyDown);
+      textarea.addEventListener('click', onCaretMove);
+      textarea.addEventListener('keyup', onCaretMove);
+
+      document.addEventListener('click', (e) => {
+        if (!suggestions.contains(e.target) && e.target !== textarea) hideSuggestions();
+      });
+
+      function onInput(e){
+        const value = textarea.value;
+        const caret = textarea.selectionStart;
+
+        // Detect @ start
+        if (!isMentionMode) {
+          const atIndex = value.lastIndexOf('@', caret - 1);
+          if (atIndex !== -1 && (atIndex === 0 || /\s/.test(value[atIndex - 1]))) {
+            isMentionMode = true;
+            mentionStartIndex = atIndex;
+            currentSelectionIndex = -1;
+            showIndicator();
+            help && (help.style.display = 'block');
+          }
+        }
+
+        if (isMentionMode) {
+          // Extract query after @
+          const afterAt = value.slice(mentionStartIndex + 1, caret);
+          if (afterAt.length >= 1) {
+            queryMentions(afterAt);
+          } else {
+            // If @ removed or empty, maybe keep suggestions minimal
+            if (value[mentionStartIndex] !== '@') {
+              // @ deleted
+              cancelMentionMode();
+            } else {
+              showSuggestions([]);
+            }
+          }
+        }
+      }
+
+      function onCaretMove(){
+        if (!isMentionMode) return;
+        const caret = textarea.selectionStart;
+        if (caret < mentionStartIndex) cancelMentionMode();
+      }
+
+      function onKeyDown(e){
+        if (!isMentionMode || suggestions.style.display === 'none') return;
+        const items = suggestions.querySelectorAll('.mention-item');
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          currentSelectionIndex = (currentSelectionIndex + 1) % Math.max(items.length, 1);
+          updateActiveItem(items);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          currentSelectionIndex = (currentSelectionIndex - 1 + Math.max(items.length, 1)) % Math.max(items.length, 1);
+          updateActiveItem(items);
+        } else if (e.key === 'Enter') {
+          if (currentSelectionIndex >= 0 && items[currentSelectionIndex]) {
+            e.preventDefault();
+            items[currentSelectionIndex].click();
+          }
+        } else if (e.key === 'Escape') {
+          hideSuggestions();
+        }
+      }
+
+      function updateActiveItem(items){
+        items.forEach((el, i) => {
+          el.style.background = i === currentSelectionIndex ? '#f0f4ff' : 'transparent';
+        });
+      }
+
+      function queryMentions(q){
+        fetch(`/api/forum/search-users?q=${encodeURIComponent(q)}`)
+          .then(r => r.json())
+          .then(results => {
+            showSuggestions(results || []);
+          })
+          .catch(() => showSuggestions([]));
+      }
+
+      function showSuggestions(users){
+        suggestions.innerHTML = '';
+        suggestions.style.display = 'block';
+        const list = document.createElement('div');
+        list.style.maxHeight = '200px';
+        list.style.overflowY = 'auto';
+
+        if (!users.length) {
+          const empty = document.createElement('div');
+          empty.style.cssText = 'padding:0.6rem 0.8rem; color:#666;';
+          empty.textContent = 'No users found';
+          list.appendChild(empty);
+        } else {
+          users.forEach((u, idx) => {
+            const item = document.createElement('div');
+            item.className = 'mention-item';
+            item.style.cssText = 'padding:0.6rem 0.8rem; cursor:pointer; display:flex; flex-direction:column; border-bottom:1px solid #f1f5f9;';
+            item.innerHTML = `
+              <strong style="color:#111827">@${u.username}</strong>
+              <small style="color:#6b7280">${u.class_name || ''} ${u.email_address ? '• ' + u.email_address : ''} ${u.mobile_no ? '• ' + u.mobile_no : ''}</small>
+            `;
+            item.onmouseover = () => item.style.background = '#f8fafc';
+            item.onmouseout = () => item.style.background = 'transparent';
+            item.onclick = () => insertMention(u.username);
+            list.appendChild(item);
+            if (idx === 0) currentSelectionIndex = 0;
+          });
+        }
+
+        suggestions.appendChild(list);
+        positionSuggestions();
+      }
+
+      function positionSuggestions(){
+        const rect = textarea.getBoundingClientRect();
+        suggestions.style.left = '0px';
+        // Place below the textarea
+      }
+
+      function insertMention(username){
+        const before = textarea.value.slice(0, mentionStartIndex);
+        const caret = textarea.selectionStart;
+        const after = textarea.value.slice(caret);
+        const mentionText = '@' + username + ' ';
+        textarea.value = before + mentionText + after;
+        // Move caret after inserted mention
+        const newPos = (before + mentionText).length;
+        textarea.setSelectionRange(newPos, newPos);
+        cancelMentionMode();
+        textarea.focus();
+      }
+
+      function showIndicator(){
+        indicator && (indicator.style.display = 'block');
+      }
+
+      function hideSuggestions(){
+        suggestions.style.display = 'none';
+        suggestions.innerHTML = '';
+        indicator && (indicator.style.display = 'none');
+        help && (help.style.display = 'none');
+      }
+
+      function cancelMentionMode(){
+        isMentionMode = false;
+        mentionStartIndex = -1;
+        currentSelectionIndex = -1;
+        hideSuggestions();
+      }
+    })();
+  </script>
+  
+  <style>
+    .user-tag {
+      background: #e0e7ff;
+      color: #6a82fb;
+      border: 1px solid #6a82fb;
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .user-tag:hover {
+      background: #6a82fb;
+      color: white;
+      transform: translateY(-1px);
+    }
+    
+    .user-tag.selected {
+      background: #6a82fb;
+      color: white;
+      box-shadow: 0 2px 8px rgba(106,130,251,0.3);
+    }
+    
+    .selected-user-tag {
+      background: #fc5c7d;
+      color: white;
+      border-radius: 20px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .selected-user-tag:hover {
+      background: #e74c3c;
+      transform: scale(1.05);
+    }
+    
+    .selected-user-tag::after {
+      content: '×';
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+  </style>
+  
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 

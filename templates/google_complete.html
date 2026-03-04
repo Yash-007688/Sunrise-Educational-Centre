@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Complete Sign-In - Sunrise Education Centre</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='uiverse-components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='enhanced-aesthetic.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='floating-navbar.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Auth Page Specific Styles (mirrors auth.html) */
+        .auth-page {
+            min-height: 100vh;
+            background: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        body.dark-mode .auth-page {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: white;
+        }
+        .auth-page::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('/attached_assets/image_1750584670920.png') center/95vmin no-repeat;
+            opacity: 0.18;
+            pointer-events: none;
+            z-index: 1;
+        }
+        body.dark-mode .auth-page::after { opacity: 0.12; }
+        .auth-page .floating-particles { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+        @media (max-width: 1024px) { .auth-page::after { background-size: 110vmin; } }
+        @media (max-width: 640px) { .auth-page::after { background-size: 130vmin; } }
+
+        /* Hide any navbar elements */
+        .navbar,
+        .floating-navbar,
+        .nav-modern,
+        .floating-navbar-container,
+        nav { display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; width: 0 !important; overflow: hidden !important; }
+
+        .auth-card {
+            background: rgba(5, 6, 10, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 24px;
+            padding: 3rem;
+            backdrop-filter: blur(18px) saturate(110%);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .auth-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; max-width: 560px; padding: 0 2rem; z-index: 10; }
+        @media (max-width: 768px) { .auth-container { position: relative; top: auto; left: auto; transform: none; margin: 2rem auto; padding: 0 1rem; } .auth-page { padding: 1rem; align-items: flex-start; justify-content: center; } }
+        @media (max-width: 480px) { .auth-card { padding: 2rem; margin: 1rem; } .auth-container { padding: 0 0.5rem; } }
+
+        .auth-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #6a82fb, #fc5c7d, #ff6b35, #6a82fb); background-size: 300% 100%; animation: shimmer 3s ease infinite; border-radius: 24px 24px 0 0; }
+
+        .auth-logo { text-align: center; margin-bottom: 2rem; }
+        .auth-logo-icon { width: 80px; height: 80px; border-radius: 20px; background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 50%, #ff6b35 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem; animation: logoFloat 3s ease-in-out infinite; box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3), 0 0 24px rgba(106,130,251,0.3); border: 2px solid rgba(255, 255, 255, 0.2); }
+        .auth-title { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff 0%, #e0e7ff 50%, #c7d2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .auth-subtitle { color: rgba(255,255,255,0.85); font-size: 1rem; }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: rgba(255,255,255,0.9); font-weight: 600; }
+        .form-input { width: 100%; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: white; font-size: 1rem; transition: all 0.3s ease; box-sizing: border-box; font-family: inherit; }
+        .form-input:focus { outline: none; border-color: #6a82fb; box-shadow: 0 0 0 3px rgba(106,130,251,0.2); background: rgba(255,255,255,0.12); }
+        .form-input::placeholder { color: rgba(255,255,255,0.6); }
+        .form-select { width: 100%; padding: 1rem 1.25rem; border-radius: 12px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: white; font-size: 1rem; transition: all 0.3s ease; box-sizing: border-box; font-family: inherit; cursor: pointer; }
+        .form-select:focus { outline: none; border-color: #6a82fb; box-shadow: 0 0 0 3px rgba(106,130,251,0.2); background: rgba(255,255,255,0.12); }
+
+        .auth-button { width: 100%; padding: 1rem 2rem; border-radius: 12px; background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%); border: none; color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 1rem; box-shadow: 0 4px 15px rgba(106,130,251,0.3); }
+        .auth-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(106,130,251,0.4); }
+        .auth-button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .form-toggle { text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .back-link { color: #6a82fb; text-decoration: none; font-weight: 600; }
+        .back-link:hover { color: #fc5c7d; text-shadow: 0 0 8px rgba(252,92,125,0.3); }
+
+        .hidden { display: none !important; }
+        @keyframes shimmer { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        @keyframes logoFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    </style>
+  </head>
+  <body class="auth-page">
+    <!-- Background particles -->
+    <div class="floating-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Main Auth Container -->
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div class="auth-logo-icon">🌅</div>
+          <h1 class="auth-title">Complete Your Sign-In</h1>
+          <p class="auth-subtitle" style="margin:0;">Signed in with: <strong>{{ email }}</strong></p>
+        </div>
+
+        <form method="POST">
+          {% if not session.get('pending_link_username') %}
+          <div id="linkExistingSection" class="form-group">
+            <label class="form-label">Link to existing username (optional)</label>
+            <input class="form-input" type="text" name="link_username" placeholder="Existing username to link (e.g., yash)" />
+            <small style="color:rgba(255,255,255,0.75);">If you already have an account, enter your existing username to link this Google email.</small>
+          </div>
+          {% endif %}
+
+          {% if not session.get('pending_link_username') %}
+          <div id="createNewSection" class="form-group">
+            <label class="form-label">Or create a new username</label>
+            <input class="form-input" type="text" name="chosen_username" placeholder="Preferred username" value="{{ suggested_name }}" />
+          </div>
+          {% endif %}
+
+          <div class="form-group">
+            <label for="roleSelect" class="form-label">Select your role/class</label>
+            <select name="class_id" id="roleSelect" class="form-select" required>
+              <option value="">Select a role...</option>
+              {% for id, name in all_classes %}
+                <option value="{{ id }}">{{ name|title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div id="adminCodeSection" class="form-group" style="display:none;">
+            <input class="form-input" type="text" name="admin_code" placeholder="Admin Code (required for admin role)" required />
+            <small style="color:rgba(255,255,255,0.75);">Admin code is required to verify admin privileges.</small>
+          </div>
+
+          <button type="submit" class="auth-button">Continue</button>
+        </form>
+
+        <div class="form-toggle">
+          <a href="/auth" class="back-link"><span style="margin-right: 0.5rem;">←</span>Back to Login</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div id="searchModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-content black-glass" style="margin: 10% auto; padding: 2rem; border-radius: 20px; width: 90%; max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="color: white; margin: 0;">🔍 Search</h2>
+                <button onclick="closeSearch()" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search courses, resources, or topics..." style="width: 100%; padding: 15px; border: none; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem; margin-bottom: 1rem;">
+            <div id="searchResults" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div id="notification-panel" class="notification-panel black-glass" style="display: none; position: fixed; top: 100px; right: 20px; width: 350px; max-height: 500px; overflow-y: auto; z-index: 999; border-radius: 16px; padding: 1rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <h3 style="margin: 0; font-size: 1.2rem; color: white;">🔔 Notifications</h3>
+            <button onclick="toggleNotifications()" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 0.2rem;">✕</button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item" style="padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;">
+                <div style="font-weight: 600; margin-bottom: 0.3rem; color: white;">📚 Latest Updates</div>
+                <div style="font-size: 0.9rem; opacity: 0.8; color: rgba(255,255,255,0.8);">Check out new features and content</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='navbar-functions.js') }}"></script>
+    <script src="{{ url_for('static', filename='attached_assets/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+      // Show/hide admin code field based on role selection
+      document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('roleSelect');
+        const adminCodeSection = document.getElementById('adminCodeSection');
+        if (!roleSelect || !adminCodeSection) return;
+        roleSelect.addEventListener('change', function() {
+          const selectedText = this.options[this.selectedIndex]?.text?.toLowerCase() || '';
+          if (selectedText === 'admin') {
+            adminCodeSection.style.display = 'block';
+            adminCodeSection.querySelector('input[name="admin_code"]').required = true;
+          } else {
+            adminCodeSection.style.display = 'none';
+            adminCodeSection.querySelector('input[name="admin_code"]').required = false;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
+

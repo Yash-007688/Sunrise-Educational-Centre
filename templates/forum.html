@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum - Sunrise Educational Centre</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='pages-global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='uiverse-components.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='forum.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='enhanced-aesthetic.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-navbar.css') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+</head>
+<body class="forum-page" data-user-role="{{ role|default('') }}">
+    
+    <!-- Enhanced Floating Particles Background -->
+    <div class="floating-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div id="navbar-container"></div>
+
+    <!-- Topics Toggle Button (hidden; navbar button will trigger this) -->
+    <button class="topics-toggle" id="categoryToggle" style="display: none;">
+        <span>💬</span>
+        <span>Browse Topics</span>
+    </button>
+
+    <!-- Hero panel like home -->
+    <section class="hero-section hero-modern" style="padding: 6rem 0 3rem 0; text-align:center; color:#fff; background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('attached_assets/image_1750584670920.png') center/cover no-repeat;">
+      <div class="hero-content hero-content-modern">
+        <p class="hero-subtitle-modern" style="max-width: 800px; margin: 0 auto 1.5rem;">Connect, ask questions, and share knowledge with peers and mentors.</p>
+      </div>
+    </section>
+
+    <!-- Debug Test Button (temporary) -->
+    <button onclick="testPopup()" style="position: fixed; top: 100px; right: 20px; z-index: 1001; background: #ff6b6b; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; display: none;">
+        Test Popup
+    </button>
+
+    <!-- Enhanced Category Popup -->
+    <div class="category-popup glass-card" id="categoryPopup">
+        <div class="category-popup-header glass-card" style="margin: 0; border-radius: 20px 20px 0 0;">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <h2 style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.5rem; margin-bottom: 0.5rem;">💬 Forum Topics</h2>
+                <p style="color: rgba(255,255,255,0.8); font-size: 1rem;">Select a topic to start chatting</p>
+            </div>
+            
+            <div class="user-info-section glass-card" style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(255,255,255,0.08); border-radius: 16px; border: 1px solid rgba(255,255,255,0.15); position: relative; overflow: hidden;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--primary-gradient);"></div>
+                <div style="margin-bottom: 1.2rem; text-align: center;">
+                    <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; font-weight: 700; color: white;">{{ username[0]|upper if username else 'U' }}</div>
+                    <strong style="color: #fff; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">{{ username }}</strong>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                        <div style="color: rgba(255,255,255,0.7); font-size: 0.8rem; margin-bottom: 0.5rem;">Role</div>
+                        <span class="class-chip" style="margin: 0; padding: 0.5rem 1rem; background: rgba(106,130,251,0.2); border: 1px solid rgba(106,130,251,0.4);">{{ role }}</span>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                        <div style="color: rgba(255,255,255,0.7); font-size: 0.8rem; margin-bottom: 0.5rem;">Status</div>
+                        <span class="status-chip {{ 'unpaid' if (user_paid_status != 'paid') else '' }}" style="margin: 0; padding: 0.5rem 1rem;">{{ user_paid_status or 'unpaid' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="category-list" id="categoryList">
+            {% if paid_topics and paid_topics|length > 0 %}
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="color: #aef9e4; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>💎</span> Premium Topics
+                    </h4>
+                    {% for t in paid_topics %}
+                        <div class="category-item glass-card" data-topic="{{ t[0] }}" data-topic-name="{{ t[1] }}" style="margin-bottom: 0.75rem; background: rgba(0, 200, 140, 0.1); border: 1px solid rgba(0, 200, 140, 0.3);">
+                            <div class="category-item-content">
+                                <div class="category-name" style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <span style="font-size: 1.2rem;">💬</span>
+                                    <span>{{ t[1] }}</span>
+                                </div>
+                            </div>
+                            <span class="category-badge paid" style="background: rgba(0, 200, 140, 0.3); color: #aef9e4; border: 1px solid rgba(0, 200, 140, 0.5); padding: 0.25rem 0.75rem; border-radius: 12px;">PREMIUM</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% if unpaid_topics and unpaid_topics|length > 0 %}
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="color: rgba(255,255,255,0.8); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>🆓</span> Free Topics
+                    </h4>
+                    {% for t in unpaid_topics %}
+                        <div class="category-item glass-card" data-topic="{{ t[0] }}" data-topic-name="{{ t[1] }}" style="margin-bottom: 0.75rem;">
+                            <div class="category-item-content">
+                                <div class="category-name" style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <span style="font-size: 1.2rem;">💭</span>
+                                    <span>{{ t[1] }}</span>
+                                </div>
+                            </div>
+                            <span class="category-badge unpaid" style="background: rgba(255, 255, 255, 0.15); color: #ffd2d2; border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.25rem 0.75rem; border-radius: 12px;">FREE</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% if (not paid_topics or paid_topics|length == 0) and (not unpaid_topics or unpaid_topics|length == 0) %}
+                <div class="glass-card" style="color: rgba(255,255,255,0.8); text-align: center; padding: 2rem; background: rgba(255,255,255,0.05);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
+                    <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">No topics available</div>
+                    <div style="font-size: 0.9rem; opacity: 0.7;">Check back later for new discussion topics</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Forum Container -->
+    <div class="forum-container">
+        
+        <!-- Hero Section -->
+        <section class="forum-hero">
+            <div class="forum-hero-content">
+                <div class="forum-logo">💬</div>
+                <h1 class="forum-title">Community Forum</h1>
+                <p class="forum-subtitle">Connect, discuss, and learn together in our vibrant educational community</p>
+                
+                <!-- User Info Card -->
+                <div class="user-info-card">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="user-avatar">{{ username[0]|upper if username else 'U' }}</div>
+                        <div class="user-details">
+                            <h3>{{ username }}</h3>
+                            <p>{{ role|title }}</p>
+                        </div>
+                    </div>
+                    <div class="user-status {{ 'status-paid' if user_paid_status == 'paid' else 'status-free' }}">
+                        {{ '💎 Premium' if user_paid_status == 'paid' else '🆓 Free' }}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Forum Content -->
+        <main class="forum-main">
+            
+            <!-- Messages Display Area -->
+            <section class="messages-area" id="forumMessages">
+                <div id="emptyForumMsg" class="empty-state">
+                    <div class="empty-state-icon">💭</div>
+                    <h3>Ready to Start Chatting?</h3>
+                    <p>Select a topic from the sidebar to join conversations, share knowledge, and connect with your classmates and teachers in real-time discussions.</p>
+                    <button onclick="document.getElementById('categoryToggle').click()" class="action-btn action-btn-primary" style="width: auto; height: auto; padding: 1rem 2rem; border-radius: 50px; font-size: 1.1rem;">
+                        <span style="margin-right: 0.5rem;">💬</span>
+                        Browse Topics
+                    </button>
+                </div>
+            </section>
+
+            <!-- Input Area -->
+            <section class="input-area">
+                <div class="input-container">
+                    <div class="input-field">
+                        <label for="forumInput">💬 Share your thoughts</label>
+                        <textarea id="forumInput" placeholder="Type your message here... Share ideas, ask questions, or join the discussion!" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="input-actions">
+                        <input type="file" id="forumMediaInput" accept="image/*,video/*" style="display:none;" />
+                        <button id="forumUploadBtn" class="action-btn action-btn-glass" title="Upload media">📎</button>
+                        <button id="forumEmojiBtn" class="action-btn action-btn-glass" title="Add emoji">😊</button>
+                        <button id="forumSendBtn" class="action-btn action-btn-primary" title="Send message">➤</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Poll Creation Modal -->
+    <div id="pollModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
+        <div class="modal-content black-glass" style="margin: 5% auto; padding: 2rem; border-radius: 20px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="color: white; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                    📊 Create Poll
+                </h2>
+                <button onclick="closePollModal()" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; padding: 0.5rem;">✕</button>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: white; margin-bottom: 0.5rem; font-weight: 600;">Poll Question</label>
+                <input type="text" id="pollQuestion" placeholder="What would you like to ask?" style="width: 100%; padding: 12px; border: none; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem;">
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: white; margin-bottom: 0.5rem; font-weight: 600;">Poll Options</label>
+                <div id="pollOptions">
+                    <div class="poll-option-input" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <input type="text" placeholder="Option 1" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+                        <button onclick="removePollOption(this)" style="background: rgba(255,0,0,0.2); border: 1px solid rgba(255,0,0,0.4); color: #ff6b6b; padding: 10px; border-radius: 8px; cursor: pointer;">🗑️</button>
+                    </div>
+                    <div class="poll-option-input" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <input type="text" placeholder="Option 2" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: rgba(255,255,255,0.1); color: white;">
+                        <button onclick="removePollOption(this)" style="background: rgba(255,0,0,0.2); border: 1px solid rgba(255,0,0,0.4); color: #ff6b6b; padding: 10px; border-radius: 8px; cursor: pointer;">🗑️</button>
+                    </div>
+                </div>
+                <button onclick="addPollOption()" class="uiverse-btn" style="margin-top: 0.5rem; padding: 8px 16px; font-size: 0.9rem;">
+                    ➕ Add Option
+                </button>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button onclick="closePollModal()" class="morph-btn" style="padding: 12px 24px;">Cancel</button>
+                <button onclick="createPoll()" class="pulse-btn" style="padding: 12px 24px;">Create Poll</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mention Suggestions Dropdown -->
+    <div id="mentionSuggestions" class="mention-suggestions black-glass" style="display: none; position: fixed; z-index: 9999; border-radius: 12px; padding: 0.5rem; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.6);">
+        <div id="mentionSuggestionsList">
+            <!-- Suggestions will be populated here -->
+        </div>
+    </div>
+
+    <!-- Mention Help Indicator -->
+    <div id="mentionIndicator" style="display: none; position: fixed; bottom: 100px; right: 20px; background: rgba(106,130,251,0.9); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; z-index: 1000;">
+        💡 Type @ to mention users
+    </div>
+
+    <!-- Command Help Panel -->
+    <div id="commandHelp" class="black-glass" style="display: none; position: fixed; bottom: 120px; left: 20px; padding: 1rem; border-radius: 12px; max-width: 300px; z-index: 1000;">
+        <h4 style="color: white; margin: 0 0 0.5rem 0; font-size: 0.9rem;">💡 Quick Commands</h4>
+        <div style="color: rgba(255,255,255,0.8); font-size: 0.8rem; line-height: 1.4;">
+            <div><strong>/poll</strong> - Create a poll</div>
+            <div><strong>@username</strong> - Mention a user</div>
+            <div><strong>Ctrl+Enter</strong> - Send message</div>
+        </div>
+    </div>
+
+    <!-- Enhanced Footer -->
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="footer-content-modern">
+                <div class="footer-section">
+                    <h3>Community Forum</h3>
+                    <p>Connect, learn, and grow together in our educational community.</p>
+                    <div class="uiverse-social-container">
+                        <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank" class="uiverse-social-btn instagram" title="Instagram">
+                            <img src="{{ url_for('static', filename='footer/instagram-brands-solid-full.svg') }}" alt="Instagram" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+                        </a>
+                        <a href="https://www.youtube.com/@MohitNariyani" target="_blank" class="uiverse-social-btn youtube" title="YouTube">
+                            <img src="{{ url_for('static', filename='footer/youtube-brands-solid-full.svg') }}" alt="YouTube" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+                        </a>
+                        <a href="https://wa.me/917224860881" target="_blank" class="uiverse-social-btn whatsapp" title="WhatsApp">
+                            <i class="fa-brands fa-whatsapp" style="font-size:24px; line-height:24px; color: #25D366;"></i>
+                        </a>
+                        <a href="/" class="uiverse-social-btn" title="Home">
+                            <i class="fas fa-home"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="/">Home</a>
+                        <a href="/study-resources">Study Resources</a>
+                        <a href="/study-resources">Study Resources</a>
+                        <a href="/admission">Admission</a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Forum Guidelines</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <span>💬 Be respectful</span>
+                        <span>📚 Stay on topic</span>
+                        <span>🤝 Help others</span>
+                        <span>🚫 No spam</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>&copy; 2024 Sunrise Educational Centre. All rights reserved.</div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <div class="uiverse-theme-slider" title="Theme">
+                            <label class="switch">
+                                <input id="footerThemeSlider" type="checkbox" />
+                                <span class="slider-round"></span>
+                            </label>
+                            <span id="footerThemeSliderLabel">Theme</span>
+                        </div>
+                        <button id="footerThemeToggle" class="btn-modern btn-glass" style="padding: 0.5rem 1rem; font-size: 0.9rem; display:none;">🌙 Theme</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        window.currentUsername = {{ username|tojson }};
+        
+        // Forum page debugging and fallback
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Forum page loaded');
+            
+            // Test if all elements are present
+            const requiredElements = {
+                categoryToggle: document.getElementById('categoryToggle'),
+                categoryPopup: document.getElementById('categoryPopup'),
+                overlay: document.getElementById('overlay'),
+                forumMessages: document.getElementById('forumMessages')
+            };
+            
+            console.log('Required elements check:', requiredElements);
+            
+            // Fallback event listener if forum.js fails
+            setTimeout(() => {
+                const toggle = document.getElementById('categoryToggle');
+                const popup = document.getElementById('categoryPopup');
+                const overlay = document.getElementById('overlay');
+                
+                if (toggle && popup && overlay && !toggle.hasAttribute('data-listener-added')) {
+                    console.log('Adding fallback event listeners');
+                    
+                    toggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log('Fallback: Toggle clicked');
+                        
+                        const isOpen = popup.classList.contains('open');
+                        if (isOpen) {
+                            popup.classList.remove('open');
+                            overlay.classList.remove('open');
+                            document.body.classList.remove('popup-open');
+                        } else {
+                            popup.classList.add('open');
+                            overlay.classList.add('open');
+                            document.body.classList.add('popup-open');
+                        }
+                    });
+                    
+                    overlay.addEventListener('click', function() {
+                        console.log('Fallback: Overlay clicked');
+                        popup.classList.remove('open');
+                        overlay.classList.remove('open');
+                        document.body.classList.remove('popup-open');
+                    });
+                    
+                    toggle.setAttribute('data-listener-added', 'true');
+                    console.log('Fallback event listeners added successfully');
+                }
+            }, 1000);
+        });
+    </script>
+    
+    <script src="{{ url_for('static', filename='modern-interactions.js') }}"></script>
+    <script src="{{ url_for('static', filename='attached_assets/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='forum.js') }}"></script>
+    <script src="{{ url_for('static', filename='loader.js') }}"></script>
+    <!-- Search Modal -->
+    <div id="searchModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-content black-glass" style="margin: 10% auto; padding: 2rem; border-radius: 20px; width: 90%; max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="color: white; margin: 0;">🔍 Search</h2>
+                <button onclick="closeSearch()" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search courses, resources, or topics..." style="width: 100%; padding: 15px; border: none; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem; margin-bottom: 1rem;">
+            <div id="searchResults" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div id="notification-panel" class="notification-panel black-glass" style="display: none; position: fixed; top: 100px; right: 20px; width: 350px; max-height: 500px; overflow-y: auto; z-index: 999; border-radius: 16px; padding: 1rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <h3 style="margin: 0; font-size: 1.2rem; color: white;">🔔 Notifications</h3>
+            <button onclick="toggleNotifications()" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 0.2rem;">✕</button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item" style="padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;">
+                <div style="font-weight: 600; margin-bottom: 0.3rem; color: white;">📚 Latest Updates</div>
+                <div style="font-size: 0.9rem; opacity: 0.8; color: rgba(255,255,255,0.8);">Check out new features and content</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='navbar-functions.js') }}"></script>
+</body>
+</html>

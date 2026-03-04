@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notifications - Sunrise Educational Centre</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='pages-global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='uiverse-components.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+</head>
+<body>
+    <div id="navbar-container"></div>
+
+    <section class="card-section black-glass" style="max-width:900px; margin: 2rem auto; padding: 1.5rem;">
+        <div style="text-align:center; margin-bottom: 1rem;">
+            <h2 style="margin:0 0 .5rem 0;">Your Notifications</h2>
+            <div style="display:flex; gap:.5rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem;">
+                <span class="uiverse-stat-chip">🔔 Unread: {{ unread_count or 0 }}</span>
+                <span class="uiverse-stat-chip">📅 Today: {{ today_count or 0 }}</span>
+                <span class="uiverse-stat-chip">📦 Total: {{ total_count or 0 }}</span>
+            </div>
+            {% if unread_count and unread_count > 0 %}
+                <button class="notification-action-btn mark-all-read-btn" onclick="markAllAsRead()" style="margin-bottom:1rem;">
+                    <i class="fas fa-check-double"></i>
+                    <span>Mark All as Read</span>
+                </button>
+            {% endif %}
+        </div>
+        {% if notifications and notifications|length > 0 %}
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.8rem;">
+                {% for n in notifications %}
+                    {% set id = n[0] %}
+                    {% set message = n[1] %}
+                    {% set created_at = n[2] %}
+                    {% set notification_type = n[4] if n|length > 4 else 'general' %}
+                    {% set item_type = n[6] if n|length > 6 else 'general' %}
+                    {% set sender_name = n[7] if n|length > 7 else None %}
+                    
+                    <li class="notification-item uiverse-card" data-notification-id="{{ id }}" data-type="{{ item_type }}" style="padding:1rem; border-radius:12px; border-left: 4px solid {% if item_type == 'personal_chat' %}#fc5c7d{% elif item_type == 'mention' %}#ff6b6b{% elif item_type == 'personal' %}#4ecdc4{% else %}#6a82fb{% endif %};">
+                        <div class="notification-content">
+                            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem; flex-wrap:wrap;">
+                                <span class="notification-badge" style="background: {% if item_type == 'personal_chat' %}#fc5c7d{% elif item_type == 'mention' %}#ff6b6b{% elif item_type == 'personal' %}#4ecdc4{% else %}#6a82fb{% endif %};">
+                                    {% if item_type == 'personal_chat' %}💬 Personal Chat
+                                    {% elif item_type == 'mention' %}📢 Mention
+                                    {% elif item_type == 'personal' %}👤 Personal
+                                    {% else %}📢 General{% endif %}
+                                </span>
+                                {% if sender_name %}
+                                    <span class="notification-stat-chip" style="background: rgba(255,255,255,0.1);">@{{ sender_name }}</span>
+                                {% endif %}
+                                <span class="notification-stat-chip">🕒 {{ created_at }}</span>
+                            </div>
+                            <div style="word-wrap: break-word; color:#fff; margin-bottom:0.5rem;">{{ message }}</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="notification-action-btn mark-read-btn" onclick="markNotificationAsSeen('{{ id }}', '{{ item_type }}')">
+                                <i class="fas fa-check"></i>
+                                <span>Mark as Read</span>
+                            </button>
+                            <button class="notification-action-btn clear-btn" onclick="deleteNotification('{{ id }}', '{{ item_type }}')">
+                                <i class="fas fa-trash"></i>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="notification-empty-state">
+                <i class="fas fa-bell-slash"></i>
+                <p>No new notifications</p>
+                <small>You're all caught up! Check back later for updates.</small>
+            </div>
+        {% endif %}
+    </section>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    
+    <script>
+        // Enhanced notification functionality with proper API calls
+        function markNotificationAsSeen(notificationId, itemType) {
+            const notificationItem = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            const button = notificationItem.querySelector('.mark-read-btn');
+            
+            // Add loading state
+            button.classList.add('notification-loading');
+            button.disabled = true;
+            
+            // Call the actual API
+            fetch(`/api/mark-notification-seen/${notificationId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    type: itemType
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove loading state
+                button.classList.remove('notification-loading');
+                
+                if (data.success) {
+                    // Add success animation
+                    notificationItem.classList.add('notification-success');
+                    
+                    // Update button text and style
+                    button.innerHTML = '<i class="fas fa-check-circle"></i><span>Marked as Read</span>';
+                    button.classList.remove('mark-read-btn');
+                    button.classList.add('clear-btn');
+                    button.disabled = true;
+                    
+                    // Remove success animation after delay
+                    setTimeout(() => {
+                        notificationItem.classList.remove('notification-success');
+                    }, 600);
+                    
+                    // Optional: Hide the notification after a delay
+                    setTimeout(() => {
+                        notificationItem.style.opacity = '0.5';
+                        notificationItem.style.transform = 'scale(0.98)';
+                    }, 2000);
+                } else {
+                    // Handle error
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                    console.error('Failed to mark notification as seen:', data.error);
+                }
+            })
+            .catch(error => {
+                // Remove loading state and show error
+                button.classList.remove('notification-loading');
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                console.error('Error marking notification as seen:', error);
+            });
+        }
+        
+        function deleteNotification(notificationId, itemType) {
+            const notificationItem = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            const button = notificationItem.querySelector('.clear-btn');
+            
+            // Add loading state
+            button.classList.add('notification-loading');
+            button.disabled = true;
+            
+            // Call the actual API
+            fetch(`/api/delete-notification/${notificationId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    type: itemType
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Add delete animation
+                    notificationItem.classList.add('notification-delete');
+                    
+                    // Remove from DOM after animation
+                    setTimeout(() => {
+                        notificationItem.remove();
+                        
+                        // Check if no notifications left
+                        const remainingNotifications = document.querySelectorAll('.notification-item');
+                        if (remainingNotifications.length === 0) {
+                            // Show empty state
+                            const notificationList = document.querySelector('ul');
+                            if (notificationList) {
+                                notificationList.innerHTML = `
+                                    <div class="notification-empty-state">
+                                        <i class="fas fa-bell-slash"></i>
+                                        <p>No new notifications</p>
+                                        <small>You're all caught up! Check back later for updates.</small>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }, 500);
+                } else {
+                    // Handle error
+                    button.classList.remove('notification-loading');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                    console.error('Failed to delete notification:', data.error);
+                }
+            })
+            .catch(error => {
+                // Remove loading state and show error
+                button.classList.remove('notification-loading');
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                console.error('Error deleting notification:', error);
+            });
+        }
+        
+        function markAllAsRead() {
+            const markAllButton = document.querySelector('.mark-all-read-btn');
+            const notificationItems = document.querySelectorAll('.notification-item');
+            
+            // Add loading state to main button
+            markAllButton.classList.add('notification-loading');
+            markAllButton.disabled = true;
+            
+            // Call the API to mark all as read
+            fetch('/api/mark-all-notifications-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Process each notification with animation
+                    notificationItems.forEach((item, index) => {
+                        setTimeout(() => {
+                            const markReadBtn = item.querySelector('.mark-read-btn');
+                            if (markReadBtn && !markReadBtn.disabled) {
+                                // Add success animation
+                                item.classList.add('notification-success');
+                                
+                                // Update button
+                                markReadBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>Marked as Read</span>';
+                                markReadBtn.classList.remove('mark-read-btn');
+                                markReadBtn.classList.add('clear-btn');
+                                markReadBtn.disabled = true;
+                                
+                                // Remove success animation
+                                setTimeout(() => {
+                                    item.classList.remove('notification-success');
+                                }, 600);
+                            }
+                        }, index * 200); // Stagger the animations
+                    });
+                    
+                    // Update main button
+                    setTimeout(() => {
+                        markAllButton.classList.remove('notification-loading');
+                        markAllButton.disabled = false;
+                        markAllButton.innerHTML = '<i class="fas fa-check-double"></i><span>All Marked as Read</span>';
+                        markAllButton.style.opacity = '0.7';
+                    }, notificationItems.length * 200 + 1000);
+                } else {
+                    // Handle error
+                    markAllButton.classList.remove('notification-loading');
+                    markAllButton.disabled = false;
+                    markAllButton.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                    console.error('Failed to mark all notifications as read:', data.error);
+                }
+            })
+            .catch(error => {
+                // Remove loading state and show error
+                markAllButton.classList.remove('notification-loading');
+                markAllButton.disabled = false;
+                markAllButton.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error - Try Again</span>';
+                console.error('Error marking all notifications as read:', error);
+            });
+        }
+        
+        // Add hover effects to notification items
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationItems = document.querySelectorAll('.notification-item');
+            
+            notificationItems.forEach(item => {
+                // Add subtle entrance animation
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    item.style.transition = 'all 0.3s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, Math.random() * 300);
+            });
+        });
+        
+        // Add keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Close any open modals or dropdowns
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (modal.style.display !== 'none') {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+        });
+        
+        // Add touch support for mobile
+        if ('ontouchstart' in window) {
+            document.addEventListener('touchstart', function(e) {
+                const target = e.target.closest('.notification-action-btn');
+                if (target) {
+                    target.style.transform = 'scale(0.95)';
+                }
+            });
+            
+            document.addEventListener('touchend', function(e) {
+                const target = e.target.closest('.notification-action-btn');
+                if (target) {
+                    setTimeout(() => {
+                        target.style.transform = '';
+                    }, 150);
+                }
+            });
+        }
+    </script>
+
+    <!-- Search Modal -->
+    <div id="searchModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-content black-glass" style="margin: 10% auto; padding: 2rem; border-radius: 20px; width: 90%; max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="color: white; margin: 0;">🔍 Search</h2>
+                <button onclick="closeSearch()" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search courses, resources, or topics..." style="width: 100%; padding: 15px; border: none; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem; margin-bottom: 1rem;">
+            <div id="searchResults" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div id="notification-panel" class="notification-panel black-glass" style="display: none; position: fixed; top: 100px; right: 20px; width: 350px; max-height: 500px; overflow-y: auto; z-index: 999; border-radius: 16px; padding: 1rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <h3 style="margin: 0; font-size: 1.2rem; color: white;">🔔 Notifications</h3>
+            <button onclick="toggleNotifications()" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 0.2rem;">✕</button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item" style="padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;">
+                <div style="font-weight: 600; margin-bottom: 0.3rem; color: white;">📚 Latest Updates</div>
+                <div style="font-size: 0.9rem; opacity: 0.8; color: rgba(255,255,255,0.8);">Check out new features and content</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='navbar-functions.js') }}"></script>
+    
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="uiverse-social-container">
+                <a href="https://www.instagram.com/sunrise_education_centre?igsh=OGc5enlsanE0eWJ2" target="_blank" class="uiverse-social-btn instagram" title="Instagram">
+                    <img src="{{ url_for('static', filename='footer/instagram-brands-solid-full.svg') }}" alt="Instagram" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+                </a>
+                <a href="https://www.youtube.com/@MohitNariyani" target="_blank" class="uiverse-social-btn youtube" title="YouTube">
+                    <img src="{{ url_for('static', filename='footer/youtube-brands-solid-full.svg') }}" alt="YouTube" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+                </a>
+                <a href="https://wa.me/917224860881" target="_blank" class="uiverse-social-btn whatsapp" title="WhatsApp">
+                    <i class="fa-brands fa-whatsapp" style="font-size:24px; line-height:24px; color: #25D366;"></i>
+                </a>
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Contact Us</a>
+            </div>
+            <div class="footer-copy">&copy; 2024 Sunrise Education Centre</div>
+            <div class="footer-theme-toggle">
+                <div class="uiverse-theme-slider" title="Theme">
+                    <label class="switch">
+                        <input id="footerThemeSlider" type="checkbox" />
+                        <span class="slider-round"></span>
+                    </label>
+                    <span id="footerThemeSliderLabel">Theme</span>
+                </div>
+                <button id="footerThemeToggle" type="button" aria-pressed="false" style="display:none;">🌙 Dark Mode</button>
+            </div>
+        </div>
+    </footer>
+</body>
+    <script src="{{ url_for('static', filename='loader.js') }}"></script>
+</html>
+<script src="{{ url_for('static', filename='attached_assets/theme.js') }}"></script>

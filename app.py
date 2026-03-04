@@ -35,7 +35,7 @@ from auth_handler import (
     init_db, register_user, authenticate_user,
     get_all_users, delete_user, search_users, get_user_by_id,
     update_user, add_notification, get_unread_notifications_for_user, get_all_notifications,
-    get_class_details_by_id, get_all_classes,
+    get_all_classes,
     mark_notification_as_seen, delete_notification,
     save_forum_message,
     create_topic, delete_topic, get_all_topics, get_topics_for_user, can_user_access_topic,
@@ -105,7 +105,7 @@ except ImportError:
     print("Flask-Compress not available, compression disabled")
 
 # Initialize Flask app
-app = Flask(__name__, static_folder='.', template_folder='.')
+app = Flask(__name__, static_folder='static', template_folder='templates')
 
 # Enable compression if available
 if compress:
@@ -116,6 +116,28 @@ if compress:
 def add_cache_headers(response):
     if request.path.startswith('/static/') or '.' in request.path:
         response.headers['Cache-Control'] = 'public, max-age=3600'
+
+    # Inject universal navbar assets into HTML responses so all pages
+    # use the same navbar experience as the home page.
+    try:
+        content_type = response.headers.get('Content-Type', '')
+        is_html = 'text/html' in content_type
+        is_static = request.path.startswith('/static/')
+        is_encoded = bool(response.headers.get('Content-Encoding'))
+        if is_html and not is_static and not is_encoded and response.status_code == 200:
+            html = response.get_data(as_text=True)
+            navbar_script = '/static/navbar-universal.js'
+            if navbar_script not in html and '</body>' in html:
+                inject_block = (
+                    '\n<link rel="stylesheet" href="/static/modern-navbar.css">\n'
+                    '<script src="/static/navbar-universal.js" defer></script>\n'
+                )
+                html = html.replace('</body>', f'{inject_block}</body>', 1)
+                response.set_data(html)
+    except Exception:
+        # Never fail a request due to navbar injection issues.
+        pass
+
     return response
 
 # Configuration
@@ -353,90 +375,8 @@ def close_connection(exception):
         db.close()
 
 def init_poll_and_doubt_tables():
+    """Legacy initializer retained for compatibility."""
     db = get_db()
-    c = db.cursor()
-    
-    # Live Class Messages
-    c.execute('''CREATE TABLE IF NOT EXISTS live_class_messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        class_id TEXT,
-        user_id TEXT,
-        username TEXT,
-        message TEXT,
-        message_type TEXT DEFAULT 'chat',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )''')
-    
-    # Live Class Recordings
-    c.execute('''CREATE TABLE IF NOT EXISTS live_class_recordings (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        class_id TEXT,
-        recording_name TEXT,
-        file_path TEXT,
-        duration INTEGER DEFAULT 0,
-        file_size INTEGER DEFAULT 0,
-        status TEXT DEFAULT 'recording', -- recording, completed, failed
-        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        ended_at TIMESTAMP,
-        created_by TEXT,
-        metadata TEXT -- JSON string for additional info
-    )''')
-    
-    # Recording Segments (for long recordings)
-    c.execute('''CREATE TABLE IF NOT EXISTS recording_segments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        recording_id INTEGER,
-        segment_number INTEGER,
-        file_path TEXT,
-        duration INTEGER DEFAULT 0,
-        file_size INTEGER DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (recording_id) REFERENCES live_class_recordings (id)
-    )''')
-    
-    # Polls
-    c.execute('''CREATE TABLE IF NOT EXISTS polls (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        class_id TEXT,
-        question TEXT,
-        created_by TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )''')
-    c.execute('''CREATE TABLE IF NOT EXISTS poll_options (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        poll_id INTEGER,
-        option_text TEXT,
-        FOREIGN KEY(poll_id) REFERENCES polls(id)
-    )''')
-    c.execute('''CREATE TABLE IF NOT EXISTS poll_votes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        poll_id INTEGER,
-        option_id INTEGER,
-        user_id TEXT,
-        voted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(poll_id) REFERENCES polls(id),
-        FOREIGN KEY(option_id) REFERENCES poll_options(id)
-    )''')
-    
-    # Ensure topic_id column exists on polls for forum linkage
-    try:
-        c.execute("PRAGMA table_info(polls)")
-        cols = [row[1] for row in c.fetchall()]
-        if 'topic_id' not in cols:
-            c.execute("ALTER TABLE polls ADD COLUMN topic_id INTEGER")
-    except Exception as _e:
-        pass
-    # Doubts
-    c.execute('''CREATE TABLE IF NOT EXISTS doubts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        class_id TEXT,
-        user_id TEXT,
-        username TEXT,
-        doubt_text TEXT,
-        status TEXT DEFAULT 'open',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        resolved_at TIMESTAMP
-    )''')
     db.commit()
 
 # Initialize database tables on app startup
@@ -1115,9 +1055,6 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading',
 active_sessions = {}
 room_participants = {}
 
-# Recording management
-active_recordings = {}  # Track active recordings by class_id
-recording_sessions = {}  # Track recording sessions by session_id
 
 # --- Socket.IO Connection Management ---
 @socketio.on('connect')
@@ -1140,11 +1077,6 @@ def handle_disconnect():
             if room in room_participants:
                 if request.sid in room_participants[room]:
                     room_participants[room].remove(request.sid)
-                    # Emit updated count to room
-                    socketio.emit('student_count_update', {
-                        'class_id': room.replace('liveclass_', ''),
-                        'count': len(room_participants[room])
-                    }, room=room)
                     
         del active_sessions[request.sid]
 
@@ -1177,13 +1109,6 @@ def handle_join_room(data):
             
         emit('joined-room', {'room': room, 'session_id': request.sid})
         
-        # Send student count update if it's a live class room
-        if room.startswith('liveclass_'):
-            class_id = room.replace('liveclass_', '')
-            socketio.emit('student_count_update', {
-                'class_id': class_id,
-                'count': len(room_participants[room])
-            }, room=room)
             
         print(f"Client {request.sid} joined room {room}")
         
@@ -1204,13 +1129,6 @@ def handle_leave_room(data):
         if room in room_participants and request.sid in room_participants[room]:
             room_participants[room].remove(request.sid)
             
-            # Send updated count
-            if room.startswith('liveclass_'):
-                class_id = room.replace('liveclass_', '')
-                socketio.emit('student_count_update', {
-                    'class_id': class_id,
-                    'count': len(room_participants[room])
-                }, room=room)
         
         # Update session info
         if request.sid in active_sessions:
@@ -1223,19 +1141,6 @@ def handle_leave_room(data):
     except Exception as e:
         print(f"Error in leave-room: {e}")
 
-@socketio.on('get_student_count')
-def handle_get_student_count(data):
-    try:
-        class_id = data.get('class_id')
-        if class_id:
-            room = f'liveclass_{class_id}'
-            count = len(room_participants.get(room, []))
-            emit('student_count_update', {
-                'class_id': class_id,
-                'count': count
-            })
-    except Exception as e:
-        print(f"Error getting student count: {e}")
 
 # --- WebRTC Signaling ---
 
@@ -1915,7 +1820,6 @@ def api_delete_forum_message(message_id):
     # For now, we'll just return success.
     return jsonify({'success': True})
 
-## Live class routes moved to blueprint `live_class_routes.live_classes_bp`
 
 # Route for authentication (login)
 @app.route('/test-auth')
@@ -2270,7 +2174,7 @@ def admin_panel():
         q = request.args.get('q', '').strip()
         users = search_users(q) if q else get_all_users()
         all_notifications = get_all_notifications()
-        active_classes = get_active_classes()
+        active_classes = []
         # Forum moderation
         forum_q = request.args.get('forum_q', '').strip()
         if forum_q:
@@ -4113,21 +4017,12 @@ def status_management():
     all_notifications = get_all_notifications()
     all_classes = get_all_classes()
     
-    # Get all live classes with status
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('''
-        SELECT id, class_code, pin, meeting_url, topic, description, created_at, status, scheduled_time
-        FROM live_classes 
-        ORDER BY created_at DESC
-    ''')
-    all_live_classes = c.fetchall()
-    conn.close()
+    all_live_classes = []
     
     return render_template('status_management.html', 
                          all_notifications=all_notifications,
                          all_classes=all_classes,
-                         all_live_classes=all_live_classes)
+                         all_status_classes=all_status_classes)
 
 @app.route('/admin/update-notification-status/<int:notification_id>', methods=['POST'])
 def update_notification_status_route(notification_id):
@@ -4479,420 +4374,6 @@ def edit_resource():
         flash(f'Error updating resource: {str(e)}', 'error')
         return redirect(url_for('upload_resource'))
 # --- SOCKET.IO EVENTS FOR CHAT, POLLS AND DOUBTS ---
-@socketio.on('chat_message')
-def handle_chat_message(data):
-    try:
-        class_id = data.get('class_id')
-        user_id = data.get('user_id')
-        username = data.get('username', 'Anonymous')
-        message = data.get('message')
-        message_type = data.get('type', 'chat')  # chat, system, etc.
-        
-        print(f"[Chat] Received chat_message - class_id={class_id}, user_id={user_id}, username={username}")
-        
-        if not class_id or not message:
-            print(f"[Chat] ERROR: Missing required fields - class_id={class_id}, message={bool(message)}")
-            emit('error', {'message': 'Invalid chat data'})
-            return
-        
-        # Store message in database
-        db = get_db()
-        c = db.cursor()
-        c.execute('''
-            INSERT INTO live_class_messages (class_id, user_id, username, message, message_type, created_at) 
-            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-        ''', (class_id, user_id, username, message, message_type))
-        db.commit()
-        message_id = c.lastrowid
-        
-        # Broadcast message to all users in the room
-        message_data = {
-            'id': message_id,
-            'class_id': class_id,
-            'user_id': user_id,
-            'username': username,
-            'message': message,
-            'message_type': message_type,
-            'created_at': datetime.now().isoformat()
-        }
-        
-        room_name = f'liveclass_{class_id}'
-        participants = room_participants.get(room_name, [])
-        print(f"[Chat] Broadcasting new_chat_message to room '{room_name}'")
-        print(f"[Chat] Room has {len(participants)} participants: {participants}")
-        print(f"[Chat] Message: {message[:50]}..." if len(message) > 50 else f"[Chat] Message: {message}")
-        
-        socketio.emit('new_chat_message', message_data, room=room_name)
-        print(f"[Chat] ✅ new_chat_message emitted successfully for class {class_id}")
-        
-    except Exception as e:
-        print(f"[Chat] ❌ ERROR handling chat message: {e}")
-        import traceback
-        traceback.print_exc()
-        emit('error', {'message': 'Failed to send message'})
-
-@socketio.on('get_chat_messages')
-def handle_get_chat_messages(data):
-    try:
-        class_id = data.get('class_id')
-        limit = data.get('limit', 50)
-        
-        if not class_id:
-            emit('error', {'message': 'Class ID required'})
-            return
-        
-        db = get_db()
-        c = db.cursor()
-        c.execute('''
-            SELECT * FROM live_class_messages 
-            WHERE class_id = ? 
-            ORDER BY created_at DESC 
-            LIMIT ?
-        ''', (class_id, limit))
-        
-        messages = []
-        for row in c.fetchall():
-            messages.append({
-                'id': row[0],
-                'class_id': row[1],
-                'user_id': row[2],
-                'username': row[3],
-                'message': row[4],
-                'message_type': row[5],
-                'created_at': row[6]
-            })
-        
-        # Send messages in chronological order
-        messages.reverse()
-        emit('chat_messages_history', {'messages': messages})
-        
-    except Exception as e:
-        print(f"Error getting chat messages: {e}")
-        emit('error', {'message': 'Failed to get chat messages'})
-
-@socketio.on('create_poll')
-def handle_create_poll(data):
-    try:
-        class_id = data.get('class_id')
-        question = data.get('question')
-        options = data.get('options', [])
-        created_by = data.get('created_by', 'host')
-        correct_answer = data.get('correct_answer')
-        duration = data.get('duration', 15)
-        
-        print(f"[Poll] Received create_poll - class_id={class_id}, question='{question[:30]}...', created_by={created_by}")
-        
-        if not class_id or not question or len(options) < 2:
-            print(f"[Poll] ERROR: Invalid poll data - class_id={class_id}, question={bool(question)}, options_count={len(options)}")
-            emit('error', {'message': 'Invalid poll data'})
-            return
-        
-        db = get_db()
-        c = db.cursor()
-        c.execute('INSERT INTO polls (class_id, question, created_by) VALUES (?, ?, ?)', (class_id, question, created_by))
-        poll_id = c.lastrowid
-        
-        for idx, opt in enumerate(options):
-            c.execute('INSERT INTO poll_options (poll_id, option_text) VALUES (?, ?)', (poll_id, opt))
-        db.commit()
-        
-        # Fetch poll with options
-        c.execute('SELECT * FROM polls WHERE id=?', (poll_id,))
-        poll = dict(c.fetchone())
-        c.execute('SELECT id, option_text FROM poll_options WHERE poll_id=?', (poll_id,))
-        poll['options'] = [dict(row) for row in c.fetchall()]
-        poll['correct_answer'] = correct_answer
-        poll['duration'] = duration
-        
-        room_name = f'liveclass_{class_id}'
-        print(f"[Poll] Broadcasting new_poll to room '{room_name}' - poll_id={poll_id}")
-        print(f"[Poll] Room has {len(room_participants.get(room_name, []))} participants")
-        
-        socketio.emit('new_poll', poll, room=room_name)
-        print(f"[Poll] ✅ Poll {poll_id} created and broadcasted for class {class_id}")
-        
-    except Exception as e:
-        print(f"[Poll] ❌ ERROR creating poll: {e}")
-        import traceback
-        traceback.print_exc()
-        emit('error', {'message': 'Failed to create poll'})
-
-@socketio.on('vote_poll')
-def handle_vote_poll(data):
-    poll_id = data.get('poll_id')
-    option_id = data.get('option_id')
-    user_id = data.get('user_id')
-    db = get_db()
-    c = db.cursor()
-    # Prevent double voting
-    c.execute('SELECT * FROM poll_votes WHERE poll_id=? AND user_id=?', (poll_id, user_id))
-    if c.fetchone():
-        return
-    c.execute('INSERT INTO poll_votes (poll_id, option_id, user_id) VALUES (?, ?, ?)', (poll_id, option_id, user_id))
-    db.commit()
-    # Send updated poll results
-    c.execute('SELECT id, option_text FROM poll_options WHERE poll_id=?', (poll_id,))
-    options = [dict(row) for row in c.fetchall()]
-    results = []
-    for opt in options:
-        c.execute('SELECT COUNT(*) as votes FROM poll_votes WHERE option_id=?', (opt['id'],))
-        votes = c.fetchone()['votes']
-        results.append({'option_id': opt['id'], 'option_text': opt['option_text'], 'votes': votes})
-    socketio.emit('poll_results', {'poll_id': poll_id, 'results': results}, room=f'liveclass_{data.get("class_id")}')
-
-@socketio.on('submit_doubt')
-def handle_submit_doubt(data):
-    try:
-        class_id = data.get('class_id')
-        user_id = data.get('user_id')
-        username = data.get('username')
-        doubt_text = data.get('doubt_text')
-        
-        print(f"[Doubt] Received submit_doubt - class_id={class_id}, username={username}, doubt='{doubt_text[:30]}...'")
-        
-        if not class_id or not doubt_text:
-            print(f"[Doubt] ERROR: Missing required fields")
-            emit('error', {'message': 'Invalid doubt data'})
-            return
-        
-        db = get_db()
-        c = db.cursor()
-        c.execute('INSERT INTO doubts (class_id, user_id, username, doubt_text) VALUES (?, ?, ?, ?)', (class_id, user_id, username, doubt_text))
-        db.commit()
-        
-        c.execute('SELECT * FROM doubts WHERE class_id=? ORDER BY created_at ASC', (class_id,))
-        doubts = [dict(row) for row in c.fetchall()]
-        
-        room_name = f'liveclass_{class_id}'
-        print(f"[Doubt] Broadcasting update_doubts to room '{room_name}' - {len(doubts)} total doubts")
-        print(f"[Doubt] Room has {len(room_participants.get(room_name, []))} participants")
-        
-        socketio.emit('update_doubts', {'doubts': doubts}, room=room_name)
-        print(f"[Doubt] ✅ Doubt submitted and broadcasted for class {class_id}")
-        
-    except Exception as e:
-        print(f"[Doubt] ❌ ERROR submitting doubt: {e}")
-        import traceback
-        traceback.print_exc()
-        emit('error', {'message': 'Failed to submit doubt'})
-
-@socketio.on('resolve_doubt')
-def handle_resolve_doubt(data):
-    doubt_id = data.get('doubt_id')
-    class_id = data.get('class_id')
-    db = get_db()
-    c = db.cursor()
-    c.execute('UPDATE doubts SET status="resolved", resolved_at=CURRENT_TIMESTAMP WHERE id=?', (doubt_id,))
-    db.commit()
-    c.execute('SELECT * FROM doubts WHERE class_id=? ORDER BY created_at ASC', (class_id,))
-    doubts = [dict(row) for row in c.fetchall()]
-    socketio.emit('update_doubts', {'doubts': doubts}, room=f'liveclass_{class_id}')
-
-@socketio.on('ignore_doubt')
-def handle_ignore_doubt(data):
-    doubt_id = data.get('doubt_id')
-    class_id = data.get('class_id')
-    db = get_db()
-    c = db.cursor()
-    c.execute('UPDATE doubts SET status="ignored", resolved_at=CURRENT_TIMESTAMP WHERE id=?', (doubt_id,))
-    db.commit()
-    c.execute('SELECT * FROM doubts WHERE class_id=? ORDER BY created_at ASC', (class_id,))
-    doubts = [dict(row) for row in c.fetchall()]
-    socketio.emit('update_doubts', {'doubts': doubts}, room=f'liveclass_{class_id}')
-
-@socketio.on('get_polls_and_doubts')
-def handle_get_polls_and_doubts(data):
-    class_id = data.get('class_id')
-    db = get_db()
-    c = db.cursor()
-    # Polls
-    c.execute('SELECT * FROM polls WHERE class_id=? ORDER BY created_at ASC', (class_id,))
-    polls = [dict(row) for row in c.fetchall()]
-    for poll in polls:
-        c.execute('SELECT id, option_text FROM poll_options WHERE poll_id=?', (poll['id'],))
-        poll['options'] = [dict(row) for row in c.fetchall()]
-    # Doubts
-    c.execute('SELECT * FROM doubts WHERE class_id=? ORDER BY created_at ASC', (class_id,))
-    doubts = [dict(row) for row in c.fetchall()]
-    socketio.emit('init_polls_and_doubts', {'polls': polls, 'doubts': doubts}, room=request.sid)
-
-# New handlers for enhanced live class features
-@socketio.on('end_poll')
-def handle_end_poll(data):
-    try:
-        poll_id = data.get('poll_id')
-        class_id = data.get('class_id')
-        
-        if not poll_id or not class_id:
-            emit('error', {'message': 'Poll ID and Class ID required'})
-            return
-            
-        db = get_db()
-        c = db.cursor()
-        
-        # Get poll results
-        c.execute('SELECT * FROM polls WHERE id=?', (poll_id,))
-        poll = dict(c.fetchone())
-        
-        c.execute('SELECT id, option_text FROM poll_options WHERE poll_id=?', (poll_id,))
-        options = [dict(row) for row in c.fetchall()]
-        
-        results = []
-        for opt in options:
-            c.execute('SELECT COUNT(*) as votes FROM poll_votes WHERE option_id=?', (opt['id'],))
-            votes = c.fetchone()['votes']
-            results.append({
-                'option_id': opt['id'], 
-                'option_text': opt['option_text'], 
-                'votes': votes,
-                'option_index': options.index(opt)
-            })
-        
-        poll_data = {
-            'poll_id': poll_id,
-            'question': poll.get('question'),
-            'results': results,
-            'correct_answer': poll.get('correct_answer'),
-            'class_id': class_id
-        }
-        
-        socketio.emit('poll_ended', poll_data, room=f'liveclass_{class_id}')
-        print(f"Poll {poll_id} ended for class {class_id}")
-        
-    except Exception as e:
-        print(f"Error ending poll: {e}")
-        emit('error', {'message': 'Failed to end poll'})
-
-@socketio.on('host_camera_status')
-def handle_host_camera_status(data):
-    try:
-        class_id = data.get('class_id')
-        status = data.get('status')
-        message = data.get('message')
-        
-        if class_id:
-            socketio.emit('host_camera_status', {
-                'class_id': class_id,
-                'status': status,
-                'message': message
-            }, room=f'liveclass_{class_id}')
-            
-    except Exception as e:
-        print(f"Error broadcasting camera status: {e}")
-
-@socketio.on('host_video_mode')
-def handle_host_video_mode(data):
-    try:
-        class_id = data.get('class_id')
-        mode = data.get('mode')
-        message = data.get('message')
-        
-        if class_id:
-            socketio.emit('host_video_mode', {
-                'class_id': class_id,
-                'mode': mode,
-                'message': message
-            }, room=f'liveclass_{class_id}')
-            
-    except Exception as e:
-        print(f"Error broadcasting video mode: {e}")
-
-@socketio.on('host_mic_status')
-def handle_host_mic_status(data):
-    try:
-        class_id = data.get('class_id')
-        muted = data.get('muted')
-        
-        if class_id:
-            socketio.emit('host_mic_status', {
-                'class_id': class_id,
-                'muted': muted
-            }, room=f'liveclass_{class_id}')
-            
-    except Exception as e:
-        print(f"Error broadcasting mic status: {e}")
-
-# --- WebRTC Signaling Events ---
-@socketio.on('webrtc_offer')
-def handle_webrtc_offer(data):
-    try:
-        class_id = data.get('class_id')
-        offer = data.get('offer')
-        from_user = data.get('from_user')
-        to_user = data.get('to_user')  # Get target user
-        
-        if class_id and offer:
-            # Debug: log the offer
-            print(f"[Signaling] webrtc_offer from {from_user} to {to_user} in class {class_id}, sid={request.sid}")
-            print(f"[Signaling] room participants: {room_participants.get('liveclass_' + str(class_id), [])}")
-            
-            # Broadcast to all users in the room (including host)
-            # Don't skip sender so we can handle targeted delivery
-            socketio.emit('webrtc_offer', {
-                'offer': offer,
-                'from_user': from_user,
-                'to_user': to_user
-            }, room=f'liveclass_{class_id}')
-            print(f"[Signaling] webrtc_offer forwarded to room liveclass_{class_id}")
-    except Exception as e:
-        print(f"Error handling WebRTC offer: {e}")
-
-@socketio.on('webrtc_answer')
-def handle_webrtc_answer(data):
-    try:
-        class_id = data.get('class_id')
-        answer = data.get('answer')
-        from_user = data.get('from_user')
-        to_user = data.get('to_user')  # Get target user
-        
-        if class_id and answer:
-            print(f"[Signaling] webrtc_answer from {from_user} to {to_user} in class {class_id}")
-            
-            # Broadcast the answer to all users in the room
-            socketio.emit('webrtc_answer', {
-                'answer': answer,
-                'from_user': from_user,
-                'to_user': to_user
-            }, room=f'liveclass_{class_id}')
-            print(f"[Signaling] webrtc_answer forwarded to room liveclass_{class_id}")
-    except Exception as e:
-        print(f"Error handling WebRTC answer: {e}")
-
-@socketio.on('webrtc_ice_candidate')
-def handle_webrtc_ice_candidate(data):
-    try:
-        class_id = data.get('class_id')
-        candidate = data.get('candidate')
-        from_user = data.get('from_user')
-        to_user = data.get('to_user')  # Get target user
-        
-        if class_id and candidate:
-            # Broadcast the ICE candidate to all users in the room
-            socketio.emit('webrtc_ice_candidate', {
-                'candidate': candidate,
-                'from_user': from_user,
-                'to_user': to_user
-            }, room=f'liveclass_{class_id}')
-            print(f"[Signaling] WebRTC ICE candidate from {from_user} to {to_user} in class {class_id}")
-    except Exception as e:
-        print(f"Error handling WebRTC ICE candidate: {e}")
-
-@socketio.on('host_stream_ready')
-def handle_host_stream_ready(data):
-    try:
-        class_id = data.get('class_id')
-        
-        if class_id:
-            # Notify all students that host stream is ready
-            socketio.emit('host_stream_ready', {
-                'class_id': class_id,
-                'message': 'Host camera stream is now available'
-            }, room=f'liveclass_{class_id}', skip_sid=request.sid)
-            print(f"Host stream ready notification sent for class {class_id}")
-    except Exception as e:
-        print(f"Error handling host stream ready: {e}")
-
-# Enhanced error handling for Socket.IO
 @socketio.on_error()
 def error_handler(e):
     print(f"Socket.IO error: {e}")
@@ -5972,62 +5453,6 @@ def test_db_state():
         })
     except Exception as e:
         return jsonify({'error': str(e)})
-
-@app.route('/download-recording/<int:recording_id>')
-def download_recording(recording_id):
-    """Download a recorded live class"""
-    try:
-        db = get_db()
-        c = db.cursor()
-        c.execute('''
-            SELECT file_path, recording_name, status 
-            FROM live_class_recordings 
-            WHERE id = ?
-        ''', (recording_id,))
-        
-        row = c.fetchone()
-        if not row:
-            return "Recording not found", 404
-        
-        file_path, recording_name, status = row
-        
-        if status != 'completed':
-            return "Recording not ready for download", 400
-        
-        if not os.path.exists(file_path):
-            return "Recording file not found", 404
-        
-        # Create a safe filename for download
-        safe_filename = secure_filename(f"{recording_name}.webm")
-        
-        return send_file(
-            file_path,
-            as_attachment=True,
-            download_name=safe_filename,
-            mimetype='video/webm'
-        )
-        
-    except Exception as e:
-        print(f"Error downloading recording: {e}")
-        return "Error downloading recording", 500
-
-@app.route('/api/recordings/<class_id>')
-def api_get_class_recordings(class_id):
-    """API endpoint to get recordings for a class"""
-    try:
-        recordings = get_class_recordings(class_id)
-        return jsonify({
-            'success': True,
-            'recordings': recordings
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-## Live class host stream route moved to blueprint `live_class_routes.live_classes_bp`
-
 @app.route('/check-admission-by-ip', methods=['POST'])
 def check_admission_by_ip():
     try:
@@ -6067,213 +5492,6 @@ def check_admission_by_ip():
     return redirect(url_for('check_admission'))
 
 # --- Recording Management Functions ---
-def start_recording_session(class_id, recording_name, created_by):
-    """Start a new recording session for a live class"""
-    try:
-        recording_id = f"rec_{class_id}_{int(time.time())}"
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{recording_name}_{timestamp}.webm"
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'recordings', filename)
-        
-        # Create recording entry in database
-        db = get_db()
-        c = db.cursor()
-        c.execute('''
-            INSERT INTO live_class_recordings 
-            (class_id, recording_name, file_path, status, created_by, metadata) 
-            VALUES (?, ?, ?, 'recording', ?, ?)
-        ''', (class_id, recording_name, file_path, created_by, json.dumps({
-            'started_at': datetime.now().isoformat(),
-            'session_id': recording_id
-        })))
-        db.commit()
-        
-        recording_db_id = c.lastrowid
-        
-        # Track active recording
-        active_recordings[class_id] = {
-            'recording_id': recording_id,
-            'db_id': recording_db_id,
-            'file_path': file_path,
-            'started_at': datetime.now(),
-            'created_by': created_by,
-            'status': 'recording'
-        }
-        
-        print(f"🎥 Started recording session {recording_id} for class {class_id}")
-        return recording_id, recording_db_id
-        
-    except Exception as e:
-        print(f"Error starting recording: {e}")
-        return None, None
-def stop_recording_session(class_id):
-    """Stop an active recording session"""
-    try:
-        if class_id not in active_recordings:
-            return False, "No active recording found"
-        
-        recording_info = active_recordings[class_id]
-        recording_db_id = recording_info['db_id']
-        
-        # Update database
-        db = get_db()
-        c = db.cursor()
-        c.execute('''
-            UPDATE live_class_recordings 
-            SET status = 'completed', ended_at = CURRENT_TIMESTAMP,
-                duration = ?, file_size = ?
-            WHERE id = ?
-        ''', (
-            int((datetime.now() - recording_info['started_at']).total_seconds()),
-            os.path.getsize(recording_info['file_path']) if os.path.exists(recording_info['file_path']) else 0,
-            recording_db_id
-        ))
-        db.commit()
-        
-        # Remove from active recordings
-        del active_recordings[class_id]
-        
-        print(f"🎥 Stopped recording session for class {class_id}")
-        return True, "Recording stopped successfully"
-        
-    except Exception as e:
-        print(f"Error stopping recording: {e}")
-        return False, str(e)
-
-def get_recording_status(class_id):
-    """Get the current recording status for a class"""
-    return active_recordings.get(class_id, None)
-
-def get_class_recordings(class_id):
-    """Get all recordings for a specific class"""
-    try:
-        db = get_db()
-        c = db.cursor()
-        c.execute('''
-            SELECT id, recording_name, file_path, duration, file_size, 
-                   status, started_at, ended_at, created_by, metadata
-            FROM live_class_recordings 
-            WHERE class_id = ? 
-            ORDER BY started_at DESC
-        ''', (class_id,))
-        
-        recordings = []
-        for row in c.fetchall():
-            recordings.append({
-                'id': row[0],
-                'recording_name': row[1],
-                'file_path': row[2],
-                'duration': row[3],
-                'file_size': row[4],
-                'status': row[5],
-                'started_at': row[6],
-                'ended_at': row[7],
-                'created_by': row[8],
-                'metadata': json.loads(row[9]) if row[9] else {}
-            })
-        
-        return recordings
-        
-    except Exception as e:
-        print(f"Error getting recordings: {e}")
-        return []
-
-# --- Recording Socket.IO Events ---
-@socketio.on('start_recording')
-def handle_start_recording(data):
-    try:
-        class_id = data.get('class_id')
-        recording_name = data.get('recording_name', f'Live Class {class_id}')
-        created_by = data.get('created_by', 'host')
-        
-        if not class_id:
-            emit('error', {'message': 'Class ID is required'})
-            return
-        
-        # Check if already recording
-        if class_id in active_recordings:
-            emit('error', {'message': 'Recording already in progress'})
-            return
-        
-        recording_id, db_id = start_recording_session(class_id, recording_name, created_by)
-        
-        if recording_id:
-            # Notify all users in the class
-            socketio.emit('recording_started', {
-                'class_id': class_id,
-                'recording_id': recording_id,
-                'recording_name': recording_name,
-                'started_at': datetime.now().isoformat()
-            }, room=f'liveclass_{class_id}')
-            
-            emit('recording_status', {
-                'status': 'started',
-                'recording_id': recording_id,
-                'message': 'Recording started successfully'
-            })
-        else:
-            emit('error', {'message': 'Failed to start recording'})
-            
-    except Exception as e:
-        print(f"Error in start_recording: {e}")
-        emit('error', {'message': 'Failed to start recording'})
-
-@socketio.on('stop_recording')
-def handle_stop_recording(data):
-    try:
-        class_id = data.get('class_id')
-        
-        if not class_id:
-            emit('error', {'message': 'Class ID is required'})
-            return
-        
-        success, message = stop_recording_session(class_id)
-        
-        if success:
-            # Notify all users in the class
-            socketio.emit('recording_stopped', {
-                'class_id': class_id,
-                'stopped_at': datetime.now().isoformat(),
-                'message': 'Recording stopped'
-            }, room=f'liveclass_{class_id}')
-            
-            emit('recording_status', {
-                'status': 'stopped',
-                'message': message
-            })
-        else:
-            emit('error', {'message': message})
-            
-    except Exception as e:
-        print(f"Error in stop_recording: {e}")
-        emit('error', {'message': 'Failed to stop recording'})
-
-@socketio.on('get_recording_status')
-def handle_get_recording_status(data):
-    try:
-        class_id = data.get('class_id')
-        
-        if not class_id:
-            emit('error', {'message': 'Class ID is required'})
-            return
-        
-        recording_status = get_recording_status(class_id)
-        recordings = get_class_recordings(class_id)
-        
-        emit('recording_status_response', {
-            'class_id': class_id,
-            'active_recording': recording_status,
-            'all_recordings': recordings
-        })
-        
-    except Exception as e:
-        print(f"Error in get_recording_status: {e}")
-        emit('error', {'message': 'Failed to get recording status'})
-
-# ==============================================================================
-# Personal Chat Routes
-# ==============================================================================
-
 @app.route('/personal-chat')
 def personal_chat_page():
     if 'user_id' not in session:
@@ -6474,28 +5692,6 @@ def handle_send_chat_message(data):
                 'timestamp': datetime.now().isoformat()
             }, room=f'user_{receiver_id}')
 
-@socketio.on('request_host_stream')
-def handle_request_host_stream(data):
-    try:
-        class_id = data.get('class_id')
-        
-        if not class_id:
-            emit('error', {'message': 'Class ID is required'})
-            return
-        
-        # Check if host is streaming
-        if class_id in active_recordings:
-            # Host is recording, so they should be streaming
-            emit('host_stream_ready', {
-                'class_id': class_id,
-                'message': 'Host stream is available'
-            })
-        else:
-            emit('error', {'message': 'Host is not currently streaming'})
-            
-    except Exception as e:
-        print(f"Error in request_host_stream: {e}")
-        emit('error', {'message': 'Failed to request host stream'})
 
 # API route for searching users for mentions
 @app.route('/api/forum/search-users', methods=['GET'])
@@ -6711,230 +5907,6 @@ def api_mark_all_notifications_read():
         return jsonify({'success': True, 'message': f'Marked {len(notifications)} notifications as read'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
-
-@socketio.on('chat_status_change')
-def handle_chat_status_change(data):
-    """Handle chat status changes (lock/unlock, public/private)"""
-    try:
-        class_id = data.get('class_id')
-        status = data.get('status')
-        message = data.get('message')
-        
-        if not class_id or not status:
-            emit('error', {'message': 'Invalid chat status data'})
-            return
-        
-        # Broadcast status change to all users in the room
-        status_data = {
-            'class_id': class_id,
-            'status': status,
-            'message': message
-        }
-        
-        socketio.emit('chat_status_change', status_data, room=f'liveclass_{class_id}')
-        print(f"Chat status changed to {status} in class {class_id}")
-        
-    except Exception as e:
-        print(f"Error handling chat status change: {e}")
-        emit('error', {'message': 'Failed to change chat status'})
-
-@socketio.on('chat_cleared')
-def handle_chat_cleared(data):
-    class_id = data.get('class_id')
-    message = data.get('message', 'Chat has been cleared by host')
-    
-    try:
-        # Delete chat messages from database
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('DELETE FROM chat_messages WHERE class_id = ?', (class_id,))
-        conn.commit()
-        conn.close()
-        
-        # Broadcast to all clients in the room
-        cleared_data = {
-            'class_id': class_id,
-            'message': message,
-            'timestamp': datetime.now().isoformat()
-        }
-        emit('chat_cleared', cleared_data, room=f'liveclass_{class_id}')
-        
-    except Exception as e:
-        print(f"Error clearing chat: {e}")
-        emit('error', {'message': 'Failed to clear chat'})
-
-# Benchmark System Socket Events
-@socketio.on('create_section')
-def handle_create_section(data):
-    """Handle creation of benchmark sections by students"""
-    try:
-        section_data = {
-            'id': data.get('id'),
-            'title': data.get('title'),
-            'type': data.get('type'),
-            'content': data.get('content'),
-            'created_at': data.get('created_at'),
-            'class_id': data.get('class_id'),
-            'user_id': request.sid
-        }
-        
-        # Store section in database
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO benchmark_sections (id, title, type, content, created_at, class_id, user_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            section_data['id'],
-            section_data['title'],
-            section_data['type'],
-            section_data['content'],
-            section_data['created_at'],
-            section_data['class_id'],
-            section_data['user_id']
-        ))
-        conn.commit()
-        conn.close()
-        
-        # Broadcast to all clients in the room
-        emit('section_created', section_data, room=f'liveclass_{section_data["class_id"]}')
-        
-    except Exception as e:
-        print(f"Error creating section: {e}")
-        emit('error', {'message': 'Failed to create section'})
-
-@socketio.on('update_section')
-def handle_update_section(data):
-    """Handle updates to benchmark sections"""
-    try:
-        section_data = {
-            'id': data.get('id'),
-            'title': data.get('title'),
-            'type': data.get('type'),
-            'content': data.get('content'),
-            'updated_at': data.get('updated_at'),
-            'class_id': data.get('class_id'),
-            'user_id': request.sid
-        }
-        
-        # Update section in database
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            UPDATE benchmark_sections 
-            SET title = ?, type = ?, content = ?, updated_at = ?
-            WHERE id = ? AND class_id = ?
-        ''', (
-            section_data['title'],
-            section_data['type'],
-            section_data['content'],
-            section_data['updated_at'],
-            section_data['id'],
-            section_data['class_id']
-        ))
-        conn.commit()
-        conn.close()
-        
-        # Broadcast to all clients in the room
-        emit('section_updated', section_data, room=f'liveclass_{section_data["class_id"]}')
-        
-    except Exception as e:
-        print(f"Error updating section: {e}")
-        emit('error', {'message': 'Failed to update section'})
-
-@socketio.on('delete_section')
-def handle_delete_section(data):
-    """Handle deletion of benchmark sections"""
-    try:
-        section_id = data.get('id')
-        class_id = data.get('class_id')
-        
-        # Delete section from database
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('DELETE FROM benchmark_sections WHERE id = ? AND class_id = ?', (section_id, class_id))
-        conn.commit()
-        conn.close()
-        
-        # Broadcast to all clients in the room
-        emit('section_deleted', {'id': section_id, 'class_id': class_id}, room=f'liveclass_{class_id}')
-        
-    except Exception as e:
-        print(f"Error deleting section: {e}")
-        emit('error', {'message': 'Failed to delete section'})
-
-@socketio.on('class_ended')
-def handle_class_ended(data):
-    """Handle class end event from host"""
-    try:
-        class_id = data.get('class_id')
-        
-        # Update class status in database
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            UPDATE live_classes 
-            SET status = 'completed', ended_at = ? 
-            WHERE id = ?
-        ''', (datetime.now().isoformat(), class_id))
-        conn.commit()
-        conn.close()
-        
-        # Broadcast to all clients in the room
-        emit('class_ended', {
-            'class_id': class_id,
-            'ended_at': datetime.now().isoformat(),
-            'message': 'Class has ended by host'
-        }, room=f'liveclass_{class_id}')
-        
-    except Exception as e:
-        print(f"Error ending class: {e}")
-        emit('error', {'message': 'Failed to end class'})
-
-@socketio.on('get_benchmark_sections')
-def handle_get_benchmark_sections(data):
-    """Handle request for benchmark sections"""
-    try:
-        class_id = data.get('class_id')
-        
-        # Get sections from database
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            SELECT id, title, type, content, created_at, updated_at, user_id
-            FROM benchmark_sections 
-            WHERE class_id = ?
-            ORDER BY created_at ASC
-        ''', (class_id,))
-        
-        sections = []
-        for row in cursor.fetchall():
-            sections.append({
-                'id': row[0],
-                'title': row[1],
-                'type': row[2],
-                'content': row[3],
-                'created_at': row[4],
-                'updated_at': row[5],
-                'user_id': row[6]
-            })
-        
-        conn.close()
-        
-        # Send sections to requesting client
-        emit('benchmark_sections_response', {
-            'class_id': class_id,
-            'sections': sections
-        })
-        
-    except Exception as e:
-        print(f"Error getting benchmark sections: {e}")
-        emit('error', {'message': 'Failed to get benchmark sections'})
-
-# Simple in-process cache for resolved file paths to speed up preview lookups
-_PREVIEW_PATH_CACHE = {}
-
-
 def resolve_uploaded_file_path(filename: str) -> Union[str, None]:
     """Resolve a filename to an absolute path inside UPLOAD_FOLDER or its subfolders.
     Results are cached to avoid repeated os.walk scans.
@@ -6982,6 +5954,11 @@ def user_has_access_to_resource(filename: str, role: str) -> bool:
         return bool(row)
     except Exception:
         return False
+
+# Route to handle cached requests from the old loader.js
+@app.route('/modern-navbar-component.html')
+def serve_navbar_component_fallback():
+    return send_from_directory(app.static_folder, 'modern-navbar-component.html')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
